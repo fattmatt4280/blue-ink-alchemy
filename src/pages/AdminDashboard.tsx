@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Navigate } from 'react-router-dom';
 import { LogOut, Save } from 'lucide-react';
+import ImageUpload from '@/components/ImageUpload';
 
 interface SiteContent {
   id: string;
@@ -76,6 +76,10 @@ const AdminDashboard = () => {
     setSaving(false);
   };
 
+  const handleImageUpload = (imageUrl: string, contentId: string) => {
+    updateContent(contentId, imageUrl);
+  };
+
   const handleSignOut = async () => {
     await signOut();
   };
@@ -111,6 +115,10 @@ const AdminDashboard = () => {
     );
   }
 
+  // Separate text content from image content
+  const textContent = content.filter(item => item.type === 'text');
+  const imageContent = content.filter(item => item.type === 'image');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       <div className="max-w-4xl mx-auto">
@@ -126,7 +134,19 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid gap-6">
-          {content.map((item) => (
+          {/* Image Upload Section */}
+          {imageContent.map((item) => (
+            <ImageUpload
+              key={item.id}
+              title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
+              currentImage={item.value}
+              onImageUploaded={(url) => handleImageUpload(url, item.id)}
+            />
+          ))}
+
+          {/* Text Content Section */}
+          {textContent.map((item) => (
             <Card key={item.id}>
               <CardHeader>
                 <CardTitle className="text-lg capitalize">
