@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -208,7 +207,7 @@ const ProductManager = () => {
             <CardTitle>Product Management</CardTitle>
             <CardDescription>Manage your product catalog</CardDescription>
           </div>
-          <Button onClick={() => setShowAddForm(true)} disabled={showAddForm || editingProduct}>
+          <Button onClick={() => setShowAddForm(true)} disabled={showAddForm || editingProduct !== null}>
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>
