@@ -91,6 +91,13 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
     event.target.value = '';
   };
 
+  const handleButtonClick = () => {
+    const fileInput = document.getElementById(`image-upload-${title.replace(/\s+/g, '-')}`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     setDragOver(false);
@@ -111,6 +118,8 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
     event.preventDefault();
     setDragOver(false);
   };
+
+  const inputId = `image-upload-${title.replace(/\s+/g, '-')}`;
 
   return (
     <Card>
@@ -148,23 +157,23 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
             Supports JPG, PNG, GIF up to 10MB
           </p>
           
-          <Label htmlFor="image-upload" className="cursor-pointer">
-            <Button 
-              type="button" 
-              disabled={uploading}
-              className="relative"
-            >
-              {uploading ? 'Uploading...' : 'Select Image'}
-            </Button>
-            <Input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="sr-only"
-              disabled={uploading}
-            />
-          </Label>
+          <Button 
+            type="button" 
+            disabled={uploading}
+            onClick={handleButtonClick}
+            className="relative"
+          >
+            {uploading ? 'Uploading...' : 'Select Image'}
+          </Button>
+          
+          <Input
+            id={inputId}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={uploading}
+          />
         </div>
       </CardContent>
     </Card>
