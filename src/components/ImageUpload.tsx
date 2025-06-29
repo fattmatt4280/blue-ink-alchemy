@@ -30,6 +30,16 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
       return;
     }
 
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image smaller than 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setUploading(true);
     
     try {
@@ -37,11 +47,14 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `uploads/${fileName}`;
 
+      console.log('Uploading file:', fileName);
+
       const { error: uploadError } = await supabase.storage
         .from('site-images')
         .upload(filePath, file);
 
       if (uploadError) {
+        console.error('Upload error:', uploadError);
         throw uploadError;
       }
 
@@ -49,6 +62,7 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
         .from('site-images')
         .getPublicUrl(filePath);
 
+      console.log('Upload successful, public URL:', data.publicUrl);
       onImageUploaded(data.publicUrl);
 
       toast({
@@ -59,7 +73,7 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
       console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your image.",
+        description: error instanceof Error ? error.message : "There was an error uploading your image.",
         variant: "destructive",
       });
     } finally {
@@ -70,8 +84,11 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.type, file.size);
       uploadImage(file);
     }
+    // Reset the input value so the same file can be selected again
+    event.target.value = '';
   };
 
   const handleDrop = (event: React.DragEvent) => {
@@ -80,6 +97,7 @@ const ImageUpload = ({ onImageUploaded, currentImage, title, description }: Imag
     
     const files = event.dataTransfer.files;
     if (files.length > 0) {
+      console.log('File dropped:', files[0].name);
       uploadImage(files[0]);
     }
   };
