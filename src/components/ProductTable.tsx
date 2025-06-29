@@ -43,7 +43,7 @@ const ProductTable = ({ products, onEdit, onDelete, editingProduct, showAddForm 
                 <img 
                   src={product.image_url} 
                   alt={product.name}
-                  className="w-12 h-12 object-cover rounded"
+                  className="w-20 h-32 object-cover rounded"
                 />
               )}
             </TableCell>
