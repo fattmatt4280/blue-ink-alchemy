@@ -125,7 +125,7 @@ const ProductImageUpload = ({ onImageUploaded, currentImage, productName }: Prod
           <img 
             src={currentImage} 
             alt={`${productName} image`} 
-            className="w-full h-48 object-cover rounded-lg"
+            className="w-full h-64 object-cover rounded-lg"
           />
           <div className="mt-2 text-sm text-gray-600">Current image</div>
         </div>
