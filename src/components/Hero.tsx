@@ -1,9 +1,9 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { Link } from "react-router-dom";
+import CartIcon from "./CartIcon";
 
 const Hero = () => {
   const { user, isAdmin } = useAuth();
@@ -25,9 +25,11 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 text-white overflow-hidden">
       <div className="absolute inset-0 bg-black/10"></div>
       
-      {/* Admin Access Button */}
-      {isAdmin && (
-        <div className="absolute top-4 right-4 z-20">
+      {/* Header with Admin and Cart buttons */}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        <CartIcon />
+        
+        {isAdmin && (
           <Link to="/admin">
             <Button 
               size="sm"
@@ -38,12 +40,9 @@ const Hero = () => {
               Admin
             </Button>
           </Link>
-        </div>
-      )}
+        )}
 
-      {/* Login Button for non-authenticated users */}
-      {!user && (
-        <div className="absolute top-4 right-4 z-20">
+        {!user && (
           <Link to="/auth">
             <Button 
               size="sm"
@@ -53,8 +52,8 @@ const Hero = () => {
               Admin Login
             </Button>
           </Link>
-        </div>
-      )}
+        )}
+      </div>
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">

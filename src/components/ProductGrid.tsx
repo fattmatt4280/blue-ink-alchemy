@@ -1,9 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Star } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from "sonner";
 
 interface Product {
   id: string;
@@ -19,6 +20,7 @@ interface Product {
 const ProductGrid = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetchProducts();
@@ -42,6 +44,16 @@ const ProductGrid = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image_url: product.image_url
+    });
+    toast.success(`${product.name} added to cart!`);
   };
 
   if (loading) {
@@ -120,6 +132,7 @@ const ProductGrid = () => {
                   <Button 
                     className="w-full bg-blue-600 hover:bg-blue-700 transition-colors group"
                     size="lg"
+                    onClick={() => handleAddToCart(product)}
                   >
                     <ShoppingCart className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                     Add to Cart
