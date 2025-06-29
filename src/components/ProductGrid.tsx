@@ -1,52 +1,59 @@
 
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Star } from "lucide-react";
+import { supabase } from '@/integrations/supabase/client';
 
-const products = [
-  {
-    id: 1,
-    name: "Blue Dream Budder 1oz",
-    price: 29.99,
-    originalPrice: 34.99,
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center",
-    description: "Perfect for touch-ups and travel",
-    size: "1oz (30ml)",
-    popular: false
-  },
-  {
-    id: 2,
-    name: "Blue Dream Budder 2oz",
-    price: 49.99,
-    originalPrice: 59.99,
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center",
-    description: "Ideal for new tattoos",
-    size: "2oz (60ml)",
-    popular: true
-  },
-  {
-    id: 3,
-    name: "Blue Dream Budder 4oz",
-    price: 79.99,
-    originalPrice: 94.99,
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center",
-    description: "Best value for regular use",
-    size: "4oz (120ml)",
-    popular: false
-  },
-  {
-    id: 4,
-    name: "Blue Dream Budder 8oz",
-    price: 129.99,
-    originalPrice: 159.99,
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center",
-    description: "Professional size for artists",
-    size: "8oz (240ml)",
-    popular: false
-  }
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  original_price: number | null;
+  image_url: string | null;
+  description: string | null;
+  size: string | null;
+  popular: boolean;
+}
 
 const ProductGrid = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching products:', error);
+        return;
+      }
+
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="products" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">Loading products...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="products" className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -72,7 +79,7 @@ const ProductGrid = () => {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden">
                   <img 
-                    src={product.image}
+                    src={product.image_url || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center"}
                     alt={product.name}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -84,8 +91,12 @@ const ProductGrid = () => {
                     <h3 className="text-xl font-medium text-gray-900 mb-1">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-2">{product.size}</p>
-                    <p className="text-gray-700">{product.description}</p>
+                    {product.size && (
+                      <p className="text-sm text-gray-600 mb-2">{product.size}</p>
+                    )}
+                    {product.description && (
+                      <p className="text-gray-700">{product.description}</p>
+                    )}
                   </div>
                   
                   <div className="flex items-center gap-1 mb-3">
@@ -99,9 +110,11 @@ const ProductGrid = () => {
                     <span className="text-2xl font-bold text-gray-900">
                       ${product.price}
                     </span>
-                    <span className="text-lg text-gray-500 line-through">
-                      ${product.originalPrice}
-                    </span>
+                    {product.original_price && (
+                      <span className="text-lg text-gray-500 line-through">
+                        ${product.original_price}
+                      </span>
+                    )}
                   </div>
                   
                   <Button 

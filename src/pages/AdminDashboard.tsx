@@ -7,6 +7,7 @@ import { Navigate } from 'react-router-dom';
 import ImageUpload from '@/components/ImageUpload';
 import AdminHeader from '@/components/AdminHeader';
 import TextContentEditor from '@/components/TextContentEditor';
+import ProductManager from '@/components/ProductManager';
 import AccessDenied from '@/components/AccessDenied';
 
 interface SiteContent {
@@ -104,10 +105,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <AdminHeader onSignOut={handleSignOut} />
 
         <div className="grid gap-6">
+          {/* Product Management Section */}
+          <ProductManager />
+
           {/* Image Upload Section */}
           {imageContent.map((item) => (
             <ImageUpload
