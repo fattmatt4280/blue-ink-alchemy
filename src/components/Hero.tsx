@@ -23,7 +23,7 @@ const Hero = () => {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-700 to-blue-500 text-white overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center text-white overflow-hidden gradient-shift-bg">
       <div className="absolute inset-0 bg-black/20"></div>
       
       {/* Futuristic grid overlay */}
