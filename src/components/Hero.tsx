@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -70,10 +71,18 @@ const Hero = () => {
           )}
         </div>
         
-        <div className="container mx-auto px-4 pr-32 sm:pr-40 md:pr-48 lg:pr-4 relative z-10">
+        {/* Mobile title positioned under header buttons */}
+        <div className="absolute top-16 left-4 right-4 z-10 lg:hidden">
+          <h1 className="text-2xl sm:text-3xl font-light tracking-tight cyber-text text-center">
+            {content.hero_title || 'Blue Dream Budder'}
+          </h1>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left space-y-8">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight cyber-text leading-tight">
+            <div className="text-center lg:text-left space-y-8 mt-16 lg:mt-0">
+              {/* Desktop title - hidden on mobile */}
+              <h1 className="hidden lg:block text-6xl xl:text-7xl font-light tracking-tight cyber-text leading-tight">
                 {content.hero_title || 'Blue Dream Budder'}
               </h1>
               
