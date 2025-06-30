@@ -31,10 +31,10 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-50 to-slate-50">
+    <section className="py-20 futuristic-bg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4">
+          <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4 cyber-text">
             Trusted by Artists & Clients
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -45,11 +45,11 @@ const Testimonials = () => {
         
         <div className="grid md:grid-cols-3 gap-8">
           {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-8">
+            <div key={testimonial.id} className="neon-card rounded-2xl backdrop-blur-sm">
+              <CardContent className="p-8 relative z-10">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-5 h-5 fill-blue-400 text-blue-400" />
                   ))}
                 </div>
                 
@@ -61,7 +61,7 @@ const Testimonials = () => {
                   <img 
                     src={testimonial.image}
                     alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-12 h-12 rounded-full object-cover neon-image"
                   />
                   <div>
                     <div className="font-medium text-gray-900">{testimonial.name}</div>
@@ -69,7 +69,7 @@ const Testimonials = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </div>
           ))}
         </div>
       </div>
