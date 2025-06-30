@@ -9,6 +9,12 @@ import { Link } from "react-router-dom";
 const Checkout = () => {
   const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart();
 
+  const subtotal = getTotalPrice();
+  const shipping = 9.99;
+  const taxRate = 0.085; // 8.5% sales tax
+  const salesTax = subtotal * taxRate;
+  const total = subtotal + shipping + salesTax;
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
@@ -104,16 +110,20 @@ const Checkout = () => {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
-                    <span className="font-semibold">${getTotalPrice().toFixed(2)}</span>
+                    <span className="font-semibold">${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping:</span>
-                    <span className="font-semibold">Free</span>
+                    <span className="font-semibold">${shipping.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Sales Tax (8.5%):</span>
+                    <span className="font-semibold">${salesTax.toFixed(2)}</span>
                   </div>
                   <div className="border-t pt-4">
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total:</span>
-                      <span>${getTotalPrice().toFixed(2)}</span>
+                      <span>${total.toFixed(2)}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -142,7 +152,7 @@ const Checkout = () => {
                   className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
                   size="lg"
                 >
-                  Complete Order - ${getTotalPrice().toFixed(2)}
+                  Complete Order - ${total.toFixed(2)}
                 </Button>
                 <Button 
                   variant="outline" 
