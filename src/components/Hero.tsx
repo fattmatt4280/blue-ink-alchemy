@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -71,18 +70,18 @@ const Hero = () => {
           )}
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 pr-32 sm:pr-40 md:pr-48 lg:pr-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left space-y-8 pr-0 lg:pr-16">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight cyber-text leading-tight">
+            <div className="text-center lg:text-left space-y-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight cyber-text leading-tight">
                 {content.hero_title || 'Blue Dream Budder'}
               </h1>
               
-              <p className="text-xl sm:text-2xl lg:text-3xl font-light opacity-90 leading-relaxed cyber-text">
+              <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-light opacity-90 leading-relaxed cyber-text">
                 {content.hero_subtitle || 'For Ink. For Skin. For Life.'}
               </p>
               
-              <p className="text-base sm:text-lg opacity-80 max-w-md mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg opacity-80 max-w-md mx-auto lg:mx-0 leading-relaxed">
                 {content.hero_description || 'Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients for optimal healing and skin restoration.'}
               </p>
               
