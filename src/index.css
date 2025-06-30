@@ -109,34 +109,34 @@ All colors MUST be HSL.
 @keyframes neonPulse {
   0%, 100% { 
     box-shadow: 
-      0 0 5px rgba(147, 197, 253, 0.4),
-      0 0 10px rgba(147, 197, 253, 0.3),
-      0 0 15px rgba(59, 130, 246, 0.2),
-      0 0 20px rgba(29, 78, 216, 0.1);
+      0 0 3px rgba(147, 197, 253, 0.4),
+      0 0 6px rgba(147, 197, 253, 0.3),
+      0 0 9px rgba(59, 130, 246, 0.2),
+      0 0 12px rgba(29, 78, 216, 0.1);
     border-color: rgba(147, 197, 253, 0.6);
   }
   25% { 
     box-shadow: 
-      0 0 10px rgba(96, 165, 250, 0.6),
-      0 0 20px rgba(59, 130, 246, 0.4),
-      0 0 30px rgba(37, 99, 235, 0.3),
-      0 0 40px rgba(29, 78, 216, 0.2);
+      0 0 5px rgba(96, 165, 250, 0.6),
+      0 0 10px rgba(59, 130, 246, 0.4),
+      0 0 15px rgba(37, 99, 235, 0.3),
+      0 0 20px rgba(29, 78, 216, 0.2);
     border-color: rgba(96, 165, 250, 0.8);
   }
   50% { 
     box-shadow: 
-      0 0 15px rgba(59, 130, 246, 0.8),
-      0 0 30px rgba(37, 99, 235, 0.6),
-      0 0 45px rgba(29, 78, 216, 0.4),
-      0 0 60px rgba(30, 64, 175, 0.3);
+      0 0 8px rgba(59, 130, 246, 0.8),
+      0 0 15px rgba(37, 99, 235, 0.6),
+      0 0 22px rgba(29, 78, 216, 0.4),
+      0 0 30px rgba(30, 64, 175, 0.3);
     border-color: rgba(59, 130, 246, 1);
   }
   75% { 
     box-shadow: 
-      0 0 20px rgba(37, 99, 235, 0.9),
-      0 0 40px rgba(29, 78, 216, 0.7),
-      0 0 60px rgba(30, 64, 175, 0.5),
-      0 0 80px rgba(30, 58, 138, 0.3);
+      0 0 10px rgba(37, 99, 235, 0.9),
+      0 0 20px rgba(29, 78, 216, 0.7),
+      0 0 30px rgba(30, 64, 175, 0.5),
+      0 0 40px rgba(30, 58, 138, 0.3);
     border-color: rgba(37, 99, 235, 1);
   }
 }
@@ -187,8 +187,8 @@ All colors MUST be HSL.
   animation: neonGlow 2s ease-in-out infinite;
   border: 2px solid rgba(147, 197, 253, 0.3);
   box-shadow: 
-    0 0 10px rgba(59, 130, 246, 0.2),
-    inset 0 0 10px rgba(147, 197, 253, 0.1);
+    0 0 5px rgba(59, 130, 246, 0.2),
+    inset 0 0 5px rgba(147, 197, 253, 0.1);
 }
 
 .futuristic-bg {
@@ -199,7 +199,7 @@ All colors MUST be HSL.
 }
 
 .cyber-text {
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  text-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
 }
 
 .neon-button {
@@ -211,8 +211,8 @@ All colors MUST be HSL.
 
 .neon-button:hover {
   box-shadow: 
-    0 0 15px rgba(59, 130, 246, 0.4),
-    0 0 30px rgba(37, 99, 235, 0.2);
+    0 0 8px rgba(59, 130, 246, 0.4),
+    0 0 15px rgba(37, 99, 235, 0.2);
   border-color: rgba(59, 130, 246, 0.6);
   transform: translateY(-2px);
 }
