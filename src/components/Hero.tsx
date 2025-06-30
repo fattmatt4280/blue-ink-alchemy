@@ -98,7 +98,7 @@ const Hero = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="neon-button border-red-500 text-white hover:bg-white/10 hover:text-white transition-all duration-300 px-8 py-6 text-lg backdrop-blur-sm"
+                  className="border-2 border-red-500 text-white hover:bg-red-500/10 hover:text-white hover:border-red-400 transition-all duration-300 px-8 py-6 text-lg backdrop-blur-sm bg-transparent"
                   onClick={() => setShowEmailPopup(true)}
                 >
                   Get 10% Off
