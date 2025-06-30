@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -97,7 +98,7 @@ const Hero = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="neon-button border-white/50 text-white hover:bg-white/10 hover:text-white transition-all duration-300 px-8 py-6 text-lg backdrop-blur-sm"
+                  className="neon-button border-red-500 text-white hover:bg-white/10 hover:text-white transition-all duration-300 px-8 py-6 text-lg backdrop-blur-sm"
                   onClick={() => setShowEmailPopup(true)}
                 >
                   Get 10% Off
