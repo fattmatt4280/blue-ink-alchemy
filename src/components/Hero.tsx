@@ -86,7 +86,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button 
                 size="lg" 
-                className="bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-6 text-lg font-black shadow-lg hover:shadow-xl border-2 border-blue-200"
+                className="bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-6 text-lg font-black shadow-lg hover:shadow-xl border-2 border-blue-200 animate-pulse hover:animate-none"
                 onClick={scrollToProducts}
               >
                 Shop Now
