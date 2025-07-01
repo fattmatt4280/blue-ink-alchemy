@@ -3,17 +3,77 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
-import { Minus, Plus, Trash2, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Minus, Plus, Trash2, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart();
+  const [searchParams] = useSearchParams();
+  const success = searchParams.get('success');
+  const cancelled = searchParams.get('cancelled');
+
+  useEffect(() => {
+    if (success === 'true') {
+      toast.success("Subscription created successfully!");
+      clearCart();
+    } else if (cancelled === 'true') {
+      toast.info("Subscription setup was cancelled.");
+    }
+  }, [success, cancelled, clearCart]);
 
   const subtotal = getTotalPrice();
   const shipping = 9.99;
   const taxRate = 0.085; // 8.5% sales tax
   const salesTax = subtotal * taxRate;
   const total = subtotal + shipping + salesTax;
+
+  if (success === 'true') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold mb-4 text-green-800">Subscription Created!</h1>
+            <p className="text-gray-600 mb-8">
+              Thank you for subscribing! You'll receive your monthly delivery soon. 
+              Check your email for subscription details and management options.
+            </p>
+            <Link to="/">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (cancelled === 'true') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <XCircle className="w-16 h-16 text-orange-500 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold mb-4 text-orange-800">Subscription Cancelled</h1>
+            <p className="text-gray-600 mb-8">
+              Your subscription setup was cancelled. No charges were made. 
+              You can try again anytime!
+            </p>
+            <Link to="/">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

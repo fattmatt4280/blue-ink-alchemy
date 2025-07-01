@@ -66,6 +66,62 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          email: string
+          id: string
+          is_guest: boolean | null
+          product_id: string | null
+          shipping_info: Json | null
+          status: string | null
+          stripe_session_id: string | null
+          subscription_discount: boolean | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          email: string
+          id?: string
+          is_guest?: boolean | null
+          product_id?: string | null
+          shipping_info?: Json | null
+          status?: string | null
+          stripe_session_id?: string | null
+          subscription_discount?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          email?: string
+          id?: string
+          is_guest?: boolean | null
+          product_id?: string | null
+          shipping_info?: Json | null
+          status?: string | null
+          stripe_session_id?: string | null
+          subscription_discount?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           created_at: string
@@ -153,6 +209,42 @@ export type Database = {
           type?: string | null
           updated_at?: string | null
           value?: string
+        }
+        Relationships: []
+      }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
