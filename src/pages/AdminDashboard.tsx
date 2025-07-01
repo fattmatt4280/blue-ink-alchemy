@@ -8,6 +8,7 @@ import ImageUpload from '@/components/ImageUpload';
 import AdminHeader from '@/components/AdminHeader';
 import TextContentEditor from '@/components/TextContentEditor';
 import ProductManager from '@/components/ProductManager';
+import ProductReorderTool from '@/components/ProductReorderTool';
 import AccessDenied from '@/components/AccessDenied';
 
 interface SiteContent {
@@ -111,6 +112,9 @@ const AdminDashboard = () => {
         <div className="grid gap-6">
           {/* Product Management Section */}
           <ProductManager />
+
+          {/* Product Reorder Tool */}
+          <ProductReorderTool />
 
           {/* Image Upload Section */}
           {imageContent.map((item) => (
