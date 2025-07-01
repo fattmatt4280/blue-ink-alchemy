@@ -92,10 +92,13 @@ const RevenueChart = ({ timeRange }: RevenueChartProps) => {
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip 
-                formatter={(value, name) => [
-                  name === 'revenue' ? `$${value.toFixed(2)}` : value,
-                  name === 'revenue' ? 'Revenue' : 'Orders'
-                ]}
+                formatter={(value, name) => {
+                  const numValue = typeof value === 'number' ? value : parseFloat(value as string);
+                  return [
+                    name === 'revenue' ? `$${numValue.toFixed(2)}` : numValue,
+                    name === 'revenue' ? 'Revenue' : 'Orders'
+                  ];
+                }}
               />
               <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2} />
               <Line type="monotone" dataKey="orders" stroke="#3b82f6" strokeWidth={2} />
