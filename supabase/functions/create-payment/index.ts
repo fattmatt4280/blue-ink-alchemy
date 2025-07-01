@@ -28,43 +28,71 @@ serve(async (req) => {
     logStep("Function started");
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not found");
+      throw new Error("STRIPE_SECRET_KEY is not set");
+    }
+    logStep("Stripe key found");
 
     const body = await req.json();
+    logStep("Request body received", { 
+      hasItems: !!body.items, 
+      itemCount: body.items?.length,
+      hasShippingInfo: !!body.shippingInfo,
+      hasTotals: !!body.totals
+    });
+
     const { items, shippingInfo, totals } = body;
 
-    logStep("Request data", { itemCount: items?.length, total: totals?.total });
-
     if (!items || items.length === 0) {
+      logStep("ERROR: No items in request");
       throw new Error("No items in cart");
     }
 
     if (!shippingInfo?.email) {
+      logStep("ERROR: No email in shipping info");
       throw new Error("Email is required");
     }
+
+    if (!shippingInfo?.firstName || !shippingInfo?.lastName || !shippingInfo?.address || !shippingInfo?.city || !shippingInfo?.zipCode) {
+      logStep("ERROR: Missing required shipping info");
+      throw new Error("All shipping information is required");
+    }
+
+    logStep("Validation passed", { 
+      email: shippingInfo.email, 
+      itemCount: items.length,
+      totalAmount: totals?.total 
+    });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
     // Check if customer exists
+    logStep("Checking for existing customer", { email: shippingInfo.email });
     const customers = await stripe.customers.list({ email: shippingInfo.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
       logStep("Existing customer found", { customerId });
+    } else {
+      logStep("No existing customer found");
     }
 
     // Create line items for Stripe
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.name,
-          images: item.image_url ? [item.image_url] : [],
+    const lineItems = items.map((item: any) => {
+      logStep("Processing item", { name: item.name, price: item.price, quantity: item.quantity });
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name,
+            images: item.image_url ? [item.image_url] : [],
+          },
+          unit_amount: Math.round(item.price * 100), // Convert to cents
         },
-        unit_amount: Math.round(item.price * 100), // Convert to cents
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
     // Add shipping as a line item
     lineItems.push({
@@ -81,6 +109,7 @@ serve(async (req) => {
     logStep("Line items created", { count: lineItems.length });
 
     // Create checkout session
+    logStep("Creating Stripe checkout session");
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : shippingInfo.email,
@@ -100,20 +129,26 @@ serve(async (req) => {
       }
     });
 
-    logStep("Stripe session created", { sessionId: session.id });
+    logStep("Stripe session created successfully", { sessionId: session.id, url: session.url });
 
     // Create order record
-    await supabaseClient.from("orders").insert({
+    logStep("Creating order record in database");
+    const { data: orderData, error: orderError } = await supabaseClient.from("orders").insert({
       email: shippingInfo.email,
       stripe_session_id: session.id,
-      amount: totals.total,
+      amount: totals?.total ? Math.round(totals.total * 100) : Math.round((items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 9.99) * 100),
       shipping_info: shippingInfo,
       status: 'pending',
       is_guest: true,
       currency: 'usd'
     });
 
-    logStep("Order record created");
+    if (orderError) {
+      logStep("ERROR creating order record", { error: orderError });
+      throw new Error(`Failed to create order record: ${orderError.message}`);
+    }
+
+    logStep("Order record created successfully");
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -121,7 +156,7 @@ serve(async (req) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
+    logStep("ERROR in create-payment function", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
