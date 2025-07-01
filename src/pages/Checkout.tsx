@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
-import { Minus, Plus, Trash2, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Minus, Plus, Trash2, ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const Checkout = () => {
@@ -13,13 +14,22 @@ const Checkout = () => {
   const [searchParams] = useSearchParams();
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
+  const [loading, setLoading] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    address: '',
+    city: '',
+    zipCode: '',
+  });
 
   useEffect(() => {
     if (success === 'true') {
-      toast.success("Subscription created successfully!");
+      toast.success("Order completed successfully!");
       clearCart();
     } else if (cancelled === 'true') {
-      toast.info("Subscription setup was cancelled.");
+      toast.info("Order was cancelled.");
     }
   }, [success, cancelled, clearCart]);
 
@@ -29,16 +39,59 @@ const Checkout = () => {
   const salesTax = subtotal * taxRate;
   const total = subtotal + shipping + salesTax;
 
+  const handleCompleteOrder = async () => {
+    if (!shippingInfo.firstName || !shippingInfo.lastName || !shippingInfo.email || !shippingInfo.address || !shippingInfo.city || !shippingInfo.zipCode) {
+      toast.error("Please fill in all shipping information");
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          items: items,
+          shippingInfo: shippingInfo,
+          totals: {
+            subtotal: Math.round(subtotal * 100), // Convert to cents
+            shipping: Math.round(shipping * 100),
+            tax: Math.round(salesTax * 100),
+            total: Math.round(total * 100)
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error("Failed to process payment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShippingChange = (field: keyof typeof shippingInfo, value: string) => {
+    setShippingInfo(prev => ({ ...prev, [field]: value }));
+  };
+
   if (success === 'true') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold mb-4 text-green-800">Subscription Created!</h1>
+            <h1 className="text-3xl font-bold mb-4 text-green-800">Order Completed!</h1>
             <p className="text-gray-600 mb-8">
-              Thank you for subscribing! You'll receive your monthly delivery soon. 
-              Check your email for subscription details and management options.
+              Thank you for your order! You'll receive an email confirmation shortly with your order details and tracking information.
             </p>
             <Link to="/">
               <Button className="bg-blue-600 hover:bg-blue-700">
@@ -58,9 +111,9 @@ const Checkout = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <XCircle className="w-16 h-16 text-orange-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold mb-4 text-orange-800">Subscription Cancelled</h1>
+            <h1 className="text-3xl font-bold mb-4 text-orange-800">Order Cancelled</h1>
             <p className="text-gray-600 mb-8">
-              Your subscription setup was cancelled. No charges were made. 
+              Your order was cancelled. No charges were made. 
               You can try again anytime!
             </p>
             <Link to="/">
@@ -195,14 +248,45 @@ const Checkout = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="First Name" />
-                    <Input placeholder="Last Name" />
+                    <Input 
+                      placeholder="First Name" 
+                      value={shippingInfo.firstName}
+                      onChange={(e) => handleShippingChange('firstName', e.target.value)}
+                      required
+                    />
+                    <Input 
+                      placeholder="Last Name" 
+                      value={shippingInfo.lastName}
+                      onChange={(e) => handleShippingChange('lastName', e.target.value)}
+                      required
+                    />
                   </div>
-                  <Input placeholder="Email" type="email" />
-                  <Input placeholder="Address" />
+                  <Input 
+                    placeholder="Email" 
+                    type="email"
+                    value={shippingInfo.email}
+                    onChange={(e) => handleShippingChange('email', e.target.value)}
+                    required
+                  />
+                  <Input 
+                    placeholder="Address" 
+                    value={shippingInfo.address}
+                    onChange={(e) => handleShippingChange('address', e.target.value)}
+                    required
+                  />
                   <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="City" />
-                    <Input placeholder="ZIP Code" />
+                    <Input 
+                      placeholder="City" 
+                      value={shippingInfo.city}
+                      onChange={(e) => handleShippingChange('city', e.target.value)}
+                      required
+                    />
+                    <Input 
+                      placeholder="ZIP Code" 
+                      value={shippingInfo.zipCode}
+                      onChange={(e) => handleShippingChange('zipCode', e.target.value)}
+                      required
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -211,13 +295,23 @@ const Checkout = () => {
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
                   size="lg"
+                  onClick={handleCompleteOrder}
+                  disabled={loading}
                 >
-                  Complete Order - ${total.toFixed(2)}
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    `Complete Order - $${total.toFixed(2)}`
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full"
                   onClick={clearCart}
+                  disabled={loading}
                 >
                   Clear Cart
                 </Button>
