@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Save, Upload } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface SiteContent {
   id: string;
@@ -23,6 +25,9 @@ interface TestimonialsEditorProps {
 }
 
 const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: TestimonialsEditorProps) => {
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const { toast } = useToast();
+
   const handleInputChange = (id: string, value: string) => {
     onContentUpdate(
       content.map(c => 
@@ -37,6 +42,85 @@ const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: Testim
 
   const getContentId = (key: string) => {
     return content.find(c => c.key === key)?.id || '';
+  };
+
+  const uploadImage = async (file: File, imageKey: string) => {
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image smaller than 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(prev => ({ ...prev, [imageKey]: true }));
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `testimonials/${fileName}`;
+
+      console.log('Uploading testimonial image:', fileName);
+
+      const { error: uploadError } = await supabase.storage
+        .from('site-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('site-images')
+        .getPublicUrl(filePath);
+
+      console.log('Testimonial image upload successful, public URL:', data.publicUrl);
+      
+      // Update the content with the new image URL
+      const contentId = getContentId(imageKey);
+      handleInputChange(contentId, data.publicUrl);
+
+      toast({
+        title: "Image uploaded!",
+        description: "Profile image has been uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "There was an error uploading your image.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(prev => ({ ...prev, [imageKey]: false }));
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>, imageKey: string) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log('Testimonial image file selected:', file.name, file.type, file.size);
+      uploadImage(file, imageKey);
+    }
+    event.target.value = '';
+  };
+
+  const handleUploadClick = (imageKey: string) => {
+    const fileInput = document.getElementById(`testimonial-image-${imageKey}`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
   };
 
   const testimonialNumbers = [1, 2, 3];
@@ -81,21 +165,36 @@ const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: Testim
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Profile Image URL</Label>
+                    <Label>Profile Image</Label>
                     <div className="flex gap-2">
                       <Input
                         value={getContentValue(imageKey)}
                         onChange={(e) => handleInputChange(getContentId(imageKey), e.target.value)}
-                        placeholder="https://..."
+                        placeholder="https://... or upload an image"
                       />
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        type="button"
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleUploadClick(imageKey)}
+                        disabled={uploading[imageKey]}
+                      >
                         <Upload className="w-4 h-4" />
+                        {uploading[imageKey] ? 'Uploading...' : 'Upload'}
                       </Button>
+                      <Input
+                        id={`testimonial-image-${imageKey}`}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileSelect(e, imageKey)}
+                        className="hidden"
+                        disabled={uploading[imageKey]}
+                      />
                     </div>
                     {getContentValue(imageKey) && (
                       <img 
                         src={getContentValue(imageKey)} 
-                        alt="Preview" 
+                        alt="Profile preview" 
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     )}
