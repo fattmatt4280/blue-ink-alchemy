@@ -29,11 +29,11 @@ CREATE POLICY "Public can view products"
   TO anon, authenticated
   USING (true);
 
--- Insert initial product data
+-- Insert initial product data in the requested order
 INSERT INTO public.products (name, price, original_price, image_url, description, size, popular) VALUES
+('Blue Dream Budder Baby', 19.99, 24.99, 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center', 'Perfect for small touch-ups', 'Baby (0.5oz)', false),
 ('Blue Dream Budder 1oz', 29.99, 34.99, 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center', 'Perfect for touch-ups and travel', '1oz (30ml)', false),
 ('Blue Dream Budder 2oz', 49.99, 59.99, 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center', 'Ideal for new tattoos', '2oz (60ml)', true),
-('Blue Dream Budder 4oz', 79.99, 94.99, 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center', 'Best value for regular use', '4oz (120ml)', false),
 ('Blue Dream Budder 8oz', 129.99, 159.99, 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=300&fit=crop&crop=center', 'Professional size for artists', '8oz (240ml)', false);
 
 -- Create storage bucket for product images
