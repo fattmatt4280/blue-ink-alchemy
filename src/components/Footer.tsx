@@ -1,8 +1,38 @@
 
 import { Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 const Footer = () => {
+  const { content, loading } = useSiteContent();
+
+  if (loading) {
+    return (
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center">Loading...</div>
+        </div>
+      </footer>
+    );
+  }
+
+  const quickLinks = [];
+  const supportLinks = [];
+
+  for (let i = 1; i <= 5; i++) {
+    const quickLinkName = content[`quick_link_${i}_name`];
+    const quickLinkUrl = content[`quick_link_${i}_url`];
+    if (quickLinkName && quickLinkUrl) {
+      quickLinks.push({ name: quickLinkName, url: quickLinkUrl });
+    }
+
+    const supportLinkName = content[`support_link_${i}_name`];
+    const supportLinkUrl = content[`support_link_${i}_url`];
+    if (supportLinkName && supportLinkUrl) {
+      supportLinks.push({ name: supportLinkName, url: supportLinkUrl });
+    }
+  }
+
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
@@ -28,25 +58,29 @@ const Footer = () => {
           
           {/* Quick Links */}
           <div>
-            <h4 className="font-medium mb-4">Quick Links</h4>
+            <h4 className="font-medium mb-4">{content.quick_links_title || 'Quick Links'}</h4>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="#" className="hover:text-white transition-colors">Shop All</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Ingredients</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">How to Use</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Reviews</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Wholesale</a></li>
+              {quickLinks.map((link, index) => (
+                <li key={index}>
+                  <Link to={link.url} className="hover:text-white transition-colors">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           
           {/* Support */}
           <div>
-            <h4 className="font-medium mb-4">Support</h4>
+            <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Returns</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Size Guide</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+              {supportLinks.map((link, index) => (
+                <li key={index}>
+                  <Link to={link.url} className="hover:text-white transition-colors">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -57,7 +91,7 @@ const Footer = () => {
             <div className="flex flex-wrap gap-6 text-sm text-gray-400">
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-              <a href="#" className="hover:text-white transition-colors">Refund Policy</a>
+              <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
             </div>
             
             <div className="text-sm text-gray-400">

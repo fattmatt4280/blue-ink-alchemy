@@ -11,6 +11,7 @@ import ProductManager from '@/components/ProductManager';
 import ProductReorderTool from '@/components/ProductReorderTool';
 import IngredientsEditor from '@/components/IngredientsEditor';
 import TestimonialsEditor from '@/components/TestimonialsEditor';
+import FooterLinksEditor from '@/components/FooterLinksEditor';
 import AccessDenied from '@/components/AccessDenied';
 
 interface SiteContent {
@@ -107,6 +108,8 @@ const AdminDashboard = () => {
     item.type === 'text' && 
     !item.key.startsWith('ingredient_') && 
     !item.key.startsWith('testimonial_') &&
+    !item.key.startsWith('quick_link') &&
+    !item.key.startsWith('support_') &&
     item.key !== 'ingredients_title' &&
     item.key !== 'ingredients_subtitle'
   );
@@ -117,6 +120,11 @@ const AdminDashboard = () => {
     item.key === 'ingredients_subtitle'
   );
   const testimonialsContent = content.filter(item => item.key.startsWith('testimonial_'));
+  const footerLinksContent = content.filter(item => 
+    item.key.startsWith('quick_link') || 
+    item.key.startsWith('support_') ||
+    item.key === 'quick_links_title'
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
@@ -141,6 +149,14 @@ const AdminDashboard = () => {
           {/* Testimonials Editor */}
           <TestimonialsEditor
             content={testimonialsContent}
+            onContentUpdate={setContent}
+            onSave={updateContent}
+            saving={saving}
+          />
+
+          {/* Footer Links Editor */}
+          <FooterLinksEditor
+            content={footerLinksContent}
             onContentUpdate={setContent}
             onSave={updateContent}
             saving={saving}

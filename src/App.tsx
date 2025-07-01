@@ -12,6 +12,11 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Checkout from "./pages/Checkout";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Shop from "./pages/Shop";
+import HowToUse from "./pages/HowToUse";
+import Reviews from "./pages/Reviews";
+import Wholesale from "./pages/Wholesale";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +36,11 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/how-to-use" element={<HowToUse />} />
+              <Route path="/reviews" element={<Reviews />} />
+              <Route path="/wholesale" element={<Wholesale />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
