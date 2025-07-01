@@ -6,6 +6,7 @@ import Ingredients from "@/components/Ingredients";
 import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import AIAssistant from "@/components/AIAssistant";
 
 const Index = () => {
   return (
@@ -17,6 +18,7 @@ const Index = () => {
       <FAQ />
       <Newsletter />
       <Footer />
+      <AIAssistant />
     </div>
   );
 };
