@@ -16,6 +16,7 @@ export interface ProductFormData {
   size: string;
   popular: boolean;
   image_url: string;
+  stripe_price_id: string;
 }
 
 interface Product {
@@ -27,6 +28,7 @@ interface Product {
   description: string | null;
   size: string | null;
   popular: boolean;
+  stripe_price_id: string | null;
 }
 
 interface ProductFormProps {
@@ -103,6 +105,19 @@ const ProductForm = ({
               placeholder="34.99"
             />
           </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="stripe_price_id">Stripe Price ID</Label>
+          <Input
+            id="stripe_price_id"
+            value={formData.stripe_price_id}
+            onChange={(e) => setFormData(prev => ({ ...prev, stripe_price_id: e.target.value }))}
+            placeholder="price_1234567890abcdef"
+          />
+          <p className="text-sm text-gray-500">
+            Optional: If provided, Stripe will handle pricing and tax calculations automatically
+          </p>
         </div>
         
         <div className="space-y-2">

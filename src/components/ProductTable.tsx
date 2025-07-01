@@ -12,6 +12,7 @@ interface Product {
   description: string | null;
   size: string | null;
   popular: boolean;
+  stripe_price_id: string | null;
 }
 
 interface ProductTableProps {
@@ -31,6 +32,7 @@ const ProductTable = ({ products, onEdit, onDelete, editingProduct, showAddForm 
           <TableHead>Name</TableHead>
           <TableHead>Size</TableHead>
           <TableHead>Price</TableHead>
+          <TableHead>Stripe Price ID</TableHead>
           <TableHead>Popular</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
@@ -58,6 +60,15 @@ const ProductTable = ({ products, onEdit, onDelete, editingProduct, showAddForm 
                   </span>
                 )}
               </div>
+            </TableCell>
+            <TableCell>
+              {product.stripe_price_id ? (
+                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                  {product.stripe_price_id}
+                </code>
+              ) : (
+                <span className="text-gray-400 text-sm">Not set</span>
+              )}
             </TableCell>
             <TableCell>
               {product.popular && (

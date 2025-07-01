@@ -13,6 +13,7 @@ interface Product {
   description: string | null;
   size: string | null;
   popular: boolean;
+  stripe_price_id: string | null;
 }
 
 export const useProductManager = () => {
@@ -30,7 +31,8 @@ export const useProductManager = () => {
     description: '',
     size: '',
     popular: false,
-    image_url: ''
+    image_url: '',
+    stripe_price_id: ''
   });
 
   useEffect(() => {
@@ -67,7 +69,8 @@ export const useProductManager = () => {
       description: product.description || '',
       size: product.size || '',
       popular: product.popular,
-      image_url: product.image_url || ''
+      image_url: product.image_url || '',
+      stripe_price_id: product.stripe_price_id || ''
     });
   };
 
@@ -91,6 +94,7 @@ export const useProductManager = () => {
         size: formData.size || null,
         popular: formData.popular,
         image_url: formData.image_url || null,
+        stripe_price_id: formData.stripe_price_id || null,
         updated_at: new Date().toISOString()
       };
 
@@ -169,7 +173,8 @@ export const useProductManager = () => {
       description: '',
       size: '',
       popular: false,
-      image_url: ''
+      image_url: '',
+      stripe_price_id: ''
     });
   };
 
