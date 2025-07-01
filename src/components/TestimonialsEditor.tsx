@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +41,16 @@ const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: Testim
 
   const getContentId = (key: string) => {
     return content.find(c => c.key === key)?.id || '';
+  };
+
+  const saveAllTestimonialFields = async (keys: string[]) => {
+    for (const key of keys) {
+      const id = getContentId(key);
+      const value = getContentValue(key);
+      if (id && value !== undefined) {
+        await onSave(id, value);
+      }
+    }
   };
 
   const uploadImage = async (file: File, imageKey: string) => {
@@ -139,6 +148,7 @@ const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: Testim
             const imageKey = `testimonial_${num}_image`;
             const contentKey = `testimonial_${num}_content`;
             const ratingKey = `testimonial_${num}_rating`;
+            const allKeys = [nameKey, roleKey, imageKey, contentKey, ratingKey];
 
             return (
               <Card key={num} className="p-4">
@@ -229,24 +239,14 @@ const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: Testim
                     />
                   </div>
 
-                  <div className="flex gap-2 flex-wrap">
-                    {[nameKey, roleKey, imageKey, contentKey, ratingKey].map((key) => {
-                      const id = getContentId(key);
-                      const value = getContentValue(key);
-                      return (
-                        <Button
-                          key={key}
-                          onClick={() => onSave(id, value)}
-                          disabled={saving}
-                          size="sm"
-                          variant="outline"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          Save {key.split('_').pop()}
-                        </Button>
-                      );
-                    })}
-                  </div>
+                  <Button
+                    onClick={() => saveAllTestimonialFields(allKeys)}
+                    disabled={saving}
+                    className="w-full"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {saving ? 'Saving...' : `Save Testimonial ${num}`}
+                  </Button>
                 </CardContent>
               </Card>
             );
