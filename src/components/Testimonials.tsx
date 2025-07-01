@@ -1,10 +1,14 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, Plus } from "lucide-react";
 import { useSiteContent } from '@/hooks/useSiteContent';
+import { useState } from 'react';
+import ReviewForm from './ReviewForm';
 
 const Testimonials = () => {
   const { content, loading } = useSiteContent();
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   if (loading) {
     return (
@@ -43,11 +47,24 @@ const Testimonials = () => {
           <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4 cyber-text">
             Trusted by Artists & Clients
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
             See why tattoo professionals and skincare enthusiasts choose Blue Dream Budder 
             for superior healing and nourishment.
           </p>
+          <Button 
+            onClick={() => setShowReviewForm(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Your Review
+          </Button>
         </div>
+
+        {showReviewForm && (
+          <div className="mb-12">
+            <ReviewForm onClose={() => setShowReviewForm(false)} />
+          </div>
+        )}
         
         <div className="grid md:grid-cols-3 gap-8">
           {testimonials.map((testimonial) => (
