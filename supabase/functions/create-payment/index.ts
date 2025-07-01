@@ -39,11 +39,10 @@ serve(async (req) => {
     logStep("Request body received", { 
       hasItems: !!body.items, 
       itemCount: body.items?.length,
-      hasShippingInfo: !!body.shippingInfo,
-      hasTotals: !!body.totals
+      hasShippingInfo: !!body.shippingInfo
     });
 
-    const { items, shippingInfo, totals } = body;
+    const { items, shippingInfo } = body;
 
     if (!items || items.length === 0) {
       logStep("ERROR: No items in request");
@@ -62,8 +61,7 @@ serve(async (req) => {
 
     logStep("Validation passed", { 
       email: shippingInfo.email, 
-      itemCount: items.length,
-      totalAmount: totals?.total 
+      itemCount: items.length
     });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
@@ -79,20 +77,44 @@ serve(async (req) => {
       logStep("No existing customer found");
     }
 
-    // Create line items for Stripe
+    // Get product details from database to find Stripe Price IDs
+    logStep("Fetching product details from database");
+    const productIds = items.map((item: any) => item.id);
+    const { data: products, error: productsError } = await supabaseClient
+      .from('products')
+      .select('id, name, stripe_price_id')
+      .in('id', productIds);
+
+    if (productsError || !products) {
+      logStep("ERROR fetching products", { error: productsError });
+      throw new Error("Failed to fetch product details");
+    }
+
+    // Create line items using Stripe Price IDs if available, fallback to custom pricing
     const lineItems = items.map((item: any) => {
-      logStep("Processing item", { name: item.name, price: item.price, quantity: item.quantity });
-      return {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name,
-            images: item.image_url ? [item.image_url] : [],
+      const product = products.find(p => p.id === item.id);
+      logStep("Processing item", { name: item.name, hasStripePriceId: !!product?.stripe_price_id });
+      
+      if (product?.stripe_price_id) {
+        // Use Stripe Price ID
+        return {
+          price: product.stripe_price_id,
+          quantity: item.quantity,
+        };
+      } else {
+        // Fallback to custom price data
+        return {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: item.name,
+              images: item.image_url ? [item.image_url] : [],
+            },
+            unit_amount: Math.round(item.price * 100), // Convert to cents
           },
-          unit_amount: Math.round(item.price * 100), // Convert to cents
-        },
-        quantity: item.quantity,
-      };
+          quantity: item.quantity,
+        };
+      }
     });
 
     // Add shipping as a line item
@@ -134,10 +156,11 @@ serve(async (req) => {
 
     // Create order record
     logStep("Creating order record in database");
+    const totalAmount = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 9.99;
     const { data: orderData, error: orderError } = await supabaseClient.from("orders").insert({
       email: shippingInfo.email,
       stripe_session_id: session.id,
-      amount: totals?.total ? Math.round(totals.total * 100) : Math.round((items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 9.99) * 100),
+      amount: Math.round(totalAmount * 100),
       shipping_info: shippingInfo,
       status: 'pending',
       is_guest: true,
