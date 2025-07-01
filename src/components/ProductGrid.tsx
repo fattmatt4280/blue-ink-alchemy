@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,8 +56,7 @@ const ProductGrid = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      image_url: product.image_url || '',
-      quantity: 1,
+      image_url: product.image_url || null,
     });
 
     // Track add to cart event
