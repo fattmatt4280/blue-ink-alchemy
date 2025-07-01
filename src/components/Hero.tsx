@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -85,7 +86,7 @@ const Hero = () => {
                 {content.hero_title || 'Blue Dream Budder'}
               </h1>
               
-              <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-light opacity-90 leading-relaxed cyber-text">
+              <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-light opacity-90 leading-relaxed cyber-text md:mt-16 lg:mt-20">
                 {content.hero_subtitle || 'For Ink. For Skin. For Life.'}
               </p>
               
