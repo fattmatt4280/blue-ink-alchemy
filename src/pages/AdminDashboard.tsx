@@ -12,6 +12,7 @@ import ProductReorderTool from '@/components/ProductReorderTool';
 import IngredientsEditor from '@/components/IngredientsEditor';
 import TestimonialsEditor from '@/components/TestimonialsEditor';
 import FooterLinksEditor from '@/components/FooterLinksEditor';
+import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AccessDenied from '@/components/AccessDenied';
 
 interface SiteContent {
@@ -137,6 +138,9 @@ const AdminDashboard = () => {
 
           {/* Product Reorder Tool */}
           <ProductReorderTool />
+
+          {/* Customer Reviews Manager */}
+          <CustomerReviewsManager />
 
           {/* Ingredients Editor */}
           <IngredientsEditor

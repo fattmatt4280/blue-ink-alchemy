@@ -1,14 +1,35 @@
 
+import { useState } from 'react';
 import ContentPage from "@/components/ContentPage";
 import Testimonials from "@/components/Testimonials";
+import ReviewForm from "@/components/ReviewForm";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const Reviews = () => {
+  const [showReviewForm, setShowReviewForm] = useState(false);
+
   return (
     <ContentPage title="Customer Reviews">
       <div className="space-y-8">
-        <p className="text-lg text-gray-600">
-          See what our customers are saying about Blue Dream Budder and how it's transformed their aftercare routine.
-        </p>
+        <div className="flex justify-between items-start">
+          <p className="text-lg text-gray-600">
+            See what our customers are saying about Blue Dream Budder and how it's transformed their aftercare routine.
+          </p>
+          <Button 
+            onClick={() => setShowReviewForm(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Review
+          </Button>
+        </div>
+        
+        {showReviewForm && (
+          <div className="mb-8">
+            <ReviewForm onClose={() => setShowReviewForm(false)} />
+          </div>
+        )}
         
         <Testimonials />
         
