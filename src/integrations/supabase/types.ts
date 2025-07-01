@@ -9,6 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_data: Json
+          event_type: string
+          id: string
+          ip_address: string | null
+          page_url: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data: Json
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          page_url?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          page_url?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      conversion_funnel: {
+        Row: {
+          conversion_rate: number | null
+          count: number
+          created_at: string
+          date: string
+          id: string
+          step_name: string
+        }
+        Insert: {
+          conversion_rate?: number | null
+          count?: number
+          created_at?: string
+          date: string
+          id?: string
+          step_name: string
+        }
+        Update: {
+          conversion_rate?: number | null
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          step_name?: string
+        }
+        Relationships: []
+      }
       customer_reviews: {
         Row: {
           approved: boolean
@@ -248,6 +314,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_demographics: {
+        Row: {
+          age_group: string | null
+          count: number
+          created_at: string
+          date: string
+          gender: string | null
+          id: string
+          region: string | null
+          source: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          count?: number
+          created_at?: string
+          date: string
+          gender?: string | null
+          id?: string
+          region?: string | null
+          source?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          count?: number
+          created_at?: string
+          date?: string
+          gender?: string | null
+          id?: string
+          region?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -276,6 +375,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      website_metrics: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          metadata: Json | null
+          metric_type: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          value?: number
+        }
+        Relationships: []
       }
     }
     Views: {

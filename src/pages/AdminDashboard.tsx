@@ -13,7 +13,9 @@ import IngredientsEditor from '@/components/IngredientsEditor';
 import TestimonialsEditor from '@/components/TestimonialsEditor';
 import FooterLinksEditor from '@/components/FooterLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import AccessDenied from '@/components/AccessDenied';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface SiteContent {
   id: string;
@@ -132,59 +134,73 @@ const AdminDashboard = () => {
       <div className="max-w-6xl mx-auto">
         <AdminHeader onSignOut={handleSignOut} />
 
-        <div className="grid gap-6">
-          {/* Product Management Section */}
-          <ProductManager />
+        <Tabs defaultValue="analytics" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="content">Content Management</TabsTrigger>
+            <TabsTrigger value="products">Product Management</TabsTrigger>
+          </TabsList>
 
-          {/* Product Reorder Tool */}
-          <ProductReorderTool />
+          <TabsContent value="analytics">
+            <AnalyticsDashboard />
+          </TabsContent>
 
-          {/* Customer Reviews Manager */}
-          <CustomerReviewsManager />
+          <TabsContent value="content" className="space-y-6">
+            {/* Customer Reviews Manager */}
+            <CustomerReviewsManager />
 
-          {/* Ingredients Editor */}
-          <IngredientsEditor
-            content={ingredientsContent}
-            onContentUpdate={setContent}
-            onSave={updateContent}
-            saving={saving}
-          />
-
-          {/* Testimonials Editor */}
-          <TestimonialsEditor
-            content={testimonialsContent}
-            onContentUpdate={setContent}
-            onSave={updateContent}
-            saving={saving}
-          />
-
-          {/* Footer Links Editor */}
-          <FooterLinksEditor
-            content={footerLinksContent}
-            onContentUpdate={setContent}
-            onSave={updateContent}
-            saving={saving}
-          />
-
-          {/* Image Upload Section */}
-          {imageContent.map((item) => (
-            <ImageUpload
-              key={item.id}
-              title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-              description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
-              currentImage={item.value}
-              onImageUploaded={(url) => handleImageUpload(url, item.id)}
+            {/* Ingredients Editor */}
+            <IngredientsEditor
+              content={ingredientsContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
             />
-          ))}
 
-          {/* Text Content Section */}
-          <TextContentEditor
-            content={textContent}
-            onContentUpdate={setContent}
-            onSave={updateContent}
-            saving={saving}
-          />
-        </div>
+            {/* Testimonials Editor */}
+            <TestimonialsEditor
+              content={testimonialsContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+
+            {/* Footer Links Editor */}
+            <FooterLinksEditor
+              content={footerLinksContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+
+            {/* Image Upload Section */}
+            {imageContent.map((item) => (
+              <ImageUpload
+                key={item.id}
+                title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
+                currentImage={item.value}
+                onImageUploaded={(url) => handleImageUpload(url, item.id)}
+              />
+            ))}
+
+            {/* Text Content Section */}
+            <TextContentEditor
+              content={textContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+          </TabsContent>
+
+          <TabsContent value="products" className="space-y-6">
+            {/* Product Management Section */}
+            <ProductManager />
+
+            {/* Product Reorder Tool */}
+            <ProductReorderTool />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
