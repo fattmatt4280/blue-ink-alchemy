@@ -9,6 +9,8 @@ import AdminHeader from '@/components/AdminHeader';
 import TextContentEditor from '@/components/TextContentEditor';
 import ProductManager from '@/components/ProductManager';
 import ProductReorderTool from '@/components/ProductReorderTool';
+import IngredientsEditor from '@/components/IngredientsEditor';
+import TestimonialsEditor from '@/components/TestimonialsEditor';
 import AccessDenied from '@/components/AccessDenied';
 
 interface SiteContent {
@@ -100,9 +102,21 @@ const AdminDashboard = () => {
     return <AccessDenied onSignOut={handleSignOut} />;
   }
 
-  // Separate text content from image content
-  const textContent = content.filter(item => item.type === 'text');
-  const imageContent = content.filter(item => item.type === 'image');
+  // Separate content types
+  const textContent = content.filter(item => 
+    item.type === 'text' && 
+    !item.key.startsWith('ingredient_') && 
+    !item.key.startsWith('testimonial_') &&
+    item.key !== 'ingredients_title' &&
+    item.key !== 'ingredients_subtitle'
+  );
+  const imageContent = content.filter(item => item.type === 'image' && !item.key.includes('testimonial_'));
+  const ingredientsContent = content.filter(item => 
+    item.key.startsWith('ingredient_') || 
+    item.key === 'ingredients_title' || 
+    item.key === 'ingredients_subtitle'
+  );
+  const testimonialsContent = content.filter(item => item.key.startsWith('testimonial_'));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
@@ -115,6 +129,22 @@ const AdminDashboard = () => {
 
           {/* Product Reorder Tool */}
           <ProductReorderTool />
+
+          {/* Ingredients Editor */}
+          <IngredientsEditor
+            content={ingredientsContent}
+            onContentUpdate={setContent}
+            onSave={updateContent}
+            saving={saving}
+          />
+
+          {/* Testimonials Editor */}
+          <TestimonialsEditor
+            content={testimonialsContent}
+            onContentUpdate={setContent}
+            onSave={updateContent}
+            saving={saving}
+          />
 
           {/* Image Upload Section */}
           {imageContent.map((item) => (

@@ -1,35 +1,41 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    role: "Tattoo Artist",
-    image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=80&h=80&fit=crop&crop=face",
-    content: "Blue Dream Budder has revolutionized how my clients heal. The natural ingredients work incredibly well, and the CBD provides amazing anti-inflammatory benefits.",
-    rating: 5
-  },
-  {
-    id: 2,
-    name: "Marcus Rodriguez",
-    role: "Client",
-    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=80&h=80&fit=crop&crop=face",
-    content: "After trying countless aftercare products, this is the only one that actually helped my tattoo heal without irritation. The Blue Dream terpenes are genius!",
-    rating: 5
-  },
-  {
-    id: 3,
-    name: "Emily Turner",
-    role: "Skin Care Enthusiast",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=80&h=80&fit=crop&crop=face",
-    content: "I use this even when I don't have fresh ink. The mango and shea butter combination leaves my skin so soft and nourished. Premium quality!",
-    rating: 5
-  }
-];
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 const Testimonials = () => {
+  const { content, loading } = useSiteContent();
+
+  if (loading) {
+    return (
+      <section className="py-20 futuristic-bg">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-lg">Loading testimonials...</div>
+        </div>
+      </section>
+    );
+  }
+
+  const testimonials = [];
+  for (let i = 1; i <= 3; i++) {
+    const name = content[`testimonial_${i}_name`];
+    const role = content[`testimonial_${i}_role`];
+    const image = content[`testimonial_${i}_image`];
+    const testimonialContent = content[`testimonial_${i}_content`];
+    const rating = parseInt(content[`testimonial_${i}_rating`]) || 5;
+    
+    if (name) {
+      testimonials.push({
+        id: i,
+        name,
+        role,
+        image,
+        content: testimonialContent,
+        rating
+      });
+    }
+  }
+
   return (
     <section className="py-20 futuristic-bg">
       <div className="container mx-auto px-4">
