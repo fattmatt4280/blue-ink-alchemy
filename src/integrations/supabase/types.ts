@@ -200,6 +200,7 @@ export type Database = {
           popular: boolean | null
           price: number
           size: string | null
+          stripe_price_id: string | null
           updated_at: string
         }
         Insert: {
@@ -213,6 +214,7 @@ export type Database = {
           popular?: boolean | null
           price: number
           size?: string | null
+          stripe_price_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -226,6 +228,7 @@ export type Database = {
           popular?: boolean | null
           price?: number
           size?: string | null
+          stripe_price_id?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,13 +54,7 @@ const Checkout = () => {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           items: items,
-          shippingInfo: shippingInfo,
-          totals: {
-            subtotal: Math.round(subtotal * 100), // Convert to cents
-            shipping: Math.round(shipping * 100),
-            tax: Math.round(salesTax * 100),
-            total: Math.round(total * 100)
-          }
+          shippingInfo: shippingInfo
         }
       });
 
@@ -230,14 +223,17 @@ const Checkout = () => {
                     <span className="font-semibold">${shipping.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Sales Tax (8.5%):</span>
+                    <span>Est. Tax:</span>
                     <span className="font-semibold">${salesTax.toFixed(2)}</span>
                   </div>
                   <div className="border-t pt-4">
                     <div className="flex justify-between text-lg font-bold">
-                      <span>Total:</span>
+                      <span>Est. Total:</span>
                       <span>${total.toFixed(2)}</span>
                     </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      *Final total calculated by Stripe with accurate tax
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -304,7 +300,7 @@ const Checkout = () => {
                       Processing...
                     </>
                   ) : (
-                    `Complete Order - $${total.toFixed(2)}`
+                    "Complete Order - Stripe will calculate final total"
                   )}
                 </Button>
                 <Button 
