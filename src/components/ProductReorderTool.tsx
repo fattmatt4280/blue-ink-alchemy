@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GripVertical, Save } from 'lucide-react';
+import { ChevronUp, ChevronDown, Save } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -34,13 +34,7 @@ const ProductReorderTool = () => {
 
       if (error) throw error;
       
-      // If products don't have display_order, assign them based on current order
-      const productsWithOrder = data?.map((product, index) => ({
-        ...product,
-        display_order: product.display_order ?? index + 1
-      })) || [];
-      
-      setProducts(productsWithOrder);
+      setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast({
@@ -53,10 +47,23 @@ const ProductReorderTool = () => {
     }
   };
 
-  const moveProduct = (fromIndex: number, toIndex: number) => {
+  const moveProduct = (productId: string, direction: 'up' | 'down') => {
+    const currentIndex = products.findIndex(p => p.id === productId);
+    if (currentIndex === -1) return;
+
     const newProducts = [...products];
-    const [movedProduct] = newProducts.splice(fromIndex, 1);
-    newProducts.splice(toIndex, 0, movedProduct);
+    
+    if (direction === 'up' && currentIndex > 0) {
+      // Swap with previous product
+      [newProducts[currentIndex], newProducts[currentIndex - 1]] = 
+      [newProducts[currentIndex - 1], newProducts[currentIndex]];
+    } else if (direction === 'down' && currentIndex < products.length - 1) {
+      // Swap with next product
+      [newProducts[currentIndex], newProducts[currentIndex + 1]] = 
+      [newProducts[currentIndex + 1], newProducts[currentIndex]];
+    } else {
+      return; // Can't move further
+    }
     
     // Update display_order for all products
     const updatedProducts = newProducts.map((product, index) => ({
@@ -66,22 +73,6 @@ const ProductReorderTool = () => {
     
     setProducts(updatedProducts);
     setHasChanges(true);
-  };
-
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData('text/plain', index.toString());
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
-    if (dragIndex !== dropIndex) {
-      moveProduct(dragIndex, dropIndex);
-    }
   };
 
   const saveOrder = async () => {
@@ -130,7 +121,7 @@ const ProductReorderTool = () => {
         <div className="flex justify-between items-center">
           <div>
             <CardTitle>Product Order</CardTitle>
-            <CardDescription>Drag and drop to reorder products</CardDescription>
+            <CardDescription>Use the up and down buttons to reorder products</CardDescription>
           </div>
           {hasChanges && (
             <Button onClick={saveOrder} disabled={saving}>
@@ -145,13 +136,28 @@ const ProductReorderTool = () => {
           {products.map((product, index) => (
             <div
               key={product.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, index)}
-              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 hover:border-gray-300 cursor-move"
+              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
             >
-              <GripVertical className="w-5 h-5 text-gray-400" />
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => moveProduct(product.id, 'up')}
+                  disabled={index === 0}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => moveProduct(product.id, 'down')}
+                  disabled={index === products.length - 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </div>
               <div className="flex-1">
                 <div className="font-medium">{product.name}</div>
                 <div className="text-sm text-gray-600">
