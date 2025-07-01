@@ -3,17 +3,53 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle newsletter signup
-    console.log("Newsletter signup:", email);
-    setIsSubscribed(true);
-    setEmail("");
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_signups')
+        .insert([{ email }]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation (email already exists)
+          toast({
+            title: "Already subscribed!",
+            description: "This email is already signed up for our newsletter.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Welcome to the family!",
+          description: "You've been successfully subscribed to our newsletter.",
+        });
+        setIsSubscribed(true);
+      }
+      
+      setEmail("");
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
+      toast({
+        title: "Signup failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -39,14 +75,16 @@ const Newsletter = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isSubmitting}
                 className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/70 focus:bg-white/20"
               />
               <Button 
                 type="submit"
                 size="lg"
+                disabled={isSubmitting}
                 className="bg-white text-blue-600 hover:bg-blue-50 transition-colors px-8"
               >
-                Subscribe
+                {isSubmitting ? "Subscribing..." : "Subscribe"}
               </Button>
             </form>
           ) : (
