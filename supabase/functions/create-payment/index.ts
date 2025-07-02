@@ -35,7 +35,14 @@ serve(async (req) => {
       logStep("ERROR: STRIPE_SECRET_KEY not found");
       throw new Error("STRIPE_SECRET_KEY is not set");
     }
-    logStep("Stripe key found");
+    
+    // Log the key format (first 10 chars) for debugging
+    logStep("Stripe key found", { 
+      keyStart: stripeKey.substring(0, 10),
+      keyLength: stripeKey.length,
+      isTestKey: stripeKey.startsWith('sk_test_'),
+      isLiveKey: stripeKey.startsWith('sk_live_')
+    });
 
     // Parse request body
     let body;
@@ -75,9 +82,37 @@ serve(async (req) => {
       itemCount: items.length
     });
 
-    // Initialize Stripe
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-    logStep("Stripe initialized");
+    // Initialize Stripe with explicit error handling
+    let stripe;
+    try {
+      stripe = new Stripe(stripeKey, { 
+        apiVersion: "2023-10-16",
+        // Add explicit configuration to help with debugging
+        typescript: true,
+      });
+      logStep("Stripe initialized successfully");
+    } catch (stripeInitError) {
+      logStep("ERROR initializing Stripe", { 
+        error: stripeInitError.message,
+        keyFormat: stripeKey.substring(0, 10) + "..."
+      });
+      throw new Error(`Failed to initialize Stripe: ${stripeInitError.message}`);
+    }
+
+    // Test Stripe connection by checking if key works
+    logStep("Testing Stripe connection");
+    try {
+      // Try a simple API call to verify the key works
+      await stripe.products.list({ limit: 1 });
+      logStep("Stripe connection test successful");
+    } catch (stripeTestError) {
+      logStep("ERROR: Stripe connection test failed", { 
+        error: stripeTestError.message,
+        type: stripeTestError.type,
+        code: stripeTestError.code
+      });
+      throw new Error(`Stripe API error: ${stripeTestError.message}`);
+    }
 
     // Check if customer exists
     logStep("Checking for existing customer", { email: shippingInfo.email });
@@ -137,7 +172,7 @@ serve(async (req) => {
     logStep("Creating Stripe checkout session");
     let session;
     try {
-      session = await stripe.checkout.sessions.create({
+      const sessionData = {
         customer: customerId,
         customer_email: customerId ? undefined : shippingInfo.email,
         line_items: lineItems,
@@ -154,10 +189,23 @@ serve(async (req) => {
         metadata: {
           order_type: 'cart_checkout',
         }
+      };
+
+      logStep("Session data prepared", { 
+        hasCustomer: !!customerId,
+        email: shippingInfo.email,
+        lineItemCount: lineItems.length
       });
+
+      session = await stripe.checkout.sessions.create(sessionData);
       logStep("Stripe session created successfully", { sessionId: session.id });
     } catch (stripeSessionError) {
-      logStep("ERROR creating Stripe session", { error: stripeSessionError.message });
+      logStep("ERROR creating Stripe session", { 
+        error: stripeSessionError.message,
+        type: stripeSessionError.type,
+        code: stripeSessionError.code,
+        param: stripeSessionError.param
+      });
       throw new Error(`Failed to create Stripe session: ${stripeSessionError.message}`);
     }
 
