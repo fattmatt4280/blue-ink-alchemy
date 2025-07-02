@@ -14,7 +14,10 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  logStep("Function started");
+
   if (req.method === "OPTIONS") {
+    logStep("OPTIONS request handled");
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -26,8 +29,7 @@ serve(async (req) => {
   );
 
   try {
-    logStep("Function started");
-
+    // Check Stripe key first
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       logStep("ERROR: STRIPE_SECRET_KEY not found");
@@ -35,27 +37,36 @@ serve(async (req) => {
     }
     logStep("Stripe key found");
 
-    const body = await req.json();
-    logStep("Request body received", { 
-      hasItems: !!body.items, 
-      itemCount: body.items?.length,
-      hasShippingInfo: !!body.shippingInfo
-    });
+    // Parse request body
+    let body;
+    try {
+      body = await req.json();
+      logStep("Request body parsed successfully", { 
+        hasItems: !!body.items, 
+        itemCount: body.items?.length,
+        hasShippingInfo: !!body.shippingInfo
+      });
+    } catch (parseError) {
+      logStep("ERROR: Failed to parse request body", { error: parseError.message });
+      throw new Error("Invalid JSON in request body");
+    }
 
     const { items, shippingInfo } = body;
 
+    // Validate items
     if (!items || items.length === 0) {
       logStep("ERROR: No items in request");
       throw new Error("No items in cart");
     }
 
+    // Validate shipping info
     if (!shippingInfo?.email) {
       logStep("ERROR: No email in shipping info");
       throw new Error("Email is required");
     }
 
     if (!shippingInfo?.firstName || !shippingInfo?.lastName || !shippingInfo?.address || !shippingInfo?.city || !shippingInfo?.zipCode) {
-      logStep("ERROR: Missing required shipping info");
+      logStep("ERROR: Missing required shipping info", { shippingInfo });
       throw new Error("All shipping information is required");
     }
 
@@ -64,20 +75,27 @@ serve(async (req) => {
       itemCount: items.length
     });
 
+    // Initialize Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    logStep("Stripe initialized");
 
     // Check if customer exists
     logStep("Checking for existing customer", { email: shippingInfo.email });
-    const customers = await stripe.customers.list({ email: shippingInfo.email, limit: 1 });
     let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
-    } else {
-      logStep("No existing customer found");
+    try {
+      const customers = await stripe.customers.list({ email: shippingInfo.email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        logStep("Existing customer found", { customerId });
+      } else {
+        logStep("No existing customer found");
+      }
+    } catch (stripeError) {
+      logStep("ERROR: Failed to check existing customers", { error: stripeError.message });
+      // Continue without existing customer
     }
 
-    // Get product details from database to find Stripe Price IDs
+    // Get product details from database
     logStep("Fetching product details from database");
     const productIds = items.map((item: any) => item.id);
     const { data: products, error: productsError } = await supabaseClient
@@ -85,17 +103,34 @@ serve(async (req) => {
       .select('id, name, stripe_price_id, price')
       .in('id', productIds);
 
-    if (productsError || !products) {
+    if (productsError) {
       logStep("ERROR fetching products", { error: productsError });
-      throw new Error("Failed to fetch product details");
+      throw new Error(`Failed to fetch product details: ${productsError.message}`);
     }
 
-    // Create line items using Stripe Price IDs if available, fallback to custom pricing
+    if (!products || products.length === 0) {
+      logStep("ERROR: No products found in database", { productIds });
+      throw new Error("No products found");
+    }
+
+    logStep("Products fetched successfully", { count: products.length });
+
+    // Create line items
     const lineItems = items.map((item: any) => {
       const product = products.find(p => p.id === item.id);
-      logStep("Processing item", { name: item.name, hasStripePriceId: !!product?.stripe_price_id });
+      logStep("Processing item", { 
+        itemId: item.id,
+        itemName: item.name, 
+        hasStripePriceId: !!product?.stripe_price_id,
+        productFound: !!product
+      });
       
-      if (product?.stripe_price_id) {
+      if (!product) {
+        logStep("ERROR: Product not found in database", { itemId: item.id });
+        throw new Error(`Product not found: ${item.id}`);
+      }
+
+      if (product.stripe_price_id) {
         // Use Stripe Price ID
         return {
           price: product.stripe_price_id,
@@ -103,14 +138,21 @@ serve(async (req) => {
         };
       } else {
         // Fallback to custom price data
+        const unitAmount = Math.round((product.price || item.price) * 100);
+        logStep("Using fallback pricing", { 
+          productId: product.id,
+          price: product.price || item.price,
+          unitAmount 
+        });
+        
         return {
           price_data: {
             currency: "usd",
             product_data: {
-              name: item.name,
+              name: item.name || product.name,
               images: item.image_url ? [item.image_url] : [],
             },
-            unit_amount: Math.round(item.price * 100), // Convert to cents
+            unit_amount: unitAmount,
           },
           quantity: item.quantity,
         };
@@ -133,54 +175,77 @@ serve(async (req) => {
 
     // Create checkout session
     logStep("Creating Stripe checkout session");
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : shippingInfo.email,
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/checkout?success=true`,
-      cancel_url: `${req.headers.get("origin")}/checkout?cancelled=true`,
-      automatic_tax: {
-        enabled: true,
-      },
-      shipping_address_collection: {
-        allowed_countries: ['US'],
-      },
-      customer_creation: customerId ? undefined : 'always',
-      metadata: {
-        order_type: 'cart_checkout',
-      }
-    });
-
-    logStep("Stripe session created successfully", { sessionId: session.id, url: session.url });
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        customer_email: customerId ? undefined : shippingInfo.email,
+        line_items: lineItems,
+        mode: "payment",
+        success_url: `${req.headers.get("origin")}/checkout?success=true`,
+        cancel_url: `${req.headers.get("origin")}/checkout?cancelled=true`,
+        automatic_tax: {
+          enabled: true,
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US'],
+        },
+        customer_creation: customerId ? undefined : 'always',
+        metadata: {
+          order_type: 'cart_checkout',
+        }
+      });
+      logStep("Stripe session created successfully", { sessionId: session.id });
+    } catch (stripeSessionError) {
+      logStep("ERROR creating Stripe session", { error: stripeSessionError.message });
+      throw new Error(`Failed to create Stripe session: ${stripeSessionError.message}`);
+    }
 
     // Create order record
     logStep("Creating order record in database");
-    const totalAmount = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 9.99;
-    const { data: orderData, error: orderError } = await supabaseClient.from("orders").insert({
-      email: shippingInfo.email,
-      stripe_session_id: session.id,
-      amount: Math.round(totalAmount * 100),
-      shipping_info: shippingInfo,
-      status: 'pending',
-      is_guest: true,
-      currency: 'usd'
-    });
+    const totalAmount = items.reduce((sum: number, item: any) => {
+      const product = products.find(p => p.id === item.id);
+      const price = product?.price || item.price || 0;
+      return sum + (price * item.quantity);
+    }, 0) + 9.99;
 
-    if (orderError) {
-      logStep("ERROR creating order record", { error: orderError });
-      throw new Error(`Failed to create order record: ${orderError.message}`);
+    try {
+      const { error: orderError } = await supabaseClient.from("orders").insert({
+        email: shippingInfo.email,
+        stripe_session_id: session.id,
+        amount: Math.round(totalAmount * 100),
+        shipping_info: shippingInfo,
+        status: 'pending',
+        is_guest: true,
+        currency: 'usd'
+      });
+
+      if (orderError) {
+        logStep("ERROR creating order record", { error: orderError });
+        // Don't throw here - the Stripe session is already created
+        console.warn("Failed to create order record, but continuing with checkout");
+      } else {
+        logStep("Order record created successfully");
+      }
+    } catch (orderCreationError) {
+      logStep("ERROR in order creation", { error: orderCreationError.message });
+      // Don't throw here - the Stripe session is already created
     }
 
-    logStep("Order record created successfully");
+    logStep("Function completed successfully", { sessionUrl: session.url });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-payment function", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
+    logStep("ERROR in create-payment function", { 
+      message: errorMessage, 
+      stack: error instanceof Error ? error.stack : undefined 
+    });
+    
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
