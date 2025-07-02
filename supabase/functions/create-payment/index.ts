@@ -21,13 +21,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Use service role key to bypass RLS for guest checkouts
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
-
   try {
     // Check Stripe key first
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -35,14 +28,7 @@ serve(async (req) => {
       logStep("ERROR: STRIPE_SECRET_KEY not found");
       throw new Error("STRIPE_SECRET_KEY is not set");
     }
-    
-    // Log the key format (first 10 chars) for debugging
-    logStep("Stripe key found", { 
-      keyStart: stripeKey.substring(0, 10),
-      keyLength: stripeKey.length,
-      isTestKey: stripeKey.startsWith('sk_test_'),
-      isLiveKey: stripeKey.startsWith('sk_live_')
-    });
+    logStep("Stripe key found");
 
     // Parse request body
     let body;
@@ -82,37 +68,11 @@ serve(async (req) => {
       itemCount: items.length
     });
 
-    // Initialize Stripe with explicit error handling
-    let stripe;
-    try {
-      stripe = new Stripe(stripeKey, { 
-        apiVersion: "2023-10-16",
-        // Add explicit configuration to help with debugging
-        typescript: true,
-      });
-      logStep("Stripe initialized successfully");
-    } catch (stripeInitError) {
-      logStep("ERROR initializing Stripe", { 
-        error: stripeInitError.message,
-        keyFormat: stripeKey.substring(0, 10) + "..."
-      });
-      throw new Error(`Failed to initialize Stripe: ${stripeInitError.message}`);
-    }
-
-    // Test Stripe connection by checking if key works
-    logStep("Testing Stripe connection");
-    try {
-      // Try a simple API call to verify the key works
-      await stripe.products.list({ limit: 1 });
-      logStep("Stripe connection test successful");
-    } catch (stripeTestError) {
-      logStep("ERROR: Stripe connection test failed", { 
-        error: stripeTestError.message,
-        type: stripeTestError.type,
-        code: stripeTestError.code
-      });
-      throw new Error(`Stripe API error: ${stripeTestError.message}`);
-    }
+    // Initialize Stripe
+    const stripe = new Stripe(stripeKey, { 
+      apiVersion: "2023-10-16",
+    });
+    logStep("Stripe initialized successfully");
 
     // Check if customer exists
     logStep("Checking for existing customer", { email: shippingInfo.email });
@@ -130,7 +90,7 @@ serve(async (req) => {
       // Continue without existing customer
     }
 
-    // Create line items directly from cart items
+    // Create line items from cart items
     const lineItems = items.map((item: any) => {
       logStep("Processing item", { 
         itemId: item.id,
@@ -161,7 +121,7 @@ serve(async (req) => {
         product_data: {
           name: "Shipping",
         },
-        unit_amount: Math.round(9.99 * 100), // $9.99 shipping
+        unit_amount: 999, // $9.99 shipping
       },
       quantity: 1,
     });
@@ -170,46 +130,41 @@ serve(async (req) => {
 
     // Create checkout session
     logStep("Creating Stripe checkout session");
-    let session;
-    try {
-      const sessionData = {
-        customer: customerId,
-        customer_email: customerId ? undefined : shippingInfo.email,
-        line_items: lineItems,
-        mode: "payment",
-        success_url: `${req.headers.get("origin")}/checkout?success=true`,
-        cancel_url: `${req.headers.get("origin")}/checkout?cancelled=true`,
-        automatic_tax: {
-          enabled: true,
-        },
-        shipping_address_collection: {
-          allowed_countries: ['US'],
-        },
-        customer_creation: customerId ? undefined : 'always',
-        metadata: {
-          order_type: 'cart_checkout',
-        }
-      };
+    const sessionData = {
+      customer: customerId,
+      customer_email: customerId ? undefined : shippingInfo.email,
+      line_items: lineItems,
+      mode: "payment" as const,
+      success_url: `${req.headers.get("origin")}/checkout?success=true`,
+      cancel_url: `${req.headers.get("origin")}/checkout?cancelled=true`,
+      automatic_tax: {
+        enabled: true,
+      },
+      shipping_address_collection: {
+        allowed_countries: ['US'] as const,
+      },
+      customer_creation: customerId ? undefined : 'always' as const,
+      metadata: {
+        order_type: 'cart_checkout',
+      }
+    };
 
-      logStep("Session data prepared", { 
-        hasCustomer: !!customerId,
-        email: shippingInfo.email,
-        lineItemCount: lineItems.length
-      });
+    logStep("Session data prepared", { 
+      hasCustomer: !!customerId,
+      email: shippingInfo.email,
+      lineItemCount: lineItems.length
+    });
 
-      session = await stripe.checkout.sessions.create(sessionData);
-      logStep("Stripe session created successfully", { sessionId: session.id });
-    } catch (stripeSessionError) {
-      logStep("ERROR creating Stripe session", { 
-        error: stripeSessionError.message,
-        type: stripeSessionError.type,
-        code: stripeSessionError.code,
-        param: stripeSessionError.param
-      });
-      throw new Error(`Failed to create Stripe session: ${stripeSessionError.message}`);
-    }
+    const session = await stripe.checkout.sessions.create(sessionData);
+    logStep("Stripe session created successfully", { sessionId: session.id });
 
-    // Create order record
+    // Create order record using service role key
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
     logStep("Creating order record in database");
     const totalAmount = items.reduce((sum: number, item: any) => {
       return sum + (item.price * item.quantity);
@@ -228,14 +183,12 @@ serve(async (req) => {
 
       if (orderError) {
         logStep("ERROR creating order record", { error: orderError });
-        // Don't throw here - the Stripe session is already created
         console.warn("Failed to create order record, but continuing with checkout");
       } else {
         logStep("Order record created successfully");
       }
     } catch (orderCreationError) {
       logStep("ERROR in order creation", { error: orderCreationError.message });
-      // Don't throw here - the Stripe session is already created
     }
 
     logStep("Function completed successfully", { sessionUrl: session.url });
