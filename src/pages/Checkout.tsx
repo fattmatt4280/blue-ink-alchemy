@@ -63,34 +63,25 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      // Format items for the Edge Function - ensure all required properties exist
-      const formattedItems = items.map(item => ({
-        id: item.id,
-        name: item.name,
-        price: Number(item.price) || 0,
-        quantity: Number(item.quantity) || 1,
-        image_url: item.image_url || null
-      }));
-
-      // Format shipping info - ensure all fields are strings
-      const formattedShippingInfo = {
-        firstName: String(shippingInfo.firstName).trim(),
-        lastName: String(shippingInfo.lastName).trim(),
-        email: String(shippingInfo.email).trim().toLowerCase(),
-        address: String(shippingInfo.address).trim(),
-        city: String(shippingInfo.city).trim(), 
-        zipCode: String(shippingInfo.zipCode).trim()
-      };
-
-      console.log("Sending formatted data:", { 
-        itemCount: formattedItems.length, 
-        shippingInfo: formattedShippingInfo 
-      });
-
+      console.log("Invoking create-payment function...");
+      
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
-          items: formattedItems,
-          shippingInfo: formattedShippingInfo
+          items: items.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: Number(item.price) || 0,
+            quantity: Number(item.quantity) || 1,
+            image_url: item.image_url || null
+          })),
+          shippingInfo: {
+            firstName: String(shippingInfo.firstName).trim(),
+            lastName: String(shippingInfo.lastName).trim(),
+            email: String(shippingInfo.email).trim().toLowerCase(),
+            address: String(shippingInfo.address).trim(),
+            city: String(shippingInfo.city).trim(), 
+            zipCode: String(shippingInfo.zipCode).trim()
+          }
         }
       });
 
@@ -98,7 +89,7 @@ const Checkout = () => {
 
       if (error) {
         console.error("Supabase function error:", error);
-        toast.error(`Payment error: ${error.message || 'Unknown error occurred'}`);
+        toast.error(`Checkout failed: ${error.message}`);
         return;
       }
 
@@ -110,15 +101,14 @@ const Checkout = () => {
 
       if (data?.url) {
         console.log("Redirecting to Stripe checkout:", data.url);
-        // Redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
         console.error("No URL returned from payment function", data);
-        toast.error("Failed to get checkout URL. Please try again.");
+        toast.error("Failed to create checkout session. Please try again.");
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error("Failed to process payment. Please try again.");
+      toast.error("Checkout failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -291,13 +281,13 @@ const Checkout = () => {
                     <Input 
                       placeholder="First Name" 
                       value={shippingInfo.firstName}
-                      onChange={(e) => handleShippingChange('firstName', e.target.value)}
+                      onChange={(e) => setShippingInfo(prev => ({ ...prev, firstName: e.target.value }))}
                       required
                     />
                     <Input 
                       placeholder="Last Name" 
                       value={shippingInfo.lastName}
-                      onChange={(e) => handleShippingChange('lastName', e.target.value)}
+                      onChange={(e) => setShippingInfo(prev => ({ ...prev, lastName: e.target.value }))}
                       required
                     />
                   </div>
@@ -305,26 +295,26 @@ const Checkout = () => {
                     placeholder="Email" 
                     type="email"
                     value={shippingInfo.email}
-                    onChange={(e) => handleShippingChange('email', e.target.value)}
+                    onChange={(e) => setShippingInfo(prev => ({ ...prev, email: e.target.value }))}
                     required
                   />
                   <Input 
                     placeholder="Address" 
                     value={shippingInfo.address}
-                    onChange={(e) => handleShippingChange('address', e.target.value)}
+                    onChange={(e) => setShippingInfo(prev => ({ ...prev, address: e.target.value }))}
                     required
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <Input 
                       placeholder="City" 
                       value={shippingInfo.city}
-                      onChange={(e) => handleShippingChange('city', e.target.value)}
+                      onChange={(e) => setShippingInfo(prev => ({ ...prev, city: e.target.value }))}
                       required
                     />
                     <Input 
                       placeholder="ZIP Code" 
                       value={shippingInfo.zipCode}
-                      onChange={(e) => handleShippingChange('zipCode', e.target.value)}
+                      onChange={(e) => setShippingInfo(prev => ({ ...prev, zipCode: e.target.value }))}
                       required
                     />
                   </div>
