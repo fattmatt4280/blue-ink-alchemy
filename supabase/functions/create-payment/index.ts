@@ -95,68 +95,28 @@ serve(async (req) => {
       // Continue without existing customer
     }
 
-    // Get product details from database
-    logStep("Fetching product details from database");
-    const productIds = items.map((item: any) => item.id);
-    const { data: products, error: productsError } = await supabaseClient
-      .from('products')
-      .select('id, name, stripe_price_id, price')
-      .in('id', productIds);
-
-    if (productsError) {
-      logStep("ERROR fetching products", { error: productsError });
-      throw new Error(`Failed to fetch product details: ${productsError.message}`);
-    }
-
-    if (!products || products.length === 0) {
-      logStep("ERROR: No products found in database", { productIds });
-      throw new Error("No products found");
-    }
-
-    logStep("Products fetched successfully", { count: products.length });
-
-    // Create line items
+    // Create line items directly from cart items
     const lineItems = items.map((item: any) => {
-      const product = products.find(p => p.id === item.id);
       logStep("Processing item", { 
         itemId: item.id,
         itemName: item.name, 
-        hasStripePriceId: !!product?.stripe_price_id,
-        productFound: !!product
+        itemPrice: item.price,
+        itemQuantity: item.quantity
       });
       
-      if (!product) {
-        logStep("ERROR: Product not found in database", { itemId: item.id });
-        throw new Error(`Product not found: ${item.id}`);
-      }
-
-      if (product.stripe_price_id) {
-        // Use Stripe Price ID
-        return {
-          price: product.stripe_price_id,
-          quantity: item.quantity,
-        };
-      } else {
-        // Fallback to custom price data
-        const unitAmount = Math.round((product.price || item.price) * 100);
-        logStep("Using fallback pricing", { 
-          productId: product.id,
-          price: product.price || item.price,
-          unitAmount 
-        });
-        
-        return {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: item.name || product.name,
-              images: item.image_url ? [item.image_url] : [],
-            },
-            unit_amount: unitAmount,
+      const unitAmount = Math.round(item.price * 100); // Convert to cents
+      
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name,
+            images: item.image_url ? [item.image_url] : [],
           },
-          quantity: item.quantity,
-        };
-      }
+          unit_amount: unitAmount,
+        },
+        quantity: item.quantity,
+      };
     });
 
     // Add shipping as a line item
@@ -204,9 +164,7 @@ serve(async (req) => {
     // Create order record
     logStep("Creating order record in database");
     const totalAmount = items.reduce((sum: number, item: any) => {
-      const product = products.find(p => p.id === item.id);
-      const price = product?.price || item.price || 0;
-      return sum + (price * item.quantity);
+      return sum + (item.price * item.quantity);
     }, 0) + 9.99;
 
     try {
