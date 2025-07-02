@@ -22,18 +22,35 @@ serve(async (req) => {
   }
 
   try {
-    // Check Stripe key first
+    // Check environment variables first
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
     if (!stripeKey) {
       logStep("ERROR: STRIPE_SECRET_KEY not found");
-      throw new Error("STRIPE_SECRET_KEY is not set");
+      return new Response(JSON.stringify({ error: "Stripe configuration missing" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
-    logStep("Stripe key found");
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      logStep("ERROR: Supabase configuration missing");
+      return new Response(JSON.stringify({ error: "Database configuration missing" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    logStep("Environment variables verified");
 
     // Parse request body
     let body;
     try {
-      body = await req.json();
+      const rawBody = await req.text();
+      logStep("Raw request body received", { length: rawBody.length });
+      body = JSON.parse(rawBody);
       logStep("Request body parsed successfully", { 
         hasItems: !!body.items, 
         itemCount: body.items?.length,
@@ -41,136 +58,141 @@ serve(async (req) => {
       });
     } catch (parseError) {
       logStep("ERROR: Failed to parse request body", { error: parseError.message });
-      throw new Error("Invalid JSON in request body");
+      return new Response(JSON.stringify({ error: "Invalid request format" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
     const { items, shippingInfo } = body;
 
-    // Validate items
-    if (!items || items.length === 0) {
-      logStep("ERROR: No items in request");
-      throw new Error("No items in cart");
+    // Validate required data
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      logStep("ERROR: Invalid items data", { items });
+      return new Response(JSON.stringify({ error: "Cart is empty or invalid" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
-    // Validate shipping info
-    if (!shippingInfo?.email) {
-      logStep("ERROR: No email in shipping info");
-      throw new Error("Email is required");
+    if (!shippingInfo?.email || !shippingInfo?.firstName || !shippingInfo?.lastName) {
+      logStep("ERROR: Missing shipping information", { shippingInfo });
+      return new Response(JSON.stringify({ error: "Shipping information incomplete" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
-    if (!shippingInfo?.firstName || !shippingInfo?.lastName || !shippingInfo?.address || !shippingInfo?.city || !shippingInfo?.zipCode) {
-      logStep("ERROR: Missing required shipping info", { shippingInfo });
-      throw new Error("All shipping information is required");
-    }
-
-    logStep("Validation passed", { 
-      email: shippingInfo.email, 
-      itemCount: items.length
-    });
+    logStep("Data validation passed");
 
     // Initialize Stripe
-    const stripe = new Stripe(stripeKey, { 
-      apiVersion: "2023-10-16",
-    });
-    logStep("Stripe initialized successfully");
-
-    // Check if customer exists
-    logStep("Checking for existing customer", { email: shippingInfo.email });
-    let customerId;
+    let stripe;
     try {
-      const customers = await stripe.customers.list({ email: shippingInfo.email, limit: 1 });
-      if (customers.data.length > 0) {
-        customerId = customers.data[0].id;
-        logStep("Existing customer found", { customerId });
-      } else {
-        logStep("No existing customer found");
-      }
+      stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+      logStep("Stripe initialized successfully");
     } catch (stripeError) {
-      logStep("ERROR: Failed to check existing customers", { error: stripeError.message });
-      // Continue without existing customer
+      logStep("ERROR: Failed to initialize Stripe", { error: stripeError.message });
+      return new Response(JSON.stringify({ error: "Payment system initialization failed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
 
-    // Create line items from cart items
-    const lineItems = items.map((item: any) => {
-      logStep("Processing item", { 
-        itemId: item.id,
-        itemName: item.name, 
-        itemPrice: item.price,
-        itemQuantity: item.quantity
+    // Create line items
+    let lineItems;
+    try {
+      lineItems = items.map((item) => {
+        const unitAmount = Math.round((item.price || 0) * 100);
+        logStep("Processing item", { 
+          itemId: item.id,
+          itemName: item.name, 
+          itemPrice: item.price,
+          unitAmount,
+          itemQuantity: item.quantity
+        });
+        
+        return {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: item.name || "Product",
+              images: item.image_url ? [item.image_url] : [],
+            },
+            unit_amount: unitAmount,
+          },
+          quantity: item.quantity || 1,
+        };
       });
-      
-      const unitAmount = Math.round(item.price * 100); // Convert to cents
-      
-      return {
+
+      // Add shipping
+      lineItems.push({
         price_data: {
           currency: "usd",
           product_data: {
-            name: item.name,
-            images: item.image_url ? [item.image_url] : [],
+            name: "Shipping",
           },
-          unit_amount: unitAmount,
+          unit_amount: 999, // $9.99 shipping
         },
-        quantity: item.quantity,
-      };
-    });
+        quantity: 1,
+      });
 
-    // Add shipping as a line item
-    lineItems.push({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: "Shipping",
-        },
-        unit_amount: 999, // $9.99 shipping
-      },
-      quantity: 1,
-    });
-
-    logStep("Line items created", { count: lineItems.length });
+      logStep("Line items created", { count: lineItems.length });
+    } catch (itemError) {
+      logStep("ERROR: Failed to create line items", { error: itemError.message });
+      return new Response(JSON.stringify({ error: "Failed to process cart items" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     // Create checkout session
-    logStep("Creating Stripe checkout session");
-    const sessionData = {
-      customer: customerId,
-      customer_email: customerId ? undefined : shippingInfo.email,
-      line_items: lineItems,
-      mode: "payment" as const,
-      success_url: `${req.headers.get("origin")}/checkout?success=true`,
-      cancel_url: `${req.headers.get("origin")}/checkout?cancelled=true`,
-      automatic_tax: {
-        enabled: true,
-      },
-      shipping_address_collection: {
-        allowed_countries: ['US'] as const,
-      },
-      customer_creation: customerId ? undefined : 'always' as const,
-      metadata: {
-        order_type: 'cart_checkout',
-      }
-    };
-
-    logStep("Session data prepared", { 
-      hasCustomer: !!customerId,
-      email: shippingInfo.email,
-      lineItemCount: lineItems.length
-    });
-
-    const session = await stripe.checkout.sessions.create(sessionData);
-    logStep("Stripe session created successfully", { sessionId: session.id });
-
-    // Create order record using service role key
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
-    logStep("Creating order record in database");
-    const totalAmount = items.reduce((sum: number, item: any) => {
-      return sum + (item.price * item.quantity);
-    }, 0) + 9.99;
-
+    let session;
     try {
+      const origin = req.headers.get("origin") || "https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com";
+      
+      const sessionData = {
+        customer_email: shippingInfo.email,
+        line_items: lineItems,
+        mode: "payment" as const,
+        success_url: `${origin}/checkout?success=true`,
+        cancel_url: `${origin}/checkout?cancelled=true`,
+        automatic_tax: {
+          enabled: true,
+        },
+        shipping_address_collection: {
+          allowed_countries: ['US'] as const,
+        },
+        customer_creation: 'always' as const,
+        metadata: {
+          order_type: 'cart_checkout',
+        }
+      };
+
+      logStep("Creating Stripe session", { origin, email: shippingInfo.email });
+      session = await stripe.checkout.sessions.create(sessionData);
+      logStep("Stripe session created", { sessionId: session.id, url: session.url });
+    } catch (stripeError) {
+      logStep("ERROR: Failed to create Stripe session", { 
+        error: stripeError.message,
+        code: stripeError.code,
+        type: stripeError.type
+      });
+      return new Response(JSON.stringify({ error: "Failed to create payment session" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    // Create order record (optional - don't fail if this doesn't work)
+    try {
+      const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, { 
+        auth: { persistSession: false } 
+      });
+
+      const totalAmount = items.reduce((sum, item) => {
+        return sum + ((item.price || 0) * (item.quantity || 1));
+      }, 0) + 9.99;
+
       const { error: orderError } = await supabaseClient.from("orders").insert({
         email: shippingInfo.email,
         stripe_session_id: session.id,
@@ -182,30 +204,37 @@ serve(async (req) => {
       });
 
       if (orderError) {
-        logStep("ERROR creating order record", { error: orderError });
-        console.warn("Failed to create order record, but continuing with checkout");
+        logStep("WARNING: Failed to create order record", { error: orderError });
       } else {
         logStep("Order record created successfully");
       }
-    } catch (orderCreationError) {
-      logStep("ERROR in order creation", { error: orderCreationError.message });
+    } catch (orderError) {
+      logStep("WARNING: Order creation failed but continuing", { error: orderError.message });
     }
 
-    logStep("Function completed successfully", { sessionUrl: session.url });
+    // Return success response
+    const response = { url: session.url };
+    logStep("Function completed successfully", response);
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-payment function", { 
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    logStep("CRITICAL ERROR in create-payment function", { 
       message: errorMessage, 
-      stack: error instanceof Error ? error.stack : undefined 
+      stack: errorStack,
+      name: error instanceof Error ? error.name : 'Unknown'
     });
     
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ 
+      error: "Payment processing failed", 
+      details: errorMessage 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
