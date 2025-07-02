@@ -38,9 +38,20 @@ const Checkout = () => {
   const handleCompleteOrder = async () => {
     console.log("Starting checkout process...");
     
-    if (!shippingInfo.firstName || !shippingInfo.lastName || !shippingInfo.email || !shippingInfo.address || !shippingInfo.city || !shippingInfo.zipCode) {
-      console.log("Missing shipping info:", shippingInfo);
-      toast.error("Please fill in all shipping information");
+    // Validate shipping info
+    const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'zipCode'];
+    const missingFields = requiredFields.filter(field => !shippingInfo[field as keyof typeof shippingInfo]?.trim());
+    
+    if (missingFields.length > 0) {
+      console.log("Missing required fields:", missingFields);
+      toast.error(`Please fill in: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(shippingInfo.email)) {
+      toast.error("Please enter a valid email address");
       return;
     }
 
@@ -52,15 +63,34 @@ const Checkout = () => {
 
     setLoading(true);
     try {
-      console.log("Invoking create-payment function with:", { 
-        items: items.length, 
-        shippingInfo: { ...shippingInfo, email: shippingInfo.email } 
+      // Format items for the Edge Function - ensure all required properties exist
+      const formattedItems = items.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: Number(item.price) || 0,
+        quantity: Number(item.quantity) || 1,
+        image_url: item.image_url || null
+      }));
+
+      // Format shipping info - ensure all fields are strings
+      const formattedShippingInfo = {
+        firstName: String(shippingInfo.firstName).trim(),
+        lastName: String(shippingInfo.lastName).trim(),
+        email: String(shippingInfo.email).trim().toLowerCase(),
+        address: String(shippingInfo.address).trim(),
+        city: String(shippingInfo.city).trim(), 
+        zipCode: String(shippingInfo.zipCode).trim()
+      };
+
+      console.log("Sending formatted data:", { 
+        itemCount: formattedItems.length, 
+        shippingInfo: formattedShippingInfo 
       });
 
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
-          items: items,
-          shippingInfo: shippingInfo
+          items: formattedItems,
+          shippingInfo: formattedShippingInfo
         }
       });
 
@@ -68,7 +98,7 @@ const Checkout = () => {
 
       if (error) {
         console.error("Supabase function error:", error);
-        toast.error(`Payment error: ${error.message}`);
+        toast.error(`Payment error: ${error.message || 'Unknown error occurred'}`);
         return;
       }
 
@@ -83,7 +113,7 @@ const Checkout = () => {
         // Redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
-        console.error("No URL returned from payment function");
+        console.error("No URL returned from payment function", data);
         toast.error("Failed to get checkout URL. Please try again.");
       }
     } catch (error) {
