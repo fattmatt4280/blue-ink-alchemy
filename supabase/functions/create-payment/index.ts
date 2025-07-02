@@ -82,7 +82,7 @@ serve(async (req) => {
     const productIds = items.map((item: any) => item.id);
     const { data: products, error: productsError } = await supabaseClient
       .from('products')
-      .select('id, name, stripe_price_id')
+      .select('id, name, stripe_price_id, price')
       .in('id', productIds);
 
     if (productsError || !products) {

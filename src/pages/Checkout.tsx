@@ -34,23 +34,29 @@ const Checkout = () => {
 
   const subtotal = getTotalPrice();
   const shipping = 9.99;
-  const taxRate = 0.085; // 8.5% sales tax
-  const salesTax = subtotal * taxRate;
-  const total = subtotal + shipping + salesTax;
 
   const handleCompleteOrder = async () => {
+    console.log("Starting checkout process...");
+    
     if (!shippingInfo.firstName || !shippingInfo.lastName || !shippingInfo.email || !shippingInfo.address || !shippingInfo.city || !shippingInfo.zipCode) {
+      console.log("Missing shipping info:", shippingInfo);
       toast.error("Please fill in all shipping information");
       return;
     }
 
     if (items.length === 0) {
+      console.log("Cart is empty");
       toast.error("Your cart is empty");
       return;
     }
 
     setLoading(true);
     try {
+      console.log("Invoking create-payment function with:", { 
+        items: items.length, 
+        shippingInfo: { ...shippingInfo, email: shippingInfo.email } 
+      });
+
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           items: items,
@@ -58,14 +64,30 @@ const Checkout = () => {
         }
       });
 
-      if (error) throw error;
+      console.log("Function response:", { data, error });
+
+      if (error) {
+        console.error("Supabase function error:", error);
+        toast.error(`Payment error: ${error.message}`);
+        return;
+      }
+
+      if (data?.error) {
+        console.error("Payment function returned error:", data.error);
+        toast.error(`Payment error: ${data.error}`);
+        return;
+      }
 
       if (data?.url) {
+        console.log("Redirecting to Stripe checkout:", data.url);
         // Redirect to Stripe Checkout
         window.location.href = data.url;
+      } else {
+        console.error("No URL returned from payment function");
+        toast.error("Failed to get checkout URL. Please try again.");
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Checkout error:', error);
       toast.error("Failed to process payment. Please try again.");
     } finally {
       setLoading(false);
@@ -222,17 +244,9 @@ const Checkout = () => {
                     <span>Shipping:</span>
                     <span className="font-semibold">${shipping.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Est. Tax:</span>
-                    <span className="font-semibold">${salesTax.toFixed(2)}</span>
-                  </div>
                   <div className="border-t pt-4">
-                    <div className="flex justify-between text-lg font-bold">
-                      <span>Est. Total:</span>
-                      <span>${total.toFixed(2)}</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      *Final total calculated by Stripe with accurate tax
+                    <p className="text-sm text-gray-500">
+                      Final total and taxes will be calculated by Stripe
                     </p>
                   </div>
                 </CardContent>
@@ -300,7 +314,7 @@ const Checkout = () => {
                       Processing...
                     </>
                   ) : (
-                    "Complete Order - Stripe will calculate final total"
+                    "Complete Order with Stripe"
                   )}
                 </Button>
                 <Button 
