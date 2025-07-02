@@ -14,7 +14,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
-  logStep("Function started");
+  logStep("Function started", { method: req.method, url: req.url });
 
   if (req.method === "OPTIONS") {
     logStep("OPTIONS request handled");
@@ -26,6 +26,12 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    logStep("Environment check", { 
+      hasStripeKey: !!stripeKey, 
+      hasSupabaseUrl: !!supabaseUrl,
+      hasServiceKey: !!supabaseServiceKey
+    });
 
     if (!stripeKey) {
       logStep("ERROR: STRIPE_SECRET_KEY not found");
@@ -43,15 +49,13 @@ serve(async (req) => {
       });
     }
 
-    logStep("Environment variables verified");
-
     // Parse request body
     let body;
     try {
       const rawBody = await req.text();
-      logStep("Raw request body received", { length: rawBody.length });
+      logStep("Request body received", { bodyLength: rawBody.length });
       body = JSON.parse(rawBody);
-      logStep("Request body parsed successfully", { 
+      logStep("Request body parsed", { 
         hasItems: !!body.items, 
         itemCount: body.items?.length,
         hasShippingInfo: !!body.shippingInfo
@@ -83,8 +87,6 @@ serve(async (req) => {
       });
     }
 
-    logStep("Data validation passed");
-
     // Initialize Stripe
     let stripe;
     try {
@@ -98,7 +100,7 @@ serve(async (req) => {
       });
     }
 
-    // Create line items
+    // Create line items with detailed logging
     let lineItems;
     try {
       lineItems = items.map((item) => {
@@ -136,7 +138,7 @@ serve(async (req) => {
         quantity: 1,
       });
 
-      logStep("Line items created", { count: lineItems.length });
+      logStep("Line items created successfully", { count: lineItems.length });
     } catch (itemError) {
       logStep("ERROR: Failed to create line items", { error: itemError.message });
       return new Response(JSON.stringify({ error: "Failed to process cart items" }), {
@@ -145,7 +147,7 @@ serve(async (req) => {
       });
     }
 
-    // Create checkout session
+    // Create checkout session with detailed error handling
     let session;
     try {
       const origin = req.headers.get("origin") || "https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com";
@@ -168,22 +170,46 @@ serve(async (req) => {
         }
       };
 
-      logStep("Creating Stripe session", { origin, email: shippingInfo.email });
+      logStep("Creating Stripe session", { 
+        origin, 
+        email: shippingInfo.email,
+        lineItemsCount: lineItems.length,
+        mode: sessionData.mode
+      });
+
       session = await stripe.checkout.sessions.create(sessionData);
-      logStep("Stripe session created", { sessionId: session.id, url: session.url });
+      logStep("Stripe session created successfully", { 
+        sessionId: session.id, 
+        url: session.url,
+        paymentStatus: session.payment_status
+      });
+
     } catch (stripeError) {
       logStep("ERROR: Failed to create Stripe session", { 
         error: stripeError.message,
         code: stripeError.code,
-        type: stripeError.type
+        type: stripeError.type,
+        stack: stripeError.stack
       });
-      return new Response(JSON.stringify({ error: "Failed to create payment session" }), {
+      
+      // Return more specific error messages
+      let errorMessage = "Failed to create payment session";
+      if (stripeError.code === 'parameter_invalid_empty') {
+        errorMessage = "Invalid payment parameters";
+      } else if (stripeError.code === 'api_key_expired') {
+        errorMessage = "Payment system configuration expired";
+      }
+      
+      return new Response(JSON.stringify({ 
+        error: errorMessage,
+        details: stripeError.message 
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
       });
     }
 
-    // Create order record (optional - don't fail if this doesn't work)
+    // Create order record (make this more resilient)
     try {
       const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, { 
         auth: { persistSession: false } 
@@ -193,7 +219,7 @@ serve(async (req) => {
         return sum + ((item.price || 0) * (item.quantity || 1));
       }, 0) + 9.99;
 
-      const { error: orderError } = await supabaseClient.from("orders").insert({
+      const orderData = {
         email: shippingInfo.email,
         stripe_session_id: session.id,
         amount: Math.round(totalAmount * 100),
@@ -201,15 +227,26 @@ serve(async (req) => {
         status: 'pending',
         is_guest: true,
         currency: 'usd'
-      });
+      };
+
+      logStep("Creating order record", { orderData });
+
+      const { error: orderError } = await supabaseClient.from("orders").insert(orderData);
 
       if (orderError) {
-        logStep("WARNING: Failed to create order record", { error: orderError });
+        logStep("WARNING: Failed to create order record", { 
+          error: orderError.message,
+          code: orderError.code,
+          details: orderError.details
+        });
       } else {
         logStep("Order record created successfully");
       }
     } catch (orderError) {
-      logStep("WARNING: Order creation failed but continuing", { error: orderError.message });
+      logStep("WARNING: Order creation failed but continuing", { 
+        error: orderError.message,
+        name: orderError.name
+      });
     }
 
     // Return success response
@@ -224,11 +261,13 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
+    const errorName = error instanceof Error ? error.name : 'Unknown';
     
     logStep("CRITICAL ERROR in create-payment function", { 
       message: errorMessage, 
       stack: errorStack,
-      name: error instanceof Error ? error.name : 'Unknown'
+      name: errorName,
+      errorType: typeof error
     });
     
     return new Response(JSON.stringify({ 
