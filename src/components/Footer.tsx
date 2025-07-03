@@ -36,8 +36,8 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Brand with Contact and Support */}
+        <div className="mb-12">
+          {/* Brand with Contact, Support, and Quick Links */}
           <div>
             <h3 className="text-2xl font-light mb-4">Blue Dream Budder</h3>
             <p className="text-gray-300 leading-relaxed mb-6">
@@ -55,33 +55,34 @@ const Footer = () => {
               </div>
             </div>
             
-            {/* Support section moved here */}
-            <div>
-              <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
-              <ul className="space-y-2 text-gray-300">
-                {supportLinks.map((link, index) => (
-                  <li key={index}>
-                    <Link to={link.url} className="hover:text-white transition-colors">
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            {/* Support and Quick Links side by side */}
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
+                <ul className="space-y-2 text-gray-300">
+                  {supportLinks.map((link, index) => (
+                    <li key={index}>
+                      <Link to={link.url} className="hover:text-white transition-colors">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-4">{content.quick_links_title || 'Quick Links'}</h4>
+                <ul className="space-y-2 text-gray-300">
+                  {quickLinks.map((link, index) => (
+                    <li key={index}>
+                      <Link to={link.url} className="hover:text-white transition-colors">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-          
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-medium mb-4">{content.quick_links_title || 'Quick Links'}</h4>
-            <ul className="space-y-2 text-gray-300">
-              {quickLinks.map((link, index) => (
-                <li key={index}>
-                  <Link to={link.url} className="hover:text-white transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
         
