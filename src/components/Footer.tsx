@@ -36,11 +36,11 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div>
             <h3 className="text-2xl font-light mb-4">Blue Dream Budder</h3>
-            <p className="text-gray-300 leading-relaxed mb-6 max-w-md">
+            <p className="text-gray-300 leading-relaxed mb-6">
               Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients 
               for optimal healing and skin restoration.
             </p>
