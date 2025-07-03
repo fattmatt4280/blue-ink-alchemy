@@ -36,15 +36,15 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {/* Brand */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {/* Brand with Contact and Support */}
           <div>
             <h3 className="text-2xl font-light mb-4">Blue Dream Budder</h3>
             <p className="text-gray-300 leading-relaxed mb-6">
               Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients 
               for optimal healing and skin restoration.
             </p>
-            <div className="space-y-2">
+            <div className="space-y-2 mb-6">
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4" />
                 <span className="text-gray-300">hello@bluedreambudder.com</span>
@@ -54,6 +54,20 @@ const Footer = () => {
                 <span className="text-gray-300">1-800-BUDDER-1</span>
               </div>
             </div>
+            
+            {/* Support section moved here */}
+            <div>
+              <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
+              <ul className="space-y-2 text-gray-300">
+                {supportLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link to={link.url} className="hover:text-white transition-colors">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
           
           {/* Quick Links */}
@@ -61,20 +75,6 @@ const Footer = () => {
             <h4 className="font-medium mb-4">{content.quick_links_title || 'Quick Links'}</h4>
             <ul className="space-y-2 text-gray-300">
               {quickLinks.map((link, index) => (
-                <li key={index}>
-                  <Link to={link.url} className="hover:text-white transition-colors">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Support */}
-          <div>
-            <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
-            <ul className="space-y-2 text-gray-300">
-              {supportLinks.map((link, index) => (
                 <li key={index}>
                   <Link to={link.url} className="hover:text-white transition-colors">
                     {link.name}
