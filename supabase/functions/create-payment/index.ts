@@ -124,7 +124,7 @@ serve(async (req) => {
 
     console.log(`[CREATE-PAYMENT] Created ${lineItems.length} line items`);
 
-    // Create checkout session with existing customer
+    // Create checkout session with existing customer - REMOVED automatic_tax to fix the error
     const origin = req.headers.get("origin") || "https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com";
     
     console.log("[CREATE-PAYMENT] Creating Stripe session with customer:", customerId);
@@ -134,9 +134,6 @@ serve(async (req) => {
       mode: "payment",
       success_url: `${origin}/checkout?success=true`,
       cancel_url: `${origin}/checkout?cancelled=true`,
-      automatic_tax: {
-        enabled: true,
-      },
       shipping_address_collection: {
         allowed_countries: ['US'],
       },
