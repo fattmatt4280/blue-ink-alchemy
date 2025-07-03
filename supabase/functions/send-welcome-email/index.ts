@@ -37,7 +37,7 @@ serve(async (req) => {
     const resend = new Resend(resendKey);
 
     const emailResponse = await resend.emails.send({
-      from: "Blue Dream Budder <hello@bluedreambudder.com>",
+      from: "Blue Dream Budder <onboarding@resend.dev>",
       to: [email],
       subject: "Welcome to Blue Dream Budder! 🎨",
       html: `
