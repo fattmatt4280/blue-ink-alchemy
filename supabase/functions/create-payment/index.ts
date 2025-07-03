@@ -25,7 +25,8 @@ serve(async (req) => {
     console.log("[CREATE-PAYMENT] Environment check:", { 
       hasStripeKey: !!stripeKey, 
       hasSupabaseUrl: !!supabaseUrl,
-      hasServiceKey: !!supabaseServiceKey
+      hasServiceKey: !!supabaseServiceKey,
+      stripeKeyPrefix: stripeKey ? stripeKey.substring(0, 7) : 'none'
     });
 
     if (!stripeKey) {
@@ -99,7 +100,7 @@ serve(async (req) => {
 
     console.log(`[CREATE-PAYMENT] Created ${lineItems.length} line items`);
 
-    // Create checkout session
+    // Create checkout session - simplified approach
     const origin = req.headers.get("origin") || "https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com";
     
     console.log("[CREATE-PAYMENT] Creating Stripe session...");
