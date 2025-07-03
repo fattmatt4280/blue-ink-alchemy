@@ -55,8 +55,8 @@ const Footer = () => {
               </div>
             </div>
             
-            {/* Support and Quick Links side by side */}
-            <div className="grid md:grid-cols-2 gap-8">
+            {/* Support and Quick Links side by side with reduced gap */}
+            <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
                 <ul className="space-y-2 text-gray-300">
