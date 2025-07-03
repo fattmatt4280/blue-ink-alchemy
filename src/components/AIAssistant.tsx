@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,7 @@ interface Message {
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasShown, setHasShown] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -47,6 +47,11 @@ const AIAssistant = () => {
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
 
+    // Expand the dialog when user starts typing
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputText,
@@ -70,6 +75,12 @@ const AIAssistant = () => {
       setMessages(prev => [...prev, aiMessage]);
       setIsTyping(false);
     }, 1000 + Math.random() * 1000);
+  };
+
+  const handleInputFocus = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
   };
 
   const generateAIResponse = (userInput: string): string => {
@@ -121,7 +132,9 @@ const AIAssistant = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 sm:w-96">
+    <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
+      isExpanded ? 'w-80 sm:w-96' : 'w-72 sm:w-80'
+    }`}>
       <Card className="shadow-2xl border-2 border-blue-200">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
           <div className="flex items-center justify-between">
@@ -141,7 +154,9 @@ const AIAssistant = () => {
         </CardHeader>
         
         <CardContent className="p-0">
-          <div className="h-80 overflow-y-auto p-4 space-y-4">
+          <div className={`overflow-y-auto p-4 space-y-4 transition-all duration-300 ${
+            isExpanded ? 'h-80' : 'h-48'
+          }`}>
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -190,6 +205,7 @@ const AIAssistant = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
+                onFocus={handleInputFocus}
                 placeholder="Ask me anything about Blue Dream Budder..."
                 className="flex-1"
               />
