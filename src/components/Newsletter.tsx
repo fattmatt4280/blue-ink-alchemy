@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,28 +16,57 @@ const Newsletter = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
+      // First, save the email to the database
+      const { error: dbError } = await supabase
         .from('newsletter_signups')
         .insert([{ email }]);
 
-      if (error) {
-        if (error.code === '23505') { // Unique constraint violation (email already exists)
+      if (dbError) {
+        if (dbError.code === '23505') { // Unique constraint violation (email already exists)
           toast({
             title: "Already subscribed!",
             description: "This email is already signed up for our newsletter.",
             variant: "destructive",
           });
+          setEmail("");
+          setIsSubmitting(false);
+          return;
         } else {
-          throw error;
+          throw dbError;
         }
-      } else {
-        toast({
-          title: "Welcome to the family!",
-          description: "You've been successfully subscribed to our newsletter.",
-        });
-        setIsSubscribed(true);
       }
-      
+
+      // If database insert was successful, send welcome email
+      try {
+        console.log('Sending welcome email to:', email);
+        const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+          body: { email }
+        });
+
+        if (emailError) {
+          console.error('Email sending error:', emailError);
+          // Don't fail the whole process if email fails, just log it
+          toast({
+            title: "Subscribed!",
+            description: "You've been subscribed, but there was an issue sending the welcome email. Check your inbox anyway!",
+          });
+        } else {
+          console.log('Welcome email sent successfully');
+          toast({
+            title: "Welcome to the family!",
+            description: "You've been subscribed and a welcome email with your 10% discount code is on its way!",
+          });
+        }
+      } catch (emailError) {
+        console.error('Welcome email error:', emailError);
+        // Still show success since they're subscribed
+        toast({
+          title: "Subscribed!",
+          description: "You've been subscribed successfully! Welcome email may take a few minutes to arrive.",
+        });
+      }
+
+      setIsSubscribed(true);
       setEmail("");
     } catch (error) {
       console.error('Newsletter signup error:', error);
@@ -90,7 +118,7 @@ const Newsletter = () => {
           ) : (
             <div className="bg-white/10 rounded-xl p-6 max-w-md mx-auto">
               <h3 className="text-xl font-medium mb-2">Welcome to the family!</h3>
-              <p className="opacity-90">Check your email for a special welcome discount.</p>
+              <p className="opacity-90">Check your email for your special 10% discount code!</p>
             </div>
           )}
           
