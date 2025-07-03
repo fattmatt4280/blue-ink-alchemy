@@ -100,44 +100,46 @@ const Checkout = () => {
         body: payload
       });
 
-      const { data, error } = await Promise.race([functionPromise, timeoutPromise]);
+      const response = await Promise.race([functionPromise, timeoutPromise]) as { 
+        data?: { url?: string; error?: string } | null; 
+        error?: { message?: string } | null 
+      };
 
       console.log("=== FUNCTION RESPONSE ===");
-      console.log("Data:", data);
-      console.log("Error:", error);
+      console.log("Response:", response);
 
-      if (error) {
-        console.error("Supabase function error:", error);
-        toast.error(`Checkout failed: ${error.message || 'Function call failed'}`);
+      if (response.error) {
+        console.error("Supabase function error:", response.error);
+        toast.error(`Checkout failed: ${response.error.message || 'Function call failed'}`);
         return;
       }
 
-      if (data?.error) {
-        console.error("Payment function returned error:", data.error);
-        toast.error(`Payment error: ${data.error}`);
+      if (response.data?.error) {
+        console.error("Payment function returned error:", response.data.error);
+        toast.error(`Payment error: ${response.data.error}`);
         return;
       }
 
-      if (data?.url) {
-        console.log("SUCCESS - Redirecting to:", data.url);
+      if (response.data?.url) {
+        console.log("SUCCESS - Redirecting to:", response.data.url);
         // Try to redirect in the same window first
         try {
-          window.location.href = data.url;
+          window.location.href = response.data.url;
         } catch (redirectError) {
           console.log("Same window redirect failed, trying new window:", redirectError);
           // Fallback to opening in new window
-          const newWindow = window.open(data.url, '_blank');
+          const newWindow = window.open(response.data.url, '_blank');
           if (!newWindow) {
-            toast.error("Please allow popups and try again, or copy this URL: " + data.url);
+            toast.error("Please allow popups and try again, or copy this URL: " + response.data.url);
           }
         }
       } else {
-        console.error("No URL returned from payment function", data);
+        console.error("No URL returned from payment function", response.data);
         toast.error("Failed to create checkout session. Please try again.");
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      if (error.message.includes('timeout')) {
+      if (error instanceof Error && error.message.includes('timeout')) {
         toast.error("Request timed out. Please check your connection and try again.");
       } else {
         toast.error(`Checkout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
