@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,7 +37,7 @@ const Checkout = () => {
   const shipping = 9.99;
 
   const handleCompleteOrder = async () => {
-    console.log("Starting checkout process...");
+    console.log("=== STARTING CHECKOUT PROCESS ===");
     
     // Validate shipping info
     const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'zipCode'];
@@ -62,34 +63,45 @@ const Checkout = () => {
     }
 
     setLoading(true);
+    
     try {
-      console.log("Invoking create-payment function...");
-      
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: {
-          items: items.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: Number(item.price) || 0,
-            quantity: Number(item.quantity) || 1,
-            image_url: item.image_url || null
-          })),
-          shippingInfo: {
-            firstName: String(shippingInfo.firstName).trim(),
-            lastName: String(shippingInfo.lastName).trim(),
-            email: String(shippingInfo.email).trim().toLowerCase(),
-            address: String(shippingInfo.address).trim(),
-            city: String(shippingInfo.city).trim(), 
-            zipCode: String(shippingInfo.zipCode).trim()
-          }
+      console.log("=== PREPARING FUNCTION CALL ===");
+      console.log("Items to send:", items);
+      console.log("Shipping info:", shippingInfo);
+
+      // Prepare the payload
+      const payload = {
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: Number(item.price) || 0,
+          quantity: Number(item.quantity) || 1,
+          image_url: item.image_url || null
+        })),
+        shippingInfo: {
+          firstName: String(shippingInfo.firstName).trim(),
+          lastName: String(shippingInfo.lastName).trim(),
+          email: String(shippingInfo.email).trim().toLowerCase(),
+          address: String(shippingInfo.address).trim(),
+          city: String(shippingInfo.city).trim(), 
+          zipCode: String(shippingInfo.zipCode).trim()
         }
+      };
+
+      console.log("=== CALLING CREATE-PAYMENT FUNCTION ===");
+      console.log("Payload:", JSON.stringify(payload, null, 2));
+
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: payload
       });
 
-      console.log("Function response:", { data, error });
+      console.log("=== FUNCTION RESPONSE ===");
+      console.log("Data:", data);
+      console.log("Error:", error);
 
       if (error) {
         console.error("Supabase function error:", error);
-        toast.error(`Checkout failed: ${error.message}`);
+        toast.error(`Checkout failed: ${error.message || 'Unknown error'}`);
         return;
       }
 
@@ -100,7 +112,7 @@ const Checkout = () => {
       }
 
       if (data?.url) {
-        console.log("Redirecting to Stripe checkout:", data.url);
+        console.log("SUCCESS - Redirecting to:", data.url);
         window.location.href = data.url;
       } else {
         console.error("No URL returned from payment function", data);
@@ -108,7 +120,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error("Checkout failed. Please try again.");
+      toast.error(`Checkout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
