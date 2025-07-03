@@ -91,9 +91,16 @@ const Checkout = () => {
       console.log("=== CALLING CREATE-PAYMENT FUNCTION ===");
       console.log("Payload:", JSON.stringify(payload, null, 2));
 
-      const { data, error } = await supabase.functions.invoke('create-payment', {
+      // Set a timeout for the function call
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Function call timeout after 30 seconds')), 30000)
+      );
+
+      const functionPromise = supabase.functions.invoke('create-payment', {
         body: payload
       });
+
+      const { data, error } = await Promise.race([functionPromise, timeoutPromise]);
 
       console.log("=== FUNCTION RESPONSE ===");
       console.log("Data:", data);
@@ -101,7 +108,7 @@ const Checkout = () => {
 
       if (error) {
         console.error("Supabase function error:", error);
-        toast.error(`Checkout failed: ${error.message || 'Unknown error'}`);
+        toast.error(`Checkout failed: ${error.message || 'Function call failed'}`);
         return;
       }
 
@@ -113,14 +120,28 @@ const Checkout = () => {
 
       if (data?.url) {
         console.log("SUCCESS - Redirecting to:", data.url);
-        window.location.href = data.url;
+        // Try to redirect in the same window first
+        try {
+          window.location.href = data.url;
+        } catch (redirectError) {
+          console.log("Same window redirect failed, trying new window:", redirectError);
+          // Fallback to opening in new window
+          const newWindow = window.open(data.url, '_blank');
+          if (!newWindow) {
+            toast.error("Please allow popups and try again, or copy this URL: " + data.url);
+          }
+        }
       } else {
         console.error("No URL returned from payment function", data);
         toast.error("Failed to create checkout session. Please try again.");
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error(`Checkout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      if (error.message.includes('timeout')) {
+        toast.error("Request timed out. Please check your connection and try again.");
+      } else {
+        toast.error(`Checkout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     } finally {
       setLoading(false);
     }
