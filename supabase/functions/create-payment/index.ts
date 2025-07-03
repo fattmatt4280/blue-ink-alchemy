@@ -68,6 +68,30 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     console.log("[CREATE-PAYMENT] Stripe initialized");
 
+    // Create or find customer - ALWAYS create a customer first to avoid V2 account restrictions
+    console.log("[CREATE-PAYMENT] Looking for existing customer...");
+    const customers = await stripe.customers.list({ email: shippingInfo.email, limit: 1 });
+    
+    let customerId;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+      console.log("[CREATE-PAYMENT] Found existing customer:", customerId);
+    } else {
+      console.log("[CREATE-PAYMENT] Creating new customer...");
+      const customer = await stripe.customers.create({
+        email: shippingInfo.email,
+        name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+        address: {
+          line1: shippingInfo.address,
+          city: shippingInfo.city,
+          postal_code: shippingInfo.zipCode,
+          country: 'US',
+        },
+      });
+      customerId = customer.id;
+      console.log("[CREATE-PAYMENT] Created new customer:", customerId);
+    }
+
     // Create line items
     const lineItems = items.map((item) => {
       const unitAmount = Math.round((item.price || 0) * 100);
@@ -100,12 +124,12 @@ serve(async (req) => {
 
     console.log(`[CREATE-PAYMENT] Created ${lineItems.length} line items`);
 
-    // Create checkout session - simplified approach
+    // Create checkout session with existing customer
     const origin = req.headers.get("origin") || "https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com";
     
-    console.log("[CREATE-PAYMENT] Creating Stripe session...");
+    console.log("[CREATE-PAYMENT] Creating Stripe session with customer:", customerId);
     const session = await stripe.checkout.sessions.create({
-      customer_email: shippingInfo.email,
+      customer: customerId, // Always use existing customer
       line_items: lineItems,
       mode: "payment",
       success_url: `${origin}/checkout?success=true`,
@@ -116,7 +140,6 @@ serve(async (req) => {
       shipping_address_collection: {
         allowed_countries: ['US'],
       },
-      customer_creation: 'always',
     });
 
     console.log(`[CREATE-PAYMENT] Stripe session created: ${session.id}`);
