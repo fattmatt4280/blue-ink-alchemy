@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,7 @@ interface Product {
   image_url?: string;
   size?: string;
   popular?: boolean;
+  most_popular?: boolean;
   display_order: number;
 }
 
@@ -114,7 +116,12 @@ const ProductGrid = () => {
                 className="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
                 onClick={() => handleProductView(product)}
               >
-                {product.popular && (
+                {product.most_popular && (
+                  <Badge className="absolute top-4 left-4 z-10 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white">
+                    Most Popular
+                  </Badge>
+                )}
+                {product.popular && !product.most_popular && (
                   <Badge className="absolute top-4 left-4 z-10 bg-blue-600 hover:bg-blue-700">
                     Popular
                   </Badge>

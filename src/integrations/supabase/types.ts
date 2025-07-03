@@ -195,6 +195,7 @@ export type Database = {
           display_order: number
           id: string
           image_url: string | null
+          most_popular: boolean | null
           name: string
           original_price: number | null
           popular: boolean | null
@@ -209,6 +210,7 @@ export type Database = {
           display_order?: number
           id?: string
           image_url?: string | null
+          most_popular?: boolean | null
           name: string
           original_price?: number | null
           popular?: boolean | null
@@ -223,6 +225,7 @@ export type Database = {
           display_order?: number
           id?: string
           image_url?: string | null
+          most_popular?: boolean | null
           name?: string
           original_price?: number | null
           popular?: boolean | null
