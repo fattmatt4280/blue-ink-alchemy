@@ -58,7 +58,7 @@ const Footer = () => {
             {/* Support and Quick Links in 4-column grid */}
             <div className="grid md:grid-cols-4 gap-4">
               <div>
-                <h4 className="font-medium mb-4">{content.support_title || 'Support'}</h4>
+                <h4 className="text-lg font-bold mb-4">{content.support_title || 'Support'}</h4>
                 <ul className="space-y-2 text-gray-300">
                   {supportLinks.map((link, index) => (
                     <li key={index}>
@@ -71,7 +71,7 @@ const Footer = () => {
               </div>
               
               <div>
-                <h4 className="font-medium mb-4">{content.quick_links_title || 'Quick Links'}</h4>
+                <h4 className="text-lg font-bold mb-4">{content.quick_links_title || 'Quick Links'}</h4>
                 <ul className="space-y-2 text-gray-300">
                   {quickLinks.map((link, index) => (
                     <li key={index}>
