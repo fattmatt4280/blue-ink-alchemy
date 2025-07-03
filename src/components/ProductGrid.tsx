@@ -113,7 +113,7 @@ const ProductGrid = () => {
             {products.map((product) => (
               <div 
                 key={product.id} 
-                className="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+                className="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative"
                 onClick={() => handleProductView(product)}
               >
                 {product.most_popular && (
