@@ -25,7 +25,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) => {
   return (
     <div 
-      className="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 relative"
+      className="group neon-card rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer"
       onClick={() => onProductView(product)}
     >
       {product.most_popular && (
@@ -44,7 +44,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="neon-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-6xl">
@@ -53,9 +53,9 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
         )}
       </div>
 
-      <div className="p-6">
+      <div className="p-6 relative z-10">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+          <h3 className="cyber-text text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
             {product.name}
           </h3>
           {product.size && (
@@ -73,7 +73,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="cyber-text text-2xl font-bold text-gray-900">
               ${product.price.toFixed(2)}
             </span>
             {product.original_price && product.original_price > product.price && (
@@ -88,7 +88,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
               e.stopPropagation();
               onAddToCart(product);
             }}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            className="neon-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Add to Cart
           </Button>
