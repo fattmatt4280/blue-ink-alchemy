@@ -8,8 +8,9 @@ const corsHeaders = {
 };
 
 const logStep = (step: string, details?: any) => {
+  const timestamp = new Date().toISOString();
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[SEND-WELCOME-EMAIL] ${step}${detailsStr}`);
+  console.log(`[${timestamp}] [SEND-WELCOME-EMAIL] ${step}${detailsStr}`);
 };
 
 serve(async (req) => {
@@ -18,23 +19,29 @@ serve(async (req) => {
   }
 
   try {
-    logStep("Function started");
+    logStep("🚀 Function started");
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) {
+      logStep("❌ RESEND_API_KEY is not set");
       throw new Error("RESEND_API_KEY is not set");
     }
+    
+    logStep("✅ RESEND_API_KEY found");
 
     const body = await req.json();
     const { email } = body;
 
     if (!email) {
+      logStep("❌ Email is required but not provided");
       throw new Error("Email is required");
     }
 
-    logStep("Sending welcome email", { email });
+    logStep("📧 Processing email signup", { email });
 
     const resend = new Resend(resendKey);
+
+    logStep("📤 Attempting to send email via Resend");
 
     const emailResponse = await resend.emails.send({
       from: "Blue Dream Budder <onboarding@resend.dev>",
@@ -90,7 +97,7 @@ serve(async (req) => {
       `,
     });
 
-    logStep("Email sent successfully", emailResponse);
+    logStep("✅ Email sent successfully!", emailResponse);
 
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -98,7 +105,7 @@ serve(async (req) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
+    logStep("💥 CRITICAL ERROR", { message: errorMessage, stack: error instanceof Error ? error.stack : 'No stack trace' });
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

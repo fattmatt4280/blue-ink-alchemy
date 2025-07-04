@@ -17,7 +17,7 @@ const Newsletter = () => {
     setIsSubmitting(true);
 
     try {
-      console.log('Starting newsletter signup for:', email);
+      console.log('🚀 Starting newsletter signup for:', email);
       
       // First, save the email to the database
       const { error: dbError } = await supabase
@@ -26,6 +26,7 @@ const Newsletter = () => {
 
       if (dbError) {
         if (dbError.code === '23505') { // Unique constraint violation (email already exists)
+          console.log('📧 Email already exists in database');
           toast({
             title: "Already subscribed!",
             description: "This email is already signed up for our newsletter.",
@@ -35,26 +36,29 @@ const Newsletter = () => {
           setIsSubmitting(false);
           return;
         } else {
-          console.error('Database error:', dbError);
+          console.error('❌ Database error:', dbError);
           throw dbError;
         }
       }
 
-      console.log('Email saved to database, now sending welcome email');
+      console.log('✅ Email saved to database successfully');
+      console.log('📤 Now attempting to send welcome email...');
 
       // Send welcome email with discount code
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
         body: { email }
       });
 
+      console.log('📬 Email function response:', { emailData, emailError });
+
       if (emailError) {
-        console.error('Email sending error:', emailError);
+        console.error('❌ Email sending error:', emailError);
         toast({
-          title: "Subscribed!",
-          description: "You've been subscribed, but there was an issue sending the welcome email. Please contact support if you don't receive your discount code.",
+          title: "Subscribed with issue",
+          description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
         });
       } else {
-        console.log('Welcome email sent successfully:', emailData);
+        console.log('✅ Welcome email sent successfully!');
         toast({
           title: "Welcome to the Blue Dream family!",
           description: "Check your email for your exclusive 10% discount code (WELCOME10)!",
@@ -64,10 +68,10 @@ const Newsletter = () => {
       setIsSubscribed(true);
       setEmail("");
     } catch (error) {
-      console.error('Newsletter signup error:', error);
+      console.error('💥 Newsletter signup error:', error);
       toast({
         title: "Signup failed",
-        description: "Please try again later or contact support.",
+        description: "Please try again later or contact support. Your discount code is WELCOME10 if you need it.",
         variant: "destructive",
       });
     } finally {
