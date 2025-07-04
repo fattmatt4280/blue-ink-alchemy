@@ -64,7 +64,7 @@ serve(async (req) => {
     logStep("📤 Attempting to send email via Resend");
 
     const emailResponse = await resend.emails.send({
-      from: "Blue Dream Budder <onboarding@resend.dev>",
+      from: "Blue Dream Budder <hello@updates.bluedreambudder.com>",
       to: [email],
       subject: "Welcome to Blue Dream Budder! 🎨",
       html: `
