@@ -10,14 +10,21 @@ const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [debugMessages, setDebugMessages] = useState<string[]>([]);
   const { toast } = useToast();
+
+  const addDebugMessage = (message: string) => {
+    setDebugMessages(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    console.log(message);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setDebugMessages([]); // Clear previous messages
 
     try {
-      console.log('🚀 Starting newsletter signup for:', email);
+      addDebugMessage('🚀 Starting newsletter signup for: ' + email);
       
       // First, save the email to the database
       const { error: dbError } = await supabase
@@ -26,7 +33,7 @@ const Newsletter = () => {
 
       if (dbError) {
         if (dbError.code === '23505') { // Unique constraint violation (email already exists)
-          console.log('📧 Email already exists in database');
+          addDebugMessage('📧 Email already exists in database');
           toast({
             title: "Already subscribed!",
             description: "This email is already signed up for our newsletter.",
@@ -36,29 +43,29 @@ const Newsletter = () => {
           setIsSubmitting(false);
           return;
         } else {
-          console.error('❌ Database error:', dbError);
+          addDebugMessage('❌ Database error: ' + JSON.stringify(dbError));
           throw dbError;
         }
       }
 
-      console.log('✅ Email saved to database successfully');
-      console.log('📤 Now attempting to send welcome email...');
+      addDebugMessage('✅ Email saved to database successfully');
+      addDebugMessage('📤 Now attempting to send welcome email...');
 
       // Send welcome email with discount code
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
         body: { email }
       });
 
-      console.log('📬 Email function response:', { emailData, emailError });
+      addDebugMessage('📬 Email function response: ' + JSON.stringify({ emailData, emailError }));
 
       if (emailError) {
-        console.error('❌ Email sending error:', emailError);
+        addDebugMessage('❌ Email sending error: ' + JSON.stringify(emailError));
         toast({
           title: "Subscribed with issue",
           description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
         });
       } else {
-        console.log('✅ Welcome email sent successfully!');
+        addDebugMessage('✅ Welcome email sent successfully!');
         toast({
           title: "Welcome to the Blue Dream family!",
           description: "Check your email for your exclusive 10% discount code (WELCOME10)!",
@@ -68,7 +75,7 @@ const Newsletter = () => {
       setIsSubscribed(true);
       setEmail("");
     } catch (error) {
-      console.error('💥 Newsletter signup error:', error);
+      addDebugMessage('💥 Newsletter signup error: ' + JSON.stringify(error));
       toast({
         title: "Signup failed",
         description: "Please try again later or contact support. Your discount code is WELCOME10 if you need it.",
@@ -118,6 +125,18 @@ const Newsletter = () => {
             <div className="bg-white/10 rounded-xl p-6 max-w-md mx-auto">
               <h3 className="text-xl font-medium mb-2">Welcome to the family!</h3>
               <p className="opacity-90">Check your email for your special 10% discount code (WELCOME10)!</p>
+            </div>
+          )}
+          
+          {/* Debug Messages - Only show when there are messages */}
+          {debugMessages.length > 0 && (
+            <div className="mt-8 bg-white/10 rounded-xl p-4 max-w-2xl mx-auto">
+              <h4 className="text-sm font-medium mb-2 opacity-75">Debug Information:</h4>
+              <div className="text-xs text-left space-y-1 opacity-90 font-mono">
+                {debugMessages.map((message, index) => (
+                  <div key={index} className="break-all">{message}</div>
+                ))}
+              </div>
             </div>
           )}
           
