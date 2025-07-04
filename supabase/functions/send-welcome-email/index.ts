@@ -14,27 +14,47 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     logStep("🚀 Function started");
+    logStep("📋 Request method", { method: req.method });
+    logStep("🔗 Request URL", { url: req.url });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) {
       logStep("❌ RESEND_API_KEY is not set");
-      throw new Error("RESEND_API_KEY is not set");
+      return new Response(JSON.stringify({ error: "RESEND_API_KEY is not configured" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
     
     logStep("✅ RESEND_API_KEY found");
 
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+      logStep("📝 Request body parsed", { body });
+    } catch (e) {
+      logStep("❌ Failed to parse request body", { error: e.message });
+      return new Response(JSON.stringify({ error: "Invalid JSON in request body" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     const { email } = body;
 
     if (!email) {
       logStep("❌ Email is required but not provided");
-      throw new Error("Email is required");
+      return new Response(JSON.stringify({ error: "Email is required" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
     logStep("📧 Processing email signup", { email });
@@ -74,7 +94,7 @@ serve(async (req) => {
             </ul>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${req.headers.get("origin") || "https://bluedreambudder.com"}/shop" 
+              <a href="https://bluedreambudder.com/shop" 
                  style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);">
                 Shop Now & Save 10%
               </a>
