@@ -27,6 +27,7 @@ const Newsletter = () => {
       addDebugMessage('🚀 Starting newsletter signup for: ' + email);
       
       // First, save the email to the database
+      addDebugMessage('💾 Attempting to save email to database...');
       const { error: dbError } = await supabase
         .from('newsletter_signups')
         .insert([{ email }]);
@@ -50,16 +51,25 @@ const Newsletter = () => {
 
       addDebugMessage('✅ Email saved to database successfully');
       addDebugMessage('📤 Now attempting to send welcome email...');
+      addDebugMessage('🔗 Calling edge function: send-welcome-email');
 
       // Send welcome email with discount code
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
         body: { email }
       });
 
-      addDebugMessage('📬 Email function response: ' + JSON.stringify({ emailData, emailError }));
+      addDebugMessage('📬 Edge function call completed');
+      addDebugMessage('📊 Function response data: ' + JSON.stringify(emailData));
+      addDebugMessage('⚠️ Function response error: ' + JSON.stringify(emailError));
 
       if (emailError) {
-        addDebugMessage('❌ Email sending error: ' + JSON.stringify(emailError));
+        addDebugMessage('❌ Email sending error details: ' + JSON.stringify(emailError));
+        
+        // Check if it's a function execution error
+        if (emailError.message) {
+          addDebugMessage('💡 Error message: ' + emailError.message);
+        }
+        
         toast({
           title: "Subscribed with issue",
           description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
@@ -76,6 +86,8 @@ const Newsletter = () => {
       setEmail("");
     } catch (error) {
       addDebugMessage('💥 Newsletter signup error: ' + JSON.stringify(error));
+      addDebugMessage('💥 Error name: ' + (error as Error)?.name);
+      addDebugMessage('💥 Error message: ' + (error as Error)?.message);
       toast({
         title: "Signup failed",
         description: "Please try again later or contact support. Your discount code is WELCOME10 if you need it.",
