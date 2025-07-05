@@ -44,17 +44,40 @@ serve(async (req) => {
       });
     }
 
-    // Read request body as text first, then parse
-    const bodyText = await req.text();
-    logStep("📝 Raw request body", { bodyText, length: bodyText.length });
-    
+    // Parse request body with better error handling
     let body;
     try {
-      body = JSON.parse(bodyText);
-      logStep("📝 Request body parsed", { body });
-    } catch (e) {
-      logStep("❌ Failed to parse request body", { error: e.message, bodyText });
-      return new Response(JSON.stringify({ error: "Invalid JSON in request body", received: bodyText }), {
+      const contentType = req.headers.get("content-type") || "";
+      logStep("📝 Content-Type header", { contentType });
+      
+      if (contentType.includes("application/json")) {
+        body = await req.json();
+        logStep("📝 Request body parsed as JSON", { body });
+      } else {
+        // Try to parse as text first, then JSON
+        const bodyText = await req.text();
+        logStep("📝 Raw request body as text", { bodyText, length: bodyText.length });
+        
+        if (bodyText.trim()) {
+          body = JSON.parse(bodyText);
+          logStep("📝 Request body parsed from text", { body });
+        } else {
+          logStep("❌ Empty request body received");
+          return new Response(JSON.stringify({ error: "Empty request body" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 400,
+          });
+        }
+      }
+    } catch (parseError) {
+      logStep("❌ Failed to parse request body", { 
+        error: parseError.message,
+        contentType: req.headers.get("content-type")
+      });
+      return new Response(JSON.stringify({ 
+        error: "Invalid request body format",
+        details: parseError.message 
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
@@ -63,7 +86,7 @@ serve(async (req) => {
     const { email } = body;
 
     if (!email) {
-      logStep("❌ Email is required but not provided");
+      logStep("❌ Email is required but not provided", { receivedBody: body });
       return new Response(JSON.stringify({ error: "Email is required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
