@@ -25,6 +25,8 @@ serve(async (req) => {
     logStep("🔗 Request URL", { url: req.url });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
+    logStep("🔑 Checking RESEND_API_KEY", { exists: !!resendKey, length: resendKey?.length });
+    
     if (!resendKey) {
       logStep("❌ RESEND_API_KEY is not set");
       return new Response(JSON.stringify({ error: "RESEND_API_KEY is not configured" }), {
@@ -59,6 +61,7 @@ serve(async (req) => {
 
     logStep("📧 Processing email signup", { email });
 
+    logStep("🔧 Initializing Resend client");
     const resend = new Resend(resendKey);
 
     logStep("📤 Attempting to send email via Resend");
@@ -125,8 +128,23 @@ serve(async (req) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("💥 CRITICAL ERROR", { message: errorMessage, stack: error instanceof Error ? error.stack : 'No stack trace' });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    const errorName = error instanceof Error ? error.name : 'Unknown error type';
+    
+    logStep("💥 CRITICAL ERROR", { 
+      message: errorMessage, 
+      stack: errorStack,
+      name: errorName,
+      fullError: error
+    });
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      details: {
+        name: errorName,
+        message: errorMessage
+      }
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
