@@ -44,13 +44,17 @@ serve(async (req) => {
       });
     }
 
+    // Read request body as text first, then parse
+    const bodyText = await req.text();
+    logStep("📝 Raw request body", { bodyText, length: bodyText.length });
+    
     let body;
     try {
-      body = await req.json();
+      body = JSON.parse(bodyText);
       logStep("📝 Request body parsed", { body });
     } catch (e) {
-      logStep("❌ Failed to parse request body", { error: e.message });
-      return new Response(JSON.stringify({ error: "Invalid JSON in request body" }), {
+      logStep("❌ Failed to parse request body", { error: e.message, bodyText });
+      return new Response(JSON.stringify({ error: "Invalid JSON in request body", received: bodyText }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
@@ -89,39 +93,26 @@ serve(async (req) => {
         to: [email],
         subject: "Welcome to Blue Dream Budder! 🎉",
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
-            <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); padding: 40px 20px; text-align: center; color: white; border-radius: 12px 12px 0 0;">
-              <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Welcome to Blue Dream Budder!</h1>
-              <p style="margin: 16px 0 0 0; font-size: 18px;">Thanks for joining our family. Your skin is about to feel incredible.</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #1e40af; text-align: center;">Welcome to Blue Dream Budder!</h1>
+            <p style="font-size: 18px; text-align: center;">Thanks for joining our family!</p>
+            
+            <div style="background: #f1f5f9; border: 2px dashed #3b82f6; padding: 20px; text-align: center; margin: 20px 0;">
+              <h2 style="color: #1e40af; margin: 0;">Your Discount Code</h2>
+              <p style="font-size: 24px; font-weight: bold; color: #1e40af; margin: 10px 0;">WELCOME10</p>
+              <p style="color: #64748b;">Save 10% on your first order</p>
             </div>
             
-            <div style="background: white; padding: 40px 20px; border-radius: 0 0 12px 12px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);">
-              <h2 style="color: #1e40af; margin: 0 0 20px 0; font-size: 24px; text-align: center;">Your Exclusive 10% Discount Code</h2>
-              
-              <div style="background: #f1f5f9; border: 3px dashed #3b82f6; padding: 25px; text-align: center; margin: 30px 0; border-radius: 12px;">
-                <p style="margin: 0 0 10px 0; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Use Code</p>
-                <p style="margin: 0; font-size: 36px; font-weight: bold; color: #1e40af; letter-spacing: 3px;">WELCOME10</p>
-                <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748b;">Save 10% on your first order</p>
-              </div>
-              
-              <p style="color: #374151; margin: 25px 0; font-size: 16px; text-align: center;">
-                As a valued subscriber, you'll be the first to know about exclusive discounts, new products, and professional tattoo aftercare tips.
-              </p>
-              
-              <div style="text-align: center; margin: 35px 0;">
-                <a href="https://bluedreambudder.com" 
-                   style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; padding: 18px 36px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 16px; display: inline-block;">
-                  Shop Now & Save 10%
-                </a>
-              </div>
-              
-              <div style="text-align: center; margin-top: 30px;">
-                <p style="color: #6b7280; font-size: 16px; margin: 0;">
-                  For Ink. For Skin. For Life.<br>
-                  <span style="color: #3b82f6; font-weight: 600;">Blue Dream Budder Team</span>
-                </p>
-              </div>
-            </div>
+            <p style="text-align: center;">
+              <a href="https://bluedreambudder.com" style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+                Shop Now & Save 10%
+              </a>
+            </p>
+            
+            <p style="text-align: center; color: #6b7280; margin-top: 30px;">
+              For Ink. For Skin. For Life.<br>
+              Blue Dream Budder Team
+            </p>
           </div>
         `,
       });
@@ -152,8 +143,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({ 
         error: "Failed to send email",
-        details: errorMessage,
-        suggestion: "Please try again or contact support if the issue persists"
+        details: errorMessage
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
