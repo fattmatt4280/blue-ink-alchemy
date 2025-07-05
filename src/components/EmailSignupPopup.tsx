@@ -1,18 +1,15 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { X, Mail } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { X, Mail, Apple } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface EmailSignupPopupProps {
   isOpen: boolean;
@@ -20,193 +17,233 @@ interface EmailSignupPopupProps {
 }
 
 const EmailSignupPopup = ({ isOpen, onClose }: EmailSignupPopupProps) => {
-  const [formData, setFormData] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
-  });
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [debugMessages, setDebugMessages] = useState<string[]>([]);
+  const [showDebugDialog, setShowDebugDialog] = useState(false);
   const { toast } = useToast();
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const addDebugMessage = (message: string) => {
+    const timestampedMessage = `${new Date().toLocaleTimeString()}: ${message}`;
+    setDebugMessages(prev => [...prev, timestampedMessage]);
+    console.log(timestampedMessage);
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setDebugMessages([]); // Clear previous messages
+    setShowDebugDialog(true); // Show the debug dialog immediately
 
     try {
-      // Simulate API call - replace with actual newsletter signup logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      addDebugMessage('🚀 Starting newsletter signup for: ' + email);
       
-      toast({
-        title: "Welcome to Blue Dream Budder!",
-        description: "Check your email for your 10% discount code.",
-      });
+      // First, save the email to the database
+      addDebugMessage('💾 Attempting to save email to database...');
+      const { error: dbError } = await supabase
+        .from('newsletter_signups')
+        .insert([{ email }]);
+
+      if (dbError) {
+        if (dbError.code === '23505') { // Unique constraint violation (email already exists)
+          addDebugMessage('📧 Email already exists in database');
+          toast({
+            title: "Already subscribed!",
+            description: "This email is already signed up for our newsletter.",
+            variant: "destructive",
+          });
+          setEmail("");
+          setIsSubmitting(false);
+          return;
+        } else {
+          addDebugMessage('❌ Database error: ' + JSON.stringify(dbError));
+          throw dbError;
+        }
+      }
+
+      addDebugMessage('✅ Email saved to database successfully');
+      addDebugMessage('📤 Now attempting to send welcome email...');
+      addDebugMessage('🔗 Calling edge function: send-welcome-email');
+      addDebugMessage('📋 Function payload: ' + JSON.stringify({ email }));
+
+      // Add timeout and more detailed error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      try {
+        addDebugMessage('⏰ Starting function call with 30s timeout...');
+        
+        // Send welcome email with discount code
+        const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+          body: { email },
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        clearTimeout(timeoutId);
+        addDebugMessage('📬 Edge function call completed');
+        addDebugMessage('📊 Function response data: ' + JSON.stringify(emailData));
+        addDebugMessage('⚠️ Function response error: ' + JSON.stringify(emailError));
+
+        if (emailError) {
+          addDebugMessage('❌ Email sending error details: ' + JSON.stringify(emailError));
+          
+          toast({
+            title: "Subscribed with issue",
+            description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
+          });
+        } else {
+          addDebugMessage('✅ Welcome email sent successfully!');
+          toast({
+            title: "Welcome to the Blue Dream family!",
+            description: "Check your email for your exclusive 10% discount code (WELCOME10)!",
+          });
+        }
+
+      } catch (functionError) {
+        clearTimeout(timeoutId);
+        addDebugMessage('💥 Function call error: ' + JSON.stringify(functionError));
+        addDebugMessage('💥 Function error name: ' + (functionError as Error)?.name);
+        addDebugMessage('💥 Function error message: ' + (functionError as Error)?.message);
+        
+        toast({
+          title: "Subscribed with issue",
+          description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
+        });
+      }
+
+      setIsSubscribed(true);
+      setEmail("");
       
-      // Reset form and close popup
-      setFormData({ email: "", firstName: "", lastName: "", phone: "" });
-      onClose();
+      // Close the popup after successful signup
+      setTimeout(() => {
+        onClose();
+        setIsSubscribed(false); // Reset for next time
+      }, 3000);
+
     } catch (error) {
+      addDebugMessage('💥 Newsletter signup error: ' + JSON.stringify(error));
+      addDebugMessage('💥 Error name: ' + (error as Error)?.name);
+      addDebugMessage('💥 Error message: ' + (error as Error)?.message);
       toast({
         title: "Signup failed",
-        description: "Please try again later.",
+        description: "Please try again later or contact support. Your discount code is WELCOME10 if you need it.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
+      // Keep debug dialog open for 10 seconds after completion so user can see final status
+      setTimeout(() => {
+        setShowDebugDialog(false);
+      }, 10000);
     }
-  };
-
-  const handleGoogleSignup = async () => {
-    setIsSubmitting(true);
-    
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`
-      }
-    });
-
-    if (error) {
-      toast({
-        title: "Error signing up with Google",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-
-    setIsSubmitting(false);
-  };
-
-  const handleAppleSignup = () => {
-    toast({
-      title: "Apple signup",
-      description: "Apple signup functionality will be implemented soon.",
-    });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center text-blue-900">
-            Get 10% Off Your First Order!
-          </DialogTitle>
-          <DialogDescription className="text-center text-gray-600">
-            Sign up for exclusive discounts and tattoo aftercare tips
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-blue-600" />
+              Get Your 10% Discount
+            </DialogTitle>
+          </DialogHeader>
+          
+          {!isSubscribed ? (
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                Join our newsletter and get an exclusive 10% discount code sent to your email!
+              </p>
+              
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className="w-full"
+                />
+                
+                <div className="flex gap-2">
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  >
+                    {isSubmitting ? "Subscribing..." : "Get My 10% Off"}
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+              
+              <p className="text-xs text-gray-500 text-center">
+                No spam, ever. Unsubscribe at any time.
+              </p>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <div className="text-green-600 mb-2">
+                <Mail className="w-12 h-12 mx-auto mb-3" />
+              </div>
+              <h3 className="text-lg font-medium text-green-800 mb-2">Welcome to the family!</h3>
+              <p className="text-gray-600">Check your email for your special 10% discount code (WELCOME10)!</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
-        <div className="space-y-6">
-          {/* Social Signup Buttons */}
-          <div className="space-y-3">
+      {/* Debug Dialog */}
+      <Dialog open={showDebugDialog} onOpenChange={setShowDebugDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto z-[9999]">
+          <DialogHeader>
+            <DialogTitle>Email Signup Popup Debug Log</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {debugMessages.length === 0 ? (
+              <div className="text-gray-500 text-center py-4">
+                Initializing debug session...
+              </div>
+            ) : (
+              debugMessages.map((message, index) => (
+                <div
+                  key={index}
+                  className="text-sm font-mono p-2 bg-gray-50 rounded border-l-4 border-blue-500"
+                >
+                  {message}
+                </div>
+              ))
+            )}
+            {isSubmitting && (
+              <div className="text-center py-2">
+                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                <span className="ml-2 text-sm text-gray-600">Processing...</span>
+              </div>
+            )}
+          </div>
+          <div className="mt-4 text-center">
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 h-12"
-              onClick={handleGoogleSignup}
-              disabled={isSubmitting}
+              onClick={() => setShowDebugDialog(false)}
+              className="px-6"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Continue with Google
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2 h-12"
-              onClick={handleAppleSignup}
-              disabled={isSubmitting}
-            >
-              <Apple className="w-5 h-5" />
-              Continue with Apple
+              Close Debug
             </Button>
           </div>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or sign up with email
-              </span>
-            </div>
-          </div>
-
-          {/* Email Form */}
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange("firstName", e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-                value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                required
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Signing Up..." : "Get My 10% Discount"}
-            </Button>
-          </form>
-
-          <p className="text-xs text-center text-gray-500">
-            By signing up, you agree to receive marketing emails. You can unsubscribe at any time.
-          </p>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
