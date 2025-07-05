@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,12 +52,9 @@ const Newsletter = () => {
       addDebugMessage('📤 Now attempting to send welcome email...');
       addDebugMessage('🔗 Calling edge function: send-welcome-email');
 
-      // Send welcome email with discount code - using correct format
+      // Send welcome email with discount code - using correct format for supabase.functions.invoke
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
-        body: JSON.stringify({ email }),
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        body: { email }
       });
 
       addDebugMessage('📬 Edge function call completed');
