@@ -44,38 +44,15 @@ serve(async (req) => {
       });
     }
 
-    // Parse request body with better error handling
+    // Parse request body
     let body;
     try {
-      const contentType = req.headers.get("content-type") || "";
-      logStep("📝 Content-Type header", { contentType });
-      
-      if (contentType.includes("application/json")) {
-        body = await req.json();
-        logStep("📝 Request body parsed as JSON", { body });
-      } else {
-        // Try to parse as text first, then JSON
-        const bodyText = await req.text();
-        logStep("📝 Raw request body as text", { bodyText, length: bodyText.length });
-        
-        if (bodyText.trim()) {
-          body = JSON.parse(bodyText);
-          logStep("📝 Request body parsed from text", { body });
-        } else {
-          logStep("❌ Empty request body received");
-          return new Response(JSON.stringify({ error: "Empty request body" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400,
-          });
-        }
-      }
+      body = await req.json();
+      logStep("📝 Request body parsed successfully", { body });
     } catch (parseError) {
-      logStep("❌ Failed to parse request body", { 
-        error: parseError.message,
-        contentType: req.headers.get("content-type")
-      });
+      logStep("❌ Failed to parse request body", { error: parseError.message });
       return new Response(JSON.stringify({ 
-        error: "Invalid request body format",
+        error: "Invalid JSON in request body",
         details: parseError.message 
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -105,8 +82,21 @@ serve(async (req) => {
 
     logStep("📧 Processing email signup", { email });
 
-    logStep("🔧 Initializing Resend client");
-    const resend = new Resend(resendKey);
+    // Initialize Resend with error handling
+    let resend;
+    try {
+      resend = new Resend(resendKey);
+      logStep("🔧 Resend client initialized successfully");
+    } catch (resendInitError) {
+      logStep("❌ Failed to initialize Resend client", { error: resendInitError.message });
+      return new Response(JSON.stringify({ 
+        error: "Failed to initialize email service",
+        details: resendInitError.message 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
 
     logStep("📤 Attempting to send email via Resend");
 
@@ -140,6 +130,23 @@ serve(async (req) => {
         `,
       });
 
+      logStep("✅ Resend API call completed", { 
+        responseData: emailResponse.data,
+        responseError: emailResponse.error 
+      });
+
+      // Check if Resend returned an error
+      if (emailResponse.error) {
+        logStep("❌ Resend API returned error", { error: emailResponse.error });
+        return new Response(JSON.stringify({ 
+          error: "Failed to send email",
+          details: emailResponse.error 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        });
+      }
+
       logStep("✅ Email sent successfully!", { 
         id: emailResponse.data?.id,
         to: email,
@@ -158,10 +165,10 @@ serve(async (req) => {
 
     } catch (emailError) {
       const errorMessage = emailError instanceof Error ? emailError.message : String(emailError);
-      logStep("💥 Resend API Error", { 
+      logStep("💥 Email sending error", { 
         error: errorMessage,
         email,
-        errorType: emailError instanceof Error ? emailError.constructor.name : 'Unknown'
+        stack: emailError instanceof Error ? emailError.stack : 'No stack trace'
       });
 
       return new Response(JSON.stringify({ 
