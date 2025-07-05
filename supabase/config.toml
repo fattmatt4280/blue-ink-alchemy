@@ -1,1 +1,36 @@
-project_id = "vozstxchkgpxzetwdzow"
+
+project_id = "eddfac78-1921-4963-ae88-c91f314935b4"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[[functions]]
+name = "send-welcome-email"
+verify_jwt = false
+
+[[functions]]
+name = "create-payment"
+verify_jwt = false
+
+[[functions]]
+name = "stripe-webhook"
+verify_jwt = false
+
+[[functions]]
+name = "create-subscription"
+verify_jwt = false
+
+[[functions]]
+name = "check-subscription"
+verify_jwt = false

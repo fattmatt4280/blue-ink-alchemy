@@ -44,7 +44,7 @@ serve(async (req) => {
       });
     }
 
-    // Parse request body - handle both direct calls and supabase.functions.invoke calls
+    // Parse request body
     let requestData;
     try {
       const rawBody = await req.text();
@@ -101,21 +101,9 @@ serve(async (req) => {
 
     logStep("📧 Processing email signup", { email });
 
-    // Initialize Resend with error handling
-    let resend;
-    try {
-      resend = new Resend(resendKey);
-      logStep("🔧 Resend client initialized successfully");
-    } catch (resendInitError) {
-      logStep("❌ Failed to initialize Resend client", { error: resendInitError.message });
-      return new Response(JSON.stringify({ 
-        error: "Failed to initialize email service",
-        details: resendInitError.message 
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      });
-    }
+    // Initialize Resend
+    const resend = new Resend(resendKey);
+    logStep("🔧 Resend client initialized successfully");
 
     logStep("📤 Attempting to send email via Resend");
 
