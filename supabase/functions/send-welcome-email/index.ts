@@ -74,9 +74,9 @@ serve(async (req) => {
     logStep("📤 Attempting to send email via Resend");
 
     const emailResponse = await resend.emails.send({
-      from: "Blue Dream Budder <welcome@updates.bluedreambudder.com>",
+      from: "Blue Dream Budder <onboarding@resend.dev>",
       to: [email],
-      subject: "Welcome to Blue Dream Budder!",
+      subject: "Welcome to Blue Dream Budder! 🎉",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
           <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); padding: 40px 20px; text-align: center; color: white; border-radius: 12px 12px 0 0;">
@@ -104,7 +104,7 @@ serve(async (req) => {
             </ul>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://bluedreambudder.com/shop" 
+              <a href="https://bluedreambudder.com/#products" 
                  style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);">
                 Shop Now & Save 10%
               </a>
@@ -116,6 +116,9 @@ serve(async (req) => {
               <p style="color: #94a3b8; font-size: 14px; margin: 0;">
                 For Ink. For Skin. For Life.<br>
                 Blue Dream Budder Team
+              </p>
+              <p style="color: #94a3b8; font-size: 12px; margin: 10px 0 0 0;">
+                If you no longer wish to receive these emails, you can unsubscribe at any time.
               </p>
             </div>
           </div>
@@ -148,7 +151,8 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({ 
       error: "Failed to send welcome email",
-      details: errorMessage
+      details: errorMessage,
+      troubleshooting: "Check if RESEND_API_KEY is set and domain is verified"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
