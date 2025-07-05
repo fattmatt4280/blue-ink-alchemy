@@ -16,13 +16,22 @@ const logStep = (step: string, details?: any) => {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    logStep("🔄 CORS preflight request");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     logStep("🚀 Function started");
-    logStep("📋 Request method", { method: req.method });
-    logStep("🔗 Request URL", { url: req.url });
+    logStep("📋 Request details", { method: req.method, url: req.url });
+
+    // Only accept POST requests
+    if (req.method !== "POST") {
+      logStep("❌ Invalid method", { method: req.method });
+      return new Response(JSON.stringify({ error: "Method not allowed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 405,
+      });
+    }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     logStep("🔑 Checking RESEND_API_KEY", { exists: !!resendKey, length: resendKey?.length });
@@ -34,8 +43,6 @@ serve(async (req) => {
         status: 500,
       });
     }
-    
-    logStep("✅ RESEND_API_KEY found");
 
     let body;
     try {
@@ -67,14 +74,14 @@ serve(async (req) => {
     logStep("📤 Attempting to send email via Resend");
 
     const emailResponse = await resend.emails.send({
-      from: "Blue Dream Budder <hello@updates.bluedreambudder.com>",
+      from: "Dream Tattoo Co <welcome@bluedreambudder.com>",
       to: [email],
-      subject: "Welcome to Blue Dream Budder! 🎨",
+      subject: "Welcome to Blue Dream Budder!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
           <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); padding: 40px 20px; text-align: center; color: white; border-radius: 12px 12px 0 0;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Welcome to the Blue Dream Family!</h1>
-            <p style="margin: 16px 0 0 0; font-size: 18px; opacity: 0.9;">Premium CBD-infused tattoo aftercare</p>
+            <h1 style="margin: 0; font-size: 28px; font-weight: bold;">Welcome to Blue Dream Budder!</h1>
+            <p style="margin: 16px 0 0 0; font-size: 18px; opacity: 0.9;">Thanks for joining the Blue Dream Budder family. Your skin is about to feel incredible.</p>
           </div>
           
           <div style="background: white; padding: 40px 20px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
@@ -86,7 +93,7 @@ serve(async (req) => {
             </div>
             
             <p style="color: #64748b; margin: 20px 0; font-size: 16px; line-height: 1.6;">
-              Thank you for joining our community! As a new subscriber, you'll be the first to know about:
+              As a new subscriber, you'll be the first to know about:
             </p>
             
             <ul style="color: #64748b; margin: 20px 0; padding-left: 20px; font-size: 16px; line-height: 1.8;">
@@ -110,10 +117,6 @@ serve(async (req) => {
                 For Ink. For Skin. For Life.<br>
                 Blue Dream Budder Team
               </p>
-              <p style="color: #cbd5e1; font-size: 12px; margin: 16px 0 0 0;">
-                You're receiving this because you signed up for our newsletter. 
-                <a href="#" style="color: #3b82f6; text-decoration: none;">Unsubscribe</a>
-              </p>
             </div>
           </div>
         </div>
@@ -122,10 +125,15 @@ serve(async (req) => {
 
     logStep("✅ Email sent successfully!", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: "Welcome email sent successfully",
+      emailResponse 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : 'No stack trace';
@@ -139,11 +147,8 @@ serve(async (req) => {
     });
     
     return new Response(JSON.stringify({ 
-      error: errorMessage,
-      details: {
-        name: errorName,
-        message: errorMessage
-      }
+      error: "Failed to send welcome email",
+      details: errorMessage
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
