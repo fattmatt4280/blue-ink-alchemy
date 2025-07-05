@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,7 @@ const Newsletter = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setDebugMessages([]); // Clear previous messages
-    setShowDebugDialog(true); // Show the debug dialog
+    setShowDebugDialog(true); // Show the debug dialog immediately
 
     try {
       addDebugMessage('🚀 Starting newsletter signup for: ' + email);
@@ -130,8 +131,14 @@ const Newsletter = () => {
       // Keep dialog open for 5 seconds after completion so user can see final status
       setTimeout(() => {
         setShowDebugDialog(false);
-      }, 5000);
+      }, 10000);
     }
+  };
+
+  // Function to manually show debug dialog for testing
+  const showDebugDialogManually = () => {
+    setShowDebugDialog(true);
+    addDebugMessage('🧪 Manual debug dialog test');
   };
 
   return (
@@ -151,25 +158,37 @@ const Newsletter = () => {
             </div>
             
             {!isSubscribed ? (
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/70 focus:bg-white/20"
-                />
+              <div className="space-y-4">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                    className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/70 focus:bg-white/20"
+                  />
+                  <Button 
+                    type="submit"
+                    size="lg"
+                    disabled={isSubmitting}
+                    className="bg-white text-blue-600 hover:bg-blue-50 transition-colors px-8"
+                  >
+                    {isSubmitting ? "Subscribing..." : "Subscribe"}
+                  </Button>
+                </form>
+                
+                {/* Test button to manually show debug dialog */}
                 <Button 
-                  type="submit"
-                  size="lg"
-                  disabled={isSubmitting}
-                  className="bg-white text-blue-600 hover:bg-blue-50 transition-colors px-8"
+                  variant="outline"
+                  size="sm"
+                  onClick={showDebugDialogManually}
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/30 mx-auto"
                 >
-                  {isSubmitting ? "Subscribing..." : "Subscribe"}
+                  Test Debug Dialog
                 </Button>
-              </form>
+              </div>
             ) : (
               <div className="bg-white/10 rounded-xl p-6 max-w-md mx-auto">
                 <h3 className="text-xl font-medium mb-2">Welcome to the family!</h3>
@@ -184,16 +203,16 @@ const Newsletter = () => {
         </div>
       </section>
 
-      {/* Debug Dialog */}
+      {/* Debug Dialog - Force it to show with z-index */}
       <Dialog open={showDebugDialog} onOpenChange={setShowDebugDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto z-[9999]">
           <DialogHeader>
             <DialogTitle>Newsletter Signup Debug Log</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             {debugMessages.length === 0 ? (
               <div className="text-gray-500 text-center py-4">
-                Initializing...
+                Initializing debug session...
               </div>
             ) : (
               debugMessages.map((message, index) => (
@@ -218,7 +237,7 @@ const Newsletter = () => {
               onClick={() => setShowDebugDialog(false)}
               className="px-6"
             >
-              Close
+              Close Debug
             </Button>
           </div>
         </DialogContent>
