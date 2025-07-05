@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,33 +52,57 @@ const Newsletter = () => {
       addDebugMessage('✅ Email saved to database successfully');
       addDebugMessage('📤 Now attempting to send welcome email...');
       addDebugMessage('🔗 Calling edge function: send-welcome-email');
+      addDebugMessage('📋 Function payload: ' + JSON.stringify({ email }));
 
-      // Send welcome email with discount code - using correct format for supabase.functions.invoke
-      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
-        body: { email }
-      });
+      // Add timeout and more detailed error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-      addDebugMessage('📬 Edge function call completed');
-      addDebugMessage('📊 Function response data: ' + JSON.stringify(emailData));
-      addDebugMessage('⚠️ Function response error: ' + JSON.stringify(emailError));
-
-      if (emailError) {
-        addDebugMessage('❌ Email sending error details: ' + JSON.stringify(emailError));
+      try {
+        addDebugMessage('⏰ Starting function call with 30s timeout...');
         
-        // Check if it's a function execution error
-        if (emailError.message) {
-          addDebugMessage('💡 Error message: ' + emailError.message);
+        // Send welcome email with discount code - using correct format for supabase.functions.invoke
+        const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+          body: { email },
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        clearTimeout(timeoutId);
+        addDebugMessage('📬 Edge function call completed');
+        addDebugMessage('📊 Function response data: ' + JSON.stringify(emailData));
+        addDebugMessage('⚠️ Function response error: ' + JSON.stringify(emailError));
+
+        if (emailError) {
+          addDebugMessage('❌ Email sending error details: ' + JSON.stringify(emailError));
+          
+          // Check if it's a function execution error
+          if (emailError.message) {
+            addDebugMessage('💡 Error message: ' + emailError.message);
+          }
+          
+          toast({
+            title: "Subscribed with issue",
+            description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
+          });
+        } else {
+          addDebugMessage('✅ Welcome email sent successfully!');
+          toast({
+            title: "Welcome to the Blue Dream family!",
+            description: "Check your email for your exclusive 10% discount code (WELCOME10)!",
+          });
         }
+
+      } catch (functionError) {
+        clearTimeout(timeoutId);
+        addDebugMessage('💥 Function call error: ' + JSON.stringify(functionError));
+        addDebugMessage('💥 Function error name: ' + (functionError as Error)?.name);
+        addDebugMessage('💥 Function error message: ' + (functionError as Error)?.message);
         
         toast({
           title: "Subscribed with issue",
           description: "You've been subscribed, but there was an issue sending the welcome email. Your discount code is WELCOME10. Please contact support if needed.",
-        });
-      } else {
-        addDebugMessage('✅ Welcome email sent successfully!');
-        toast({
-          title: "Welcome to the Blue Dream family!",
-          description: "Check your email for your exclusive 10% discount code (WELCOME10)!",
         });
       }
 
