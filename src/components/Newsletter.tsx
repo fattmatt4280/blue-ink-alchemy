@@ -53,9 +53,12 @@ const Newsletter = () => {
       addDebugMessage('📤 Now attempting to send welcome email...');
       addDebugMessage('🔗 Calling edge function: send-welcome-email');
 
-      // Send welcome email with discount code
+      // Send welcome email with discount code - using correct format
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
-        body: { email }
+        body: JSON.stringify({ email }),
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
 
       addDebugMessage('📬 Edge function call completed');
