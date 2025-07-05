@@ -44,11 +44,22 @@ serve(async (req) => {
       });
     }
 
-    // Parse request body
-    let body;
+    // Parse request body - handle both direct calls and supabase.functions.invoke calls
+    let requestData;
     try {
-      body = await req.json();
-      logStep("📝 Request body parsed successfully", { body });
+      const rawBody = await req.text();
+      logStep("📝 Raw request body", { rawBody, length: rawBody.length });
+      
+      if (!rawBody || rawBody.trim() === '') {
+        logStep("❌ Empty request body");
+        return new Response(JSON.stringify({ error: "Empty request body" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
+      
+      requestData = JSON.parse(rawBody);
+      logStep("📝 Parsed request data", { requestData, type: typeof requestData });
     } catch (parseError) {
       logStep("❌ Failed to parse request body", { error: parseError.message });
       return new Response(JSON.stringify({ 
@@ -60,10 +71,18 @@ serve(async (req) => {
       });
     }
 
-    const { email } = body;
+    // Extract email from the request data
+    let email;
+    if (requestData && typeof requestData === 'object') {
+      if (requestData.email) {
+        email = requestData.email;
+      } else if (Array.isArray(requestData) && requestData[0] && requestData[0].email) {
+        email = requestData[0].email;
+      }
+    }
 
     if (!email) {
-      logStep("❌ Email is required but not provided", { receivedBody: body });
+      logStep("❌ Email is required but not provided", { receivedData: requestData });
       return new Response(JSON.stringify({ error: "Email is required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
