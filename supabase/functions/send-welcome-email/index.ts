@@ -138,8 +138,7 @@ serve(async (req) => {
       });
 
       logStep("✅ Resend API call completed", { 
-        responseData: emailResponse.data,
-        responseError: emailResponse.error 
+        emailResponse: emailResponse
       });
 
       // Check if Resend returned an error
