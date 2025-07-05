@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,14 +6,53 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import CartIcon from "./CartIcon";
 import EmailSignupPopup from "./EmailSignupPopup";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Hero = () => {
   const { user, isAdmin } = useAuth();
   const { content, loading } = useSiteContent();
   const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [debugMessages, setDebugMessages] = useState<string[]>([]);
+  const [showDebugDialog, setShowDebugDialog] = useState(false);
+
+  const addDebugMessage = (message: string) => {
+    const timestampedMessage = `${new Date().toLocaleTimeString()}: ${message}`;
+    setDebugMessages(prev => [...prev, timestampedMessage]);
+    console.log(timestampedMessage);
+  };
 
   const scrollToProducts = () => {
     document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleDiscountClick = () => {
+    setDebugMessages([]); // Clear previous messages
+    setShowDebugDialog(true); // Show the debug dialog immediately
+    addDebugMessage('🎯 Get 10% Off button clicked');
+    addDebugMessage('📝 Setting showEmailPopup to true');
+    setShowEmailPopup(true);
+    addDebugMessage('✅ EmailSignupPopup should now be visible');
+  };
+
+  const handleEmailPopupClose = () => {
+    addDebugMessage('❌ EmailSignupPopup close requested');
+    setShowEmailPopup(false);
+    addDebugMessage('✅ EmailSignupPopup closed');
+    // Keep debug dialog open for a few more seconds
+    setTimeout(() => {
+      setShowDebugDialog(false);
+    }, 3000);
+  };
+
+  // Function to manually show debug dialog for testing
+  const showDebugDialogManually = () => {
+    setShowDebugDialog(true);
+    addDebugMessage('🧪 Manual debug dialog test for Hero component');
   };
 
   if (loading) {
@@ -102,14 +140,26 @@ const Hero = () => {
                 >
                   Shop Now
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-6 text-lg"
-                  onClick={() => setShowEmailPopup(true)}
-                >
-                  Get 10% Off
-                </Button>
+                <div className="space-y-2">
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-6 text-lg"
+                    onClick={handleDiscountClick}
+                  >
+                    Get 10% Off
+                  </Button>
+                  
+                  {/* Test button for debug dialog */}
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={showDebugDialogManually}
+                    className="bg-white/10 hover:bg-white/20 text-white border-white/30 text-xs"
+                  >
+                    Test Discount Debug
+                  </Button>
+                </div>
               </div>
             </div>
             
@@ -136,8 +186,42 @@ const Hero = () => {
 
       <EmailSignupPopup 
         isOpen={showEmailPopup} 
-        onClose={() => setShowEmailPopup(false)} 
+        onClose={handleEmailPopupClose} 
       />
+
+      {/* Debug Dialog for Discount Button */}
+      <Dialog open={showDebugDialog} onOpenChange={setShowDebugDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto z-[9999]">
+          <DialogHeader>
+            <DialogTitle>Get 10% Off Button Debug Log</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {debugMessages.length === 0 ? (
+              <div className="text-gray-500 text-center py-4">
+                Initializing debug session...
+              </div>
+            ) : (
+              debugMessages.map((message, index) => (
+                <div
+                  key={index}
+                  className="text-sm font-mono p-2 bg-gray-50 rounded border-l-4 border-red-500"
+                >
+                  {message}
+                </div>
+              ))
+            )}
+          </div>
+          <div className="mt-4 text-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowDebugDialog(false)}
+              className="px-6"
+            >
+              Close Debug
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
