@@ -1,27 +1,35 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [debugMessages, setDebugMessages] = useState<string[]>([]);
+  const [showDebugDialog, setShowDebugDialog] = useState(false);
   const { toast } = useToast();
 
   const addDebugMessage = (message: string) => {
-    setDebugMessages(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
-    console.log(message);
+    const timestampedMessage = `${new Date().toLocaleTimeString()}: ${message}`;
+    setDebugMessages(prev => [...prev, timestampedMessage]);
+    console.log(timestampedMessage);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setDebugMessages([]); // Clear previous messages
+    setShowDebugDialog(true); // Show the debug dialog
 
     try {
       addDebugMessage('🚀 Starting newsletter signup for: ' + email);
@@ -119,69 +127,103 @@ const Newsletter = () => {
       });
     } finally {
       setIsSubmitting(false);
+      // Keep dialog open for 5 seconds after completion so user can see final status
+      setTimeout(() => {
+        setShowDebugDialog(false);
+      }, 5000);
     }
   };
 
   return (
-    <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <Mail className="w-16 h-16 mx-auto mb-6 opacity-90" />
-            <h2 className="text-4xl lg:text-5xl font-light mb-4">
-              Stay in the Loop
-            </h2>
-            <p className="text-xl opacity-90 leading-relaxed">
-              Get exclusive discounts, tattoo aftercare tips, and be the first to know 
-              about new products and limited releases.
+    <>
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-8">
+              <Mail className="w-16 h-16 mx-auto mb-6 opacity-90" />
+              <h2 className="text-4xl lg:text-5xl font-light mb-4">
+                Stay in the Loop
+              </h2>
+              <p className="text-xl opacity-90 leading-relaxed">
+                Get exclusive discounts, tattoo aftercare tips, and be the first to know 
+                about new products and limited releases.
+              </p>
+            </div>
+            
+            {!isSubscribed ? (
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/70 focus:bg-white/20"
+                />
+                <Button 
+                  type="submit"
+                  size="lg"
+                  disabled={isSubmitting}
+                  className="bg-white text-blue-600 hover:bg-blue-50 transition-colors px-8"
+                >
+                  {isSubmitting ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </form>
+            ) : (
+              <div className="bg-white/10 rounded-xl p-6 max-w-md mx-auto">
+                <h3 className="text-xl font-medium mb-2">Welcome to the family!</h3>
+                <p className="opacity-90">Check your email for your special 10% discount code (WELCOME10)!</p>
+              </div>
+            )}
+            
+            <p className="text-sm opacity-70 mt-6">
+              No spam, ever. Unsubscribe at any time.
             </p>
           </div>
-          
-          {!isSubscribed ? (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isSubmitting}
-                className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/70 focus:bg-white/20"
-              />
-              <Button 
-                type="submit"
-                size="lg"
-                disabled={isSubmitting}
-                className="bg-white text-blue-600 hover:bg-blue-50 transition-colors px-8"
-              >
-                {isSubmitting ? "Subscribing..." : "Subscribe"}
-              </Button>
-            </form>
-          ) : (
-            <div className="bg-white/10 rounded-xl p-6 max-w-md mx-auto">
-              <h3 className="text-xl font-medium mb-2">Welcome to the family!</h3>
-              <p className="opacity-90">Check your email for your special 10% discount code (WELCOME10)!</p>
-            </div>
-          )}
-          
-          {/* Debug Messages - Only show when there are messages */}
-          {debugMessages.length > 0 && (
-            <div className="mt-8 bg-white/10 rounded-xl p-4 max-w-2xl mx-auto">
-              <h4 className="text-sm font-medium mb-2 opacity-75">Debug Information:</h4>
-              <div className="text-xs text-left space-y-1 opacity-90 font-mono">
-                {debugMessages.map((message, index) => (
-                  <div key={index} className="break-all">{message}</div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <p className="text-sm opacity-70 mt-6">
-            No spam, ever. Unsubscribe at any time.
-          </p>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Debug Dialog */}
+      <Dialog open={showDebugDialog} onOpenChange={setShowDebugDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Newsletter Signup Debug Log</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {debugMessages.length === 0 ? (
+              <div className="text-gray-500 text-center py-4">
+                Initializing...
+              </div>
+            ) : (
+              debugMessages.map((message, index) => (
+                <div
+                  key={index}
+                  className="text-sm font-mono p-2 bg-gray-50 rounded border-l-4 border-blue-500"
+                >
+                  {message}
+                </div>
+              ))
+            )}
+            {isSubmitting && (
+              <div className="text-center py-2">
+                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                <span className="ml-2 text-sm text-gray-600">Processing...</span>
+              </div>
+            )}
+          </div>
+          <div className="mt-4 text-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowDebugDialog(false)}
+              className="px-6"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
