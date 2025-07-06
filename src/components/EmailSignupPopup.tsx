@@ -64,25 +64,19 @@ const EmailSignupPopup = ({ isOpen, onClose }: EmailSignupPopupProps) => {
 
       addDebugMessage('✅ Email saved to database successfully');
       addDebugMessage('📤 Now attempting to send welcome email...');
-      addDebugMessage('🔗 Calling edge function: send-welcome-email');
-      addDebugMessage('📋 Function payload: ' + JSON.stringify({ email }));
-
-      // Add timeout and more detailed error handling
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      // Prepare the request data
+      const requestData = { email };
+      addDebugMessage('📋 Function payload: ' + JSON.stringify(requestData));
 
       try {
-        addDebugMessage('⏰ Starting function call with 30s timeout...');
+        addDebugMessage('⏰ Starting function call...');
         
         // Send welcome email with discount code
         const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
-          body: { email },
-          headers: {
-            'Content-Type': 'application/json',
-          }
+          body: requestData
         });
 
-        clearTimeout(timeoutId);
         addDebugMessage('📬 Edge function call completed');
         addDebugMessage('📊 Function response data: ' + JSON.stringify(emailData));
         addDebugMessage('⚠️ Function response error: ' + JSON.stringify(emailError));
@@ -103,7 +97,6 @@ const EmailSignupPopup = ({ isOpen, onClose }: EmailSignupPopupProps) => {
         }
 
       } catch (functionError) {
-        clearTimeout(timeoutId);
         addDebugMessage('💥 Function call error: ' + JSON.stringify(functionError));
         addDebugMessage('💥 Function error name: ' + (functionError as Error)?.name);
         addDebugMessage('💥 Function error message: ' + (functionError as Error)?.message);

@@ -14,6 +14,8 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  logStep("🌟 Function invoked - starting execution");
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     logStep("🔄 CORS preflight request");
