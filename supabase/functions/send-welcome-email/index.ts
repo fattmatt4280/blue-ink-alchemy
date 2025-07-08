@@ -111,7 +111,7 @@ serve(async (req) => {
 
     try {
       const emailResponse = await resend.emails.send({
-        from: "Blue Dream Budder <updates@bluedreambudder.com>",
+        from: "Blue Dream Budder <noreply@updates.bluedreambudder.com>",
         to: [email],
         subject: "Welcome to Blue Dream Budder! 🎉",
         html: `
@@ -158,7 +158,7 @@ serve(async (req) => {
       logStep("✅ Email sent successfully!", { 
         id: emailResponse.data?.id,
         to: email,
-        from: "Blue Dream Budder <updates@bluedreambudder.com>"
+        from: "Blue Dream Budder <noreply@updates.bluedreambudder.com>"
       });
 
       return new Response(JSON.stringify({ 
