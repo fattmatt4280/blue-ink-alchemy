@@ -1,20 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { ArrowDown, Settings } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { ArrowDown } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { Link } from "react-router-dom";
 import { useState } from "react";
-import CartIcon from "./CartIcon";
 import EmailSignupPopup from "./EmailSignupPopup";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import HeroHeader from "./HeroHeader";
+import HeroContent from "./HeroContent";
+import HeroDebugDialog from "./HeroDebugDialog";
 
 const Hero = () => {
-  const { user, isAdmin } = useAuth();
   const { content, loading } = useSiteContent();
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [debugMessages, setDebugMessages] = useState<string[]>([]);
@@ -73,35 +65,7 @@ const Hero = () => {
           }}></div>
         </div>
         
-        {/* Header with Admin and Cart buttons */}
-        <div className="absolute top-4 right-4 z-20 flex gap-2">
-          <CartIcon />
-          
-          {isAdmin && (
-            <Link to="/admin">
-              <Button 
-                size="sm"
-                className="neon-button bg-white/10 hover:bg-white/20 text-white border-white/30"
-                variant="outline"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Admin
-              </Button>
-            </Link>
-          )}
-
-          {!user && (
-            <Link to="/auth">
-              <Button 
-                size="sm"
-                className="neon-button bg-white/10 hover:bg-white/20 text-white border-white/30"
-                variant="outline"
-              >
-                Admin Login
-              </Button>
-            </Link>
-          )}
-        </div>
+        <HeroHeader />
         
         {/* Mobile title positioned under header buttons */}
         <div className="absolute top-16 left-4 right-4 z-10 lg:hidden">
@@ -110,56 +74,10 @@ const Hero = () => {
           </h1>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left space-y-8 mt-16 lg:mt-0">
-              {/* Desktop title - hidden on mobile */}
-              <h1 className="hidden lg:block text-7xl xl:text-8xl 2xl:text-9xl font-light tracking-tight cyber-text leading-tight">
-                {content.hero_title || 'Blue Dream Budder'}
-              </h1>
-              
-              <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-light opacity-90 leading-relaxed cyber-text md:mt-16 lg:mt-20">
-                {content.hero_subtitle || 'For Ink. For Skin. For Life.'}
-              </p>
-              
-              <p className="text-sm sm:text-base lg:text-lg opacity-80 max-w-md mx-auto lg:mx-0 leading-relaxed">
-                {content.hero_description || 'Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients for optimal healing and skin restoration.'}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button 
-                  size="lg" 
-                  className="bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-6 text-lg font-black shadow-lg hover:shadow-xl border-2 border-blue-200 shadow-[0_0_10px_rgba(30,58,138,0.6)] hover:shadow-[0_0_15px_rgba(30,58,138,0.8)]"
-                  onClick={scrollToProducts}
-                >
-                  Shop Now
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-6 text-lg"
-                  onClick={handleDiscountClick}
-                >
-                  Get 10% Off
-                </Button>
-              </div>
-            </div>
-            
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="w-80 h-80 lg:w-96 lg:h-96 rounded-full neon-card backdrop-blur-md flex items-center justify-center">
-                  <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center neon-card">
-                    <img 
-                      src={content.hero_image || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop&crop=center"}
-                      alt="Blue Dream Budder Jar"
-                      className="w-48 h-48 lg:w-60 lg:h-60 object-cover rounded-full shadow-2xl neon-image"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HeroContent 
+          onShopNowClick={scrollToProducts}
+          onDiscountClick={handleDiscountClick}
+        />
         
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <ArrowDown className="w-6 h-6 text-white/70" />
@@ -171,39 +89,11 @@ const Hero = () => {
         onClose={handleEmailPopupClose} 
       />
 
-      {/* Debug Dialog for Discount Button */}
-      <Dialog open={showDebugDialog} onOpenChange={setShowDebugDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto z-[9999]">
-          <DialogHeader>
-            <DialogTitle>Get 10% Off Button Debug Log</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            {debugMessages.length === 0 ? (
-              <div className="text-gray-500 text-center py-4">
-                Initializing debug session...
-              </div>
-            ) : (
-              debugMessages.map((message, index) => (
-                <div
-                  key={index}
-                  className="text-sm font-mono p-2 bg-gray-50 rounded border-l-4 border-red-500"
-                >
-                  {message}
-                </div>
-              ))
-            )}
-          </div>
-          <div className="mt-4 text-center">
-            <Button
-              variant="outline"
-              onClick={() => setShowDebugDialog(false)}
-              className="px-6"
-            >
-              Close Debug
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <HeroDebugDialog 
+        isOpen={showDebugDialog}
+        onClose={() => setShowDebugDialog(false)}
+        debugMessages={debugMessages}
+      />
     </>
   );
 };
