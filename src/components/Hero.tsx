@@ -49,12 +49,6 @@ const Hero = () => {
     }, 3000);
   };
 
-  // Function to manually show debug dialog for testing
-  const showDebugDialogManually = () => {
-    setShowDebugDialog(true);
-    addDebugMessage('🧪 Manual debug dialog test for Hero component');
-  };
-
   if (loading) {
     return (
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-700 to-blue-500 text-white overflow-hidden">
@@ -140,26 +134,14 @@ const Hero = () => {
                 >
                   Shop Now
                 </Button>
-                <div className="space-y-2">
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    className="bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-6 text-lg"
-                    onClick={handleDiscountClick}
-                  >
-                    Get 10% Off
-                  </Button>
-                  
-                  {/* Test button for debug dialog */}
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    onClick={showDebugDialogManually}
-                    className="bg-white/10 hover:bg-white/20 text-white border-white/30 text-xs"
-                  >
-                    Test Discount Debug
-                  </Button>
-                </div>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-6 text-lg"
+                  onClick={handleDiscountClick}
+                >
+                  Get 10% Off
+                </Button>
               </div>
             </div>
             

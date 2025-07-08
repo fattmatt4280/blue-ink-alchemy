@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,12 +134,6 @@ const Newsletter = () => {
     }
   };
 
-  // Function to manually show debug dialog for testing
-  const showDebugDialogManually = () => {
-    setShowDebugDialog(true);
-    addDebugMessage('🧪 Manual debug dialog test');
-  };
-
   return (
     <>
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
@@ -178,16 +171,6 @@ const Newsletter = () => {
                     {isSubmitting ? "Subscribing..." : "Subscribe"}
                   </Button>
                 </form>
-                
-                {/* Test button to manually show debug dialog */}
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={showDebugDialogManually}
-                  className="bg-white/10 hover:bg-white/20 text-white border-white/30 mx-auto"
-                >
-                  Test Debug Dialog
-                </Button>
               </div>
             ) : (
               <div className="bg-white/10 rounded-xl p-6 max-w-md mx-auto">
