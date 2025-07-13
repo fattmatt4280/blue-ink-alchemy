@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -11,10 +12,22 @@ interface Message {
   timestamp: Date;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  original_price?: number;
+  description?: string;
+  size?: string;
+  popular?: boolean;
+  most_popular?: boolean;
+}
+
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasShown, setHasShown] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -26,6 +39,25 @@ const AIAssistant = () => {
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch products data
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('display_order');
+
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Auto-open after 3 seconds
   useEffect(() => {
@@ -65,7 +97,7 @@ const AIAssistant = () => {
 
     // Simulate AI response
     setTimeout(() => {
-      const aiResponse = generateAIResponse(inputText);
+      const aiResponse = generateAIResponse(inputText, products);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: aiResponse,
@@ -83,34 +115,67 @@ const AIAssistant = () => {
     }
   };
 
-  const generateAIResponse = (userInput: string): string => {
+  const generateAIResponse = (userInput: string, products: Product[]): string => {
     const input = userInput.toLowerCase();
     
+    // Product-specific questions
+    if (input.includes('sizes') || input.includes('size options')) {
+      const sizes = products.map(p => `${p.name} (${p.size})`).join(', ');
+      return `We offer several sizes to meet your needs: ${sizes}. Each size is designed for different usage levels - from touch-ups to professional artist needs.`;
+    }
+    
+    if (input.includes('most popular') || input.includes('bestseller') || input.includes('recommend')) {
+      const mostPopular = products.find(p => p.most_popular);
+      const popular = products.filter(p => p.popular && !p.most_popular);
+      
+      if (mostPopular) {
+        return `Our most popular product is the ${mostPopular.name} at $${mostPopular.price}${mostPopular.size ? ` (${mostPopular.size})` : ''}. ${mostPopular.description || 'It\'s perfect for professional use and offers great value.'} ${popular.length > 0 ? `We also have other popular options like ${popular.map(p => p.name).join(' and ')}.` : ''}`;
+      }
+      return "Our Blue Dream Budder 8oz is our most popular size, perfect for professional artists and frequent use.";
+    }
+    
+    if (input.includes('price') || input.includes('cost') || input.includes('how much')) {
+      const priceList = products.map(p => {
+        const priceText = p.original_price && p.original_price > p.price 
+          ? `$${p.price} (normally $${p.original_price})` 
+          : `$${p.price}`;
+        return `${p.name}: ${priceText}`;
+      }).join(', ');
+      
+      return `Here are our current prices: ${priceList}. All products contain the same high-quality CBD formula, just in different sizes to meet your needs.`;
+    }
+    
+    if (input.includes('difference') || input.includes('compare')) {
+      return `All our Blue Dream Budder products contain the same premium CBD formula with natural healing ingredients. The main differences are the sizes: ${products.map(p => `${p.name} (${p.size})`).join(', ')}. Choose based on how often you'll use it - smaller sizes for occasional touch-ups, larger sizes for new tattoos or professional use.`;
+    }
+    
+    // Existing responses with enhanced product knowledge
     if (input.includes('tattoo') || input.includes('aftercare')) {
-      return "Our Blue Dream Budder is specifically formulated for tattoo aftercare! It contains premium CBD and all-natural ingredients that help reduce inflammation, promote healing, and keep your tattoo vibrant. Apply a thin layer 2-3 times daily on clean, dry skin.";
+      return "Our Blue Dream Budder is specifically formulated for tattoo aftercare! It contains premium CBD and all-natural ingredients that help reduce inflammation, promote healing, and keep your tattoo vibrant. Apply a thin layer 2-3 times daily on clean, dry skin. We offer multiple sizes to suit your needs.";
     }
     
     if (input.includes('cbd') || input.includes('ingredients')) {
-      return "Our formula contains high-quality CBD extract, organic coconut oil, beeswax, and healing botanicals like calendula and lavender. All ingredients are natural and skin-safe, perfect for sensitive post-tattoo skin.";
-    }
-    
-    if (input.includes('price') || input.includes('cost') || input.includes('buy')) {
-      return "You can find our current pricing and purchase options by scrolling down to our product section. We offer different sizes to meet your needs, and we frequently have special promotions for new customers!";
+      return "Our formula contains high-quality CBD isolate, organic mango butter, shea butter, avocado oil, coconut oil, and Blue Dream terpenes for aromatherapy. All ingredients are natural and skin-safe, perfect for sensitive post-tattoo skin. The CBD provides anti-inflammatory benefits while the natural butters deeply moisturize.";
     }
     
     if (input.includes('how to use') || input.includes('application')) {
-      return "Clean your tattoo gently with mild soap, pat dry, then apply a thin layer of Blue Dream Budder. Massage gently until absorbed. Use 2-3 times daily or as needed. Avoid over-application - a little goes a long way!";
+      return "Clean your tattoo gently with mild soap, pat dry, then apply a thin layer of Blue Dream Budder. Massage gently until absorbed. Use 2-3 times daily or as needed during the healing process. A little goes a long way! Start with our smaller sizes if you're trying it for the first time.";
     }
     
     if (input.includes('shipping') || input.includes('delivery')) {
-      return "We offer fast and reliable shipping options. Most orders are processed within 1-2 business days. You'll receive tracking information once your order ships. Free shipping is available on orders over a certain amount!";
+      return "We offer fast and reliable shipping options. Most orders are processed within 1-2 business days. You'll receive tracking information once your order ships. Free shipping is available on qualifying orders!";
+    }
+    
+    if (input.includes('professional') || input.includes('artist')) {
+      const professionalSize = products.find(p => p.name.includes('8oz'));
+      return `Many professional tattoo artists recommend our products! ${professionalSize ? `Our ${professionalSize.name} at $${professionalSize.price} is specifically designed for professional use and high-volume applications.` : 'Our larger sizes are perfect for professional studios.'} The natural ingredients and CBD formula help ensure optimal healing for your clients.`;
     }
     
     if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
-      return "Hello! I'm here to help you learn more about Blue Dream Budder and how it can help with your tattoo aftercare needs. What would you like to know?";
+      return "Hello! I'm here to help you learn more about Blue Dream Budder and how it can help with your tattoo aftercare needs. We have several sizes available, each with the same premium CBD formula. What would you like to know?";
     }
     
-    return "That's a great question! Our Blue Dream Budder is designed to provide superior tattoo aftercare with the healing power of CBD. Feel free to ask me about ingredients, usage instructions, or anything else about our products. You can also scroll down to see our full product range!";
+    return `That's a great question! Our Blue Dream Budder line offers premium CBD-infused tattoo aftercare in multiple sizes: ${products.map(p => p.name).join(', ')}. Each contains the same healing formula with natural ingredients. Feel free to ask me about specific sizes, ingredients, pricing, or usage instructions!`;
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
