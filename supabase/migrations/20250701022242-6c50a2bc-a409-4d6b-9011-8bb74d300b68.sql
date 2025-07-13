@@ -12,7 +12,7 @@ INSERT INTO site_content (key, value, type) VALUES
 ('quick_link_4_name', 'Reviews', 'text'),
 ('quick_link_4_url', '/reviews', 'text'),
 ('quick_link_5_name', 'Wholesale', 'text'),
-('quick_link_5_url', '/wholesale', 'text'),
+('quick_link_5_url', 'https://dreamtattoocompany.com', 'text'),
 -- Support section
 ('support_title', 'Support', 'text'),
 ('support_link_1_name', 'Contact Us', 'text'),

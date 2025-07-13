@@ -32,6 +32,29 @@ const Footer = () => {
     }
   }
 
+  const renderLink = (link: { name: string; url: string }) => {
+    const isExternal = link.url.startsWith('http');
+    
+    if (isExternal) {
+      return (
+        <a 
+          href={link.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:text-white transition-colors"
+        >
+          {link.name}
+        </a>
+      );
+    }
+    
+    return (
+      <Link to={link.url} className="hover:text-white transition-colors">
+        {link.name}
+      </Link>
+    );
+  };
+
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
@@ -51,9 +74,7 @@ const Footer = () => {
                 <ul className="space-y-2 text-gray-300">
                   {supportLinks.map((link, index) => (
                     <li key={index}>
-                      <Link to={link.url} className="hover:text-white transition-colors">
-                        {link.name}
-                      </Link>
+                      {renderLink(link)}
                     </li>
                   ))}
                 </ul>
@@ -64,9 +85,7 @@ const Footer = () => {
                 <ul className="space-y-2 text-gray-300">
                   {quickLinks.map((link, index) => (
                     <li key={index}>
-                      <Link to={link.url} className="hover:text-white transition-colors">
-                        {link.name}
-                      </Link>
+                      {renderLink(link)}
                     </li>
                   ))}
                 </ul>
