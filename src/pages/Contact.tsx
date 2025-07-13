@@ -19,8 +19,8 @@ const Contact = () => {
                 <p className="text-gray-600 mb-2">
                   For general inquiries, product questions, or order support:
                 </p>
-                <a href="mailto:hello@bluedreambudder.com" className="text-blue-600 hover:underline">
-                  hello@bluedreambudder.com
+                <a href="mailto:bluedreambudder@gmail.com" className="text-blue-600 hover:underline">
+                  bluedreambudder@gmail.com
                 </a>
               </div>
             </div>
@@ -32,8 +32,8 @@ const Contact = () => {
                 <p className="text-gray-600 mb-2">
                   Speak directly with our customer service team:
                 </p>
-                <a href="tel:1-800-BUDDER-1" className="text-blue-600 hover:underline">
-                  1-800-BUDDER-1
+                <a href="tel:331-643-5463" className="text-blue-600 hover:underline">
+                  331-643-5463
                 </a>
               </div>
             </div>
