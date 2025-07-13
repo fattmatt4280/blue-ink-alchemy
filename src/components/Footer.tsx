@@ -1,5 +1,4 @@
 
-import { Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteContent } from "@/hooks/useSiteContent";
 
@@ -37,23 +36,13 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
         <div className="mb-12">
-          {/* Brand with Contact, Support, and Quick Links */}
+          {/* Brand with Support and Quick Links */}
           <div>
             <h3 className="text-3xl font-bold mb-4">Blue Dream Budder</h3>
             <p className="text-gray-300 leading-relaxed mb-6">
               Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients 
               for optimal healing and skin restoration.
             </p>
-            <div className="space-y-2 mb-6">
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4" />
-                <span className="text-gray-300">bluedreambudder@gmail.com</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4" />
-                <span className="text-gray-300">331-643-5463</span>
-              </div>
-            </div>
             
             {/* Support and Quick Links in 4-column grid */}
             <div className="grid md:grid-cols-4 gap-4">
