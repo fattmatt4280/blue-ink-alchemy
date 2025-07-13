@@ -24,15 +24,27 @@ interface Product {
   most_popular?: boolean;
 }
 
+const predefinedQuestions = [
+  "What ingredients are in Blue Dream Budder?",
+  "How do I use this for tattoo aftercare?",
+  "What sizes are available and which is best?",
+  "What are the benefits of CBD for healing?",
+  "How does this help with tattoo inflammation?",
+  "Is this all natural and organic?",
+  "What makes this different from other aftercare products?",
+  "How often should I apply this?"
+];
+
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasShown, setHasShown] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showQuestions, setShowQuestions] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our CBD-infused tattoo aftercare products. How can I help you today?",
+      text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our CBD-infused tattoo aftercare products. Click a question below or ask me anything!",
       isUser: false,
       timestamp: new Date()
     }
@@ -77,10 +89,39 @@ const AIAssistant = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleQuestionClick = (question: string) => {
+    setShowQuestions(false);
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: question,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const aiResponse = generateAIResponse(question, products);
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponse,
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, 1000 + Math.random() * 1000);
+  };
+
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
 
-    // Expand the dialog when user starts typing
+    setShowQuestions(false);
     if (!isExpanded) {
       setIsExpanded(true);
     }
@@ -96,7 +137,6 @@ const AIAssistant = () => {
     setInputText('');
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       const aiResponse = generateAIResponse(inputText, products);
       const aiMessage: Message = {
@@ -111,6 +151,7 @@ const AIAssistant = () => {
   };
 
   const handleInputFocus = () => {
+    setShowQuestions(false);
     if (!isExpanded) {
       setIsExpanded(true);
     }
@@ -323,6 +364,26 @@ Each ingredient is specifically chosen for its healing properties and synergisti
                 </div>
               </div>
             ))}
+            
+            {/* Predefined Questions */}
+            {showQuestions && (
+              <div className="space-y-2">
+                <p className="text-xs text-gray-500 font-medium">Popular questions:</p>
+                <div className="grid grid-cols-1 gap-2">
+                  {predefinedQuestions.slice(0, 4).map((question, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleQuestionClick(question)}
+                      className="text-left justify-start h-auto p-2 text-xs hover:bg-blue-50"
+                    >
+                      {question}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {isTyping && (
               <div className="flex items-start gap-2">
