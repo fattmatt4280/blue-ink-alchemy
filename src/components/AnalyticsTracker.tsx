@@ -93,27 +93,15 @@ const AnalyticsTracker = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       
-      // Increment page views for today
+      // Use RPC function to increment page views
       const { error: pageViewError } = await supabase
-        .from('website_metrics')
-        .select('*')
-        .eq('date', today)
-        .eq('metric_type', 'page_views')
-        .single();
-
-      if (pageViewError && pageViewError.code === 'PGRST116') {
-        // No record exists, create one
-        await supabase.from('website_metrics').insert({
-          date: today,
-          metric_type: 'page_views',
-          value: 1
+        .rpc('increment_daily_metric', {
+          metric_date: today,
+          metric_name: 'page_views'
         });
-      } else if (!pageViewError) {
-        // Record exists, increment it
-        await supabase.from('website_metrics')
-          .update({ value: supabase.sql`value + 1` })
-          .eq('date', today)
-          .eq('metric_type', 'page_views');
+
+      if (pageViewError) {
+        console.error('Error updating page views:', pageViewError);
       }
 
       // Track unique visitors (simplified - in production you'd want more sophisticated tracking)
@@ -123,26 +111,15 @@ const AnalyticsTracker = () => {
       if (isNewSession) {
         sessionStorage.setItem('session_tracked', 'true');
         
+        // Use RPC function to increment visits
         const { error: visitError } = await supabase
-          .from('website_metrics')
-          .select('*')
-          .eq('date', today)
-          .eq('metric_type', 'visits')
-          .single();
-
-        if (visitError && visitError.code === 'PGRST116') {
-          // No record exists, create one
-          await supabase.from('website_metrics').insert({
-            date: today,
-            metric_type: 'visits',
-            value: 1
+          .rpc('increment_daily_metric', {
+            metric_date: today,
+            metric_name: 'visits'
           });
-        } else if (!visitError) {
-          // Record exists, increment it
-          await supabase.from('website_metrics')
-            .update({ value: supabase.sql`value + 1` })
-            .eq('date', today)
-            .eq('metric_type', 'visits');
+
+        if (visitError) {
+          console.error('Error updating visits:', visitError);
         }
       }
     } catch (error) {
