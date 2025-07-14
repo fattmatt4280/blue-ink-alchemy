@@ -1,7 +1,6 @@
 
 import { Link } from "react-router-dom";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const Footer = () => {
   const { content, loading } = useSiteContent();
@@ -15,19 +14,6 @@ const Footer = () => {
       </footer>
     );
   }
-
-  const socialPlatforms = [
-    { key: 'tiktok', icon: '🎵', name: 'TikTok' },
-    { key: 'instagram', icon: Instagram, name: 'Instagram' },
-    { key: 'facebook', icon: Facebook, name: 'Facebook' },
-    { key: 'twitter', icon: Twitter, name: 'Twitter' },
-    { key: 'youtube', icon: Youtube, name: 'YouTube' }
-  ];
-
-  const enabledSocialLinks = socialPlatforms.filter(platform => 
-    content[`social_${platform.key}_enabled`] === 'true' && 
-    content[`social_${platform.key}_url`]
-  );
 
   const quickLinks = [];
   const supportLinks = [];
@@ -81,63 +67,33 @@ const Footer = () => {
               for optimal healing and skin restoration.
             </p>
             
-            {/* Support and Quick Links in 4-column grid */}
-            <div className="grid md:grid-cols-4 gap-4">
-              <div>
-                <h4 className="text-lg font-bold mb-4">{content.support_title || 'Support'}</h4>
-                <ul className="space-y-2 text-gray-300">
-                  {supportLinks.map((link, index) => (
-                    <li key={index}>
-                      {renderLink(link)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="text-lg font-bold mb-4">{content.quick_links_title || 'Quick Links'}</h4>
-                <ul className="space-y-2 text-gray-300">
-                  {quickLinks.map((link, index) => (
-                    <li key={index}>
-                      {renderLink(link)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              {/* Social Links */}
-              {content.social_links_enabled === 'true' && enabledSocialLinks.length > 0 && (
+            {/* Support and Quick Links in 2-column grid */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-md">
+              {supportLinks.length > 0 && (
                 <div>
-                  <h4 className="text-lg font-bold mb-4">Follow Us</h4>
-                  <div className="flex space-x-4">
-                    {enabledSocialLinks.map((platform) => {
-                      const IconComponent = platform.icon;
-                      const url = content[`social_${platform.key}_url`];
-                      const name = content[`social_${platform.key}_name`] || platform.name;
-                      
-                      return (
-                        <a
-                          key={platform.key}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-gray-300 hover:text-white transition-colors"
-                          aria-label={name}
-                        >
-                          {typeof IconComponent === 'string' ? (
-                            <span className="text-2xl">{IconComponent}</span>
-                          ) : (
-                            <IconComponent className="w-6 h-6" />
-                          )}
-                        </a>
-                      );
-                    })}
-                  </div>
+                  <h4 className="text-lg font-bold mb-4">{content.support_title || 'Support'}</h4>
+                  <ul className="space-y-2 text-gray-300">
+                    {supportLinks.map((link, index) => (
+                      <li key={index}>
+                        {renderLink(link)}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
               
-              {/* Empty column for spacing */}
-              <div></div>
+              {quickLinks.length > 0 && (
+                <div>
+                  <h4 className="text-lg font-bold mb-4">{content.quick_links_title || 'Quick Links'}</h4>
+                  <ul className="space-y-2 text-gray-300">
+                    {quickLinks.map((link, index) => (
+                      <li key={index}>
+                        {renderLink(link)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>
