@@ -95,13 +95,25 @@ const AnalyticsTracker = () => {
       
       // Increment page views for today
       const { error: pageViewError } = await supabase
-        .rpc('increment_daily_metric', {
-          metric_date: today,
-          metric_name: 'page_views'
-        });
+        .from('website_metrics')
+        .select('*')
+        .eq('date', today)
+        .eq('metric_type', 'page_views')
+        .single();
 
-      if (pageViewError) {
-        console.error('Error updating page views:', pageViewError);
+      if (pageViewError && pageViewError.code === 'PGRST116') {
+        // No record exists, create one
+        await supabase.from('website_metrics').insert({
+          date: today,
+          metric_type: 'page_views',
+          value: 1
+        });
+      } else if (!pageViewError) {
+        // Record exists, increment it
+        await supabase.from('website_metrics')
+          .update({ value: supabase.sql`value + 1` })
+          .eq('date', today)
+          .eq('metric_type', 'page_views');
       }
 
       // Track unique visitors (simplified - in production you'd want more sophisticated tracking)
@@ -112,13 +124,25 @@ const AnalyticsTracker = () => {
         sessionStorage.setItem('session_tracked', 'true');
         
         const { error: visitError } = await supabase
-          .rpc('increment_daily_metric', {
-            metric_date: today,
-            metric_name: 'visits'
-          });
+          .from('website_metrics')
+          .select('*')
+          .eq('date', today)
+          .eq('metric_type', 'visits')
+          .single();
 
-        if (visitError) {
-          console.error('Error updating visits:', visitError);
+        if (visitError && visitError.code === 'PGRST116') {
+          // No record exists, create one
+          await supabase.from('website_metrics').insert({
+            date: today,
+            metric_type: 'visits',
+            value: 1
+          });
+        } else if (!visitError) {
+          // Record exists, increment it
+          await supabase.from('website_metrics')
+            .update({ value: supabase.sql`value + 1` })
+            .eq('date', today)
+            .eq('metric_type', 'visits');
         }
       }
     } catch (error) {
