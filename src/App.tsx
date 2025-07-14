@@ -18,6 +18,7 @@ import HowToUse from "./pages/HowToUse";
 import Reviews from "./pages/Reviews";
 import Wholesale from "./pages/Wholesale";
 import Contact from "./pages/Contact";
+import SizeGuide from "./pages/SizeGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/reviews" element={<Reviews />} />
               <Route path="/wholesale" element={<Wholesale />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/size-guide" element={<SizeGuide />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
