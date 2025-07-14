@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const Footer = () => {
   const { content, loading } = useSiteContent();
@@ -14,6 +15,19 @@ const Footer = () => {
       </footer>
     );
   }
+
+  const socialPlatforms = [
+    { key: 'tiktok', icon: '🎵', name: 'TikTok' },
+    { key: 'instagram', icon: Instagram, name: 'Instagram' },
+    { key: 'facebook', icon: Facebook, name: 'Facebook' },
+    { key: 'twitter', icon: Twitter, name: 'Twitter' },
+    { key: 'youtube', icon: Youtube, name: 'YouTube' }
+  ];
+
+  const enabledSocialLinks = socialPlatforms.filter(platform => 
+    content[`social_${platform.key}_enabled`] === 'true' && 
+    content[`social_${platform.key}_url`]
+  );
 
   const quickLinks = [];
   const supportLinks = [];
@@ -91,8 +105,38 @@ const Footer = () => {
                 </ul>
               </div>
               
-              {/* Empty columns for spacing */}
-              <div></div>
+              {/* Social Links */}
+              {content.social_links_enabled === 'true' && enabledSocialLinks.length > 0 && (
+                <div>
+                  <h4 className="text-lg font-bold mb-4">Follow Us</h4>
+                  <div className="flex space-x-4">
+                    {enabledSocialLinks.map((platform) => {
+                      const IconComponent = platform.icon;
+                      const url = content[`social_${platform.key}_url`];
+                      const name = content[`social_${platform.key}_name`] || platform.name;
+                      
+                      return (
+                        <a
+                          key={platform.key}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-300 hover:text-white transition-colors"
+                          aria-label={name}
+                        >
+                          {typeof IconComponent === 'string' ? (
+                            <span className="text-2xl">{IconComponent}</span>
+                          ) : (
+                            <IconComponent className="w-6 h-6" />
+                          )}
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Empty column for spacing */}
               <div></div>
             </div>
           </div>

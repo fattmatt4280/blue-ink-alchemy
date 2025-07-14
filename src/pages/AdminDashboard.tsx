@@ -12,6 +12,7 @@ import ProductReorderTool from '@/components/ProductReorderTool';
 import IngredientsEditor from '@/components/IngredientsEditor';
 import TestimonialsEditor from '@/components/TestimonialsEditor';
 import FooterLinksEditor from '@/components/FooterLinksEditor';
+import SocialLinksEditor from '@/components/SocialLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import AccessDenied from '@/components/AccessDenied';
@@ -172,6 +173,9 @@ const AdminDashboard = () => {
               onSave={updateContent}
               saving={saving}
             />
+
+            {/* Social Links Editor */}
+            <SocialLinksEditor />
 
             {/* Image Upload Section */}
             {imageContent.map((item) => (
