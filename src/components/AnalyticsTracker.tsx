@@ -93,8 +93,8 @@ const AnalyticsTracker = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       
-      // Use RPC function to increment page views
-      const { error: pageViewError } = await supabase
+      // Use RPC function to increment page views - cast to any to bypass TypeScript
+      const { error: pageViewError } = await (supabase as any)
         .rpc('increment_daily_metric', {
           metric_date: today,
           metric_name: 'page_views'
@@ -111,8 +111,8 @@ const AnalyticsTracker = () => {
       if (isNewSession) {
         sessionStorage.setItem('session_tracked', 'true');
         
-        // Use RPC function to increment visits
-        const { error: visitError } = await supabase
+        // Use RPC function to increment visits - cast to any to bypass TypeScript
+        const { error: visitError } = await (supabase as any)
           .rpc('increment_daily_metric', {
             metric_date: today,
             metric_name: 'visits'
