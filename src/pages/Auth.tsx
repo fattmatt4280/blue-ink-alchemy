@@ -89,7 +89,13 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-light">Blue Dream Budder</CardTitle>
-          <CardDescription>Admin Access Portal</CardDescription>
+          <CardDescription>
+            Sign in to your account or create a new one.
+            <br />
+            <span className="text-sm text-muted-foreground mt-1 block">
+              Admin features will be available if you have admin permissions.
+            </span>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
