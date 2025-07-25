@@ -48,15 +48,11 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
         
         <div className="flex justify-center">
           <div className="relative">
-            <div className="w-80 h-80 lg:w-96 lg:h-96 rounded-full neon-card backdrop-blur-md flex items-center justify-center">
-              <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center neon-card">
-                <img 
-                  src={content.hero_image || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop&crop=center"}
-                  alt="Blue Dream Budder Jar"
-                  className="w-48 h-48 lg:w-60 lg:h-60 object-cover rounded-full shadow-2xl neon-image"
-                />
-              </div>
-            </div>
+            <img 
+              src={content.hero_image || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop&crop=center"}
+              alt="Blue Dream Budder Jar"
+              className="w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-full shadow-2xl"
+            />
           </div>
         </div>
       </div>
