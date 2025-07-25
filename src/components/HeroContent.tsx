@@ -49,7 +49,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
         <div className="flex justify-center">
           <div className="relative">
             <img 
-              src={content.hero_image || "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop&crop=center"}
+              src={content.hero_image || "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&h=400&fit=crop&crop=center"}
               alt="Blue Dream Budder Jar"
               className="w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-full shadow-2xl"
             />
