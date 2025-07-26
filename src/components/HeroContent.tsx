@@ -12,25 +12,30 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
 
   return (
     <div className="container mx-auto px-4 relative z-10">
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
-        <div className="text-center lg:text-left space-y-8 mt-16 lg:mt-0">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="text-center lg:text-left space-y-6 mt-20 lg:mt-0">
           {/* Desktop title - hidden on mobile */}
-          <h1 className="hidden lg:block text-7xl xl:text-8xl 2xl:text-9xl font-light tracking-tight cyber-text leading-tight">
+          <h1 className="hidden lg:block font-orbitron text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight cyber-text leading-tight">
             {content.hero_title || 'Blue Dream Budder'}
           </h1>
           
-          <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-light opacity-90 leading-relaxed cyber-text md:mt-16 lg:mt-20">
+          {/* Mobile title - visible on mobile only */}
+          <h1 className="lg:hidden font-orbitron text-4xl sm:text-5xl font-bold tracking-tight cyber-text leading-tight mt-6">
+            {content.hero_title || 'Blue Dream Budder'}
+          </h1>
+          
+          <p className="font-inter text-lg sm:text-xl lg:text-2xl font-medium opacity-90 leading-relaxed cyber-text">
             {content.hero_subtitle || 'For Ink. For Skin. For Life.'}
           </p>
           
-          <p className="text-sm sm:text-base lg:text-lg opacity-80 max-w-md mx-auto lg:mx-0 leading-relaxed">
+          <p className="font-inter text-sm sm:text-base lg:text-lg opacity-80 max-w-lg mx-auto lg:mx-0 leading-relaxed">
             {content.hero_description || 'Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients for optimal healing and skin restoration.'}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
             <Button 
               size="lg" 
-              className="bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-6 text-lg font-black shadow-lg hover:shadow-xl border-2 border-blue-200 shadow-[0_0_10px_rgba(30,58,138,0.6)] hover:shadow-[0_0_15px_rgba(30,58,138,0.8)]"
+              className="font-inter font-semibold bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-4 text-base shadow-lg hover:shadow-xl border-2 border-blue-200 shadow-[0_0_10px_rgba(30,58,138,0.6)] hover:shadow-[0_0_15px_rgba(30,58,138,0.8)]"
               onClick={onShopNowClick}
             >
               Shop Now
@@ -38,7 +43,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-6 text-lg"
+              className="font-inter font-semibold bg-red-500 border-2 border-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-all duration-300 px-8 py-4 text-base"
               onClick={onDiscountClick}
             >
               Get 10% Off

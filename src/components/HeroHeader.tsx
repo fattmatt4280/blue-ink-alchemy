@@ -9,7 +9,7 @@ const HeroHeader = () => {
   const { user, isAdmin, signOut } = useAuth();
 
   return (
-    <div className="absolute top-4 right-4 z-20 flex gap-2">
+    <div className="absolute top-6 right-6 z-20 flex gap-2 backdrop-blur-sm rounded-lg p-2">
       <CartIcon />
       
       {user ? (
