@@ -14,13 +14,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
     <div className="container mx-auto px-4 relative z-10">
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         <div className="text-center lg:text-left space-y-6 mt-20 lg:mt-0">
-          {/* Desktop title - hidden on mobile */}
-          <h1 className="hidden lg:block font-orbitron text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight cyber-text leading-tight">
-            {content.hero_title || 'Blue Dream Budder'}
-          </h1>
-          
-          {/* Mobile title - visible on mobile only */}
-          <h1 className="lg:hidden font-orbitron text-4xl sm:text-5xl font-bold tracking-tight cyber-text leading-tight mt-6">
+          <h1 className="font-orbitron text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight cyber-text leading-tight mt-6">
             {content.hero_title || 'Blue Dream Budder'}
           </h1>
           
