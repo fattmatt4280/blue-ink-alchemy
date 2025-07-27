@@ -63,6 +63,7 @@ const Checkout = () => {
     }
 
     setLoading(true);
+    toast.info("Creating checkout session...");
     
     try {
       console.log("=== PREPARING FUNCTION CALL ===");
@@ -91,59 +92,42 @@ const Checkout = () => {
       console.log("=== CALLING CREATE-PAYMENT FUNCTION ===");
       console.log("Payload:", JSON.stringify(payload, null, 2));
 
-      // Set a timeout for the function call
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Function call timeout after 30 seconds')), 30000)
-      );
-
-      const functionPromise = supabase.functions.invoke('create-payment', {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
         body: payload
       });
 
-      const response = await Promise.race([functionPromise, timeoutPromise]) as { 
-        data?: { url?: string; error?: string } | null; 
-        error?: { message?: string } | null 
-      };
-
       console.log("=== FUNCTION RESPONSE ===");
-      console.log("Response:", response);
+      console.log("Response data:", data);
+      console.log("Response error:", error);
 
-      if (response.error) {
-        console.error("Supabase function error:", response.error);
-        toast.error(`Checkout failed: ${response.error.message || 'Function call failed'}`);
+      if (error) {
+        console.error("Supabase function error:", error);
+        toast.error(`Checkout failed: ${error.message || 'Function call failed'}`);
         return;
       }
 
-      if (response.data?.error) {
-        console.error("Payment function returned error:", response.data.error);
-        toast.error(`Payment error: ${response.data.error}`);
+      if (data?.error) {
+        console.error("Payment function returned error:", data.error);
+        toast.error(`Payment error: ${data.error}`);
         return;
       }
 
-      if (response.data?.url) {
-        console.log("SUCCESS - Redirecting to:", response.data.url);
-        // Try to redirect in the same window first
-        try {
-          window.location.href = response.data.url;
-        } catch (redirectError) {
-          console.log("Same window redirect failed, trying new window:", redirectError);
-          // Fallback to opening in new window
-          const newWindow = window.open(response.data.url, '_blank');
-          if (!newWindow) {
-            toast.error("Please allow popups and try again, or copy this URL: " + response.data.url);
-          }
-        }
+      if (data?.url) {
+        console.log("SUCCESS - Redirecting to Stripe checkout");
+        console.log("Stripe URL:", data.url);
+        
+        // Show progress message
+        toast.success("Redirecting to Stripe checkout...");
+        
+        // Simple, reliable redirect
+        window.location.href = data.url;
       } else {
-        console.error("No URL returned from payment function", response.data);
+        console.error("No URL returned from payment function", data);
         toast.error("Failed to create checkout session. Please try again.");
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      if (error instanceof Error && error.message.includes('timeout')) {
-        toast.error("Request timed out. Please check your connection and try again.");
-      } else {
-        toast.error(`Checkout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+      toast.error(`Checkout failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
