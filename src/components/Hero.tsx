@@ -67,12 +67,6 @@ const Hero = () => {
         
         <HeroHeader />
         
-        {/* Mobile title positioned under header buttons */}
-        <div className="absolute top-16 left-4 right-4 z-10 lg:hidden">
-          <h1 className="text-4xl sm:text-5xl font-light tracking-tight cyber-text text-center leading-tight">
-            {content.hero_title || 'Blue Dream Budder'}
-          </h1>
-        </div>
         
         <HeroContent 
           onShopNowClick={scrollToProducts}

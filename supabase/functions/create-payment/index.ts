@@ -26,7 +26,9 @@ serve(async (req) => {
       hasStripeKey: !!stripeKey, 
       hasSupabaseUrl: !!supabaseUrl,
       hasServiceKey: !!supabaseServiceKey,
-      stripeKeyPrefix: stripeKey ? stripeKey.substring(0, 7) : 'none'
+      stripeKeyPrefix: stripeKey ? stripeKey.substring(0, 7) : 'none',
+      isLiveKey: stripeKey ? stripeKey.startsWith('sk_live_') : false,
+      isTestKey: stripeKey ? stripeKey.startsWith('sk_test_') : false
     });
 
     if (!stripeKey) {
@@ -182,12 +184,27 @@ serve(async (req) => {
         error: sessionError.message,
         type: sessionError.type,
         code: sessionError.code,
-        param: sessionError.param
+        param: sessionError.param,
+        isLiveMode: stripeKey.startsWith('sk_live_'),
+        customerExists: !!customerId
       });
       
+      // Provide more specific error messages for live key issues
+      let errorMessage = "Failed to create checkout session";
+      if (stripeKey.startsWith('sk_live_')) {
+        if (sessionError.code === 'rate_limit') {
+          errorMessage = "Too many requests. Please try again in a moment.";
+        } else if (sessionError.code === 'invalid_request_error') {
+          errorMessage = "Invalid payment configuration. Please contact support.";
+        } else if (sessionError.message?.includes('price')) {
+          errorMessage = "Product pricing configuration error. Please contact support.";
+        }
+      }
+      
       return new Response(JSON.stringify({ 
-        error: "Failed to create checkout session", 
-        details: sessionError.message 
+        error: errorMessage, 
+        details: sessionError.message,
+        code: sessionError.code
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
