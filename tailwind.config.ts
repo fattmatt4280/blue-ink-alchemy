@@ -18,10 +18,11 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'orbitron': ['Orbitron', 'sans-serif'],
-				'inter': ['Inter', 'sans-serif'],
-			},
+      fontFamily: {
+        'orbitron': ['Orbitron', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
+        'kaushan': ['Kaushan Script', 'cursive'],
+      },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
