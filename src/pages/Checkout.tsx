@@ -31,7 +31,7 @@ const Checkout = () => {
     } else if (cancelled === 'true') {
       toast.info("Order was cancelled.");
     }
-  }, [success, cancelled, clearCart]);
+  }, [success, cancelled]); // Removed clearCart from dependencies to prevent infinite loop
 
   const subtotal = getTotalPrice();
   const shipping = 9.99;
