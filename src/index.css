@@ -287,22 +287,3 @@ All colors MUST be HSL.
 .neon-button:active {
   transform: translateY(-1px) scale(1.01);
 }
-
-/* Gradient text effects */
-.gradient-text-blue {
-  background: linear-gradient(135deg, #60a5fa, #3b82f6, #1d4ed8, #1e40af);
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 8s ease infinite;
-}
-
-.gradient-text-dream {
-  background: linear-gradient(135deg, #93c5fd, #60a5fa, #3b82f6, #2563eb, #1d4ed8);
-  background-size: 500% 500%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 10s ease infinite;
-}
