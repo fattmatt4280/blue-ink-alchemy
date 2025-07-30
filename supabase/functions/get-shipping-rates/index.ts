@@ -152,15 +152,30 @@ serve(async (req) => {
     });
 
     // Filter and format rates - Shippo test rates might not have 'available' property
+    logStep("Raw rates before filtering", { 
+      totalRates: shipment.rates?.length || 0,
+      ratesArray: shipment.rates,
+      messages: shipment.messages 
+    });
+    
     const rates = shipment.rates
       .filter((rate: any) => {
+        const hasAmount = !!rate.amount;
+        const hasProvider = !!rate.provider;
+        const isValid = hasAmount && hasProvider;
+        
         logStep("Rate filter check", { 
           rateId: rate.object_id, 
           available: rate.available, 
           amount: rate.amount,
-          provider: rate.provider 
+          provider: rate.provider,
+          hasAmount,
+          hasProvider,
+          isValid,
+          attributes: rate.attributes
         });
-        return rate.amount && rate.provider; // Filter by having amount and provider instead
+        
+        return isValid;
       })
       .map((rate: any) => ({
         id: rate.object_id,

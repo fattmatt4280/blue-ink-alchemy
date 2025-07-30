@@ -96,12 +96,19 @@ const ShippingRateSelector = ({
       }
 
       if (data?.success && data?.rates) {
+        console.log("=== SHIPPING RATES RESPONSE ===");
+        console.log("Response data:", data);
+        console.log("Rates received:", data.rates);
+        console.log("Number of rates:", data.rates.length);
+        
         setRates(data.rates);
         // Auto-select the cheapest rate
         if (data.rates.length > 0 && !selectedRate) {
           onRateSelected(data.rates[0]);
         }
       } else {
+        console.log("=== SHIPPING RATES ERROR ===");
+        console.log("Response data:", data);
         throw new Error(data?.error || "Failed to get shipping rates");
       }
     } catch (err) {
