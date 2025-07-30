@@ -33,14 +33,14 @@ serve(async (req) => {
     const { cartItems, toAddress, fromAddress, orderId } = await req.json();
     logStep("Request data parsed", { cartItems: cartItems?.length, orderId });
 
-    // Default from address (your business address)
+    // Default from address (your business address) - using a real address for testing
     const defaultFromAddress = fromAddress || {
       name: "Blue Dream Budder",
       company: "Blue Dream Budder LLC",
-      street1: "123 Business St",
-      city: "Los Angeles",
+      street1: "1600 Amphitheatre Parkway",
+      city: "Mountain View",
       state: "CA",
-      zip: "90210",
+      zip: "94043",
       country: "US",
       phone: "+1 555-0123",
       email: "shipping@bluedreambudder.com"
@@ -144,7 +144,12 @@ serve(async (req) => {
     }
 
     const shipment = await shipmentResponse.json();
-    logStep("Shipment created", { shipmentId: shipment.object_id, ratesCount: shipment.rates?.length });
+    logStep("Shipment created", { 
+      shipmentId: shipment.object_id, 
+      ratesCount: shipment.rates?.length,
+      rawRates: shipment.rates,
+      messages: shipment.messages
+    });
 
     // Filter and format rates
     const rates = shipment.rates
