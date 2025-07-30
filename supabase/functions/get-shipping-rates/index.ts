@@ -150,7 +150,14 @@ serve(async (req) => {
       messages: shipment.messages
     });
 
-    // Filter and format rates - Shippo test rates might not have 'available' property
+    // USPS baseline rates for price comparison
+    const uspsBaselineRates = {
+      'Ground Advantage': 8.50,
+      'Priority Mail': 10.20,
+      'Priority Mail Express': 28.50
+    };
+
+    // Filter and format rates with price comparison
     logStep("Raw rates before filtering", { 
       totalRates: shipment.rates?.length || 0,
       ratesArray: shipment.rates,
@@ -176,15 +183,33 @@ serve(async (req) => {
         
         return isValid;
       })
-      .map((rate: any) => ({
-        id: rate.object_id,
-        carrier: rate.provider,
-        service_level: rate.servicelevel.name,
-        amount: parseFloat(rate.amount),
-        currency: rate.currency,
-        estimated_days: rate.estimated_days,
-        duration_terms: rate.duration_terms
-      }))
+      .map((rate: any) => {
+        const shippoAmount = parseFloat(rate.amount);
+        const serviceName = rate.servicelevel.name;
+        
+        // Check if we have a baseline rate for this service
+        const baselineAmount = uspsBaselineRates[serviceName as keyof typeof uspsBaselineRates];
+        const finalAmount = baselineAmount && baselineAmount < shippoAmount ? baselineAmount : shippoAmount;
+        
+        if (baselineAmount && baselineAmount < shippoAmount) {
+          logStep("Using baseline rate", {
+            service: serviceName,
+            shippoRate: shippoAmount,
+            baselineRate: baselineAmount,
+            savings: shippoAmount - baselineAmount
+          });
+        }
+
+        return {
+          id: rate.object_id,
+          carrier: rate.provider,
+          service_level: serviceName,
+          amount: finalAmount,
+          currency: rate.currency,
+          estimated_days: rate.estimated_days,
+          duration_terms: rate.duration_terms
+        };
+      })
       .sort((a: any, b: any) => a.amount - b.amount); // Sort by price
 
     logStep("Rates processed", { availableRates: rates.length });
