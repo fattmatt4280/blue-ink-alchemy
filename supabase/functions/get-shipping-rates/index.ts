@@ -71,6 +71,13 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(defaultFromAddress),
+      }).then(async (response) => {
+        const text = await response.text();
+        logStep("From address response", { status: response.status, text: text.substring(0, 200) });
+        if (!response.ok) {
+          throw new Error(`From address validation failed: ${response.status} - ${text}`);
+        }
+        return text ? JSON.parse(text) : {};
       }),
       fetch('https://api.goshippo.com/addresses/', {
         method: 'POST',
@@ -79,15 +86,18 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(shippoToAddress),
+      }).then(async (response) => {
+        const text = await response.text();
+        logStep("To address response", { status: response.status, text: text.substring(0, 200) });
+        if (!response.ok) {
+          throw new Error(`To address validation failed: ${response.status} - ${text}`);
+        }
+        return text ? JSON.parse(text) : {};
       })
     ]);
 
-    const validatedFromAddress = await fromAddressValidation.json();
-    const validatedToAddress = await toAddressValidation.json();
-
-    if (!fromAddressValidation.ok || !toAddressValidation.ok) {
-      throw new Error('Address validation failed');
-    }
+    const validatedFromAddress = fromAddressValidation;
+    const validatedToAddress = toAddressValidation;
 
     logStep("Addresses validated", { 
       fromValid: validatedFromAddress.validation_results?.is_valid,
