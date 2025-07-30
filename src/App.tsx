@@ -19,6 +19,7 @@ import Reviews from "./pages/Reviews";
 import Wholesale from "./pages/Wholesale";
 import Contact from "./pages/Contact";
 import SizeGuide from "./pages/SizeGuide";
+import Tracking from "./pages/Tracking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,9 +44,10 @@ const App = () => (
               <Route path="/how-to-use" element={<HowToUse />} />
               <Route path="/reviews" element={<Reviews />} />
               <Route path="/wholesale" element={<Wholesale />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/size-guide" element={<SizeGuide />} />
-              <Route path="*" element={<NotFound />} />
+               <Route path="/contact" element={<Contact />} />
+               <Route path="/size-guide" element={<SizeGuide />} />
+               <Route path="/tracking" element={<Tracking />} />
+               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </CartProvider>

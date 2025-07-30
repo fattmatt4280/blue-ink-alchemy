@@ -262,6 +262,174 @@ export type Database = {
         }
         Relationships: []
       }
+      shipments: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          currency: string | null
+          delivered_at: string | null
+          id: string
+          label_url: string | null
+          order_id: string | null
+          service_level: string | null
+          shipped_at: string | null
+          shipping_cost: number | null
+          shippo_tracking_number: string | null
+          shippo_transaction_id: string | null
+          tracking_status: string | null
+          tracking_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          currency?: string | null
+          delivered_at?: string | null
+          id?: string
+          label_url?: string | null
+          order_id?: string | null
+          service_level?: string | null
+          shipped_at?: string | null
+          shipping_cost?: number | null
+          shippo_tracking_number?: string | null
+          shippo_transaction_id?: string | null
+          tracking_status?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          currency?: string | null
+          delivered_at?: string | null
+          id?: string
+          label_url?: string | null
+          order_id?: string | null
+          service_level?: string | null
+          shipped_at?: string | null
+          shipping_cost?: number | null
+          shippo_tracking_number?: string | null
+          shippo_transaction_id?: string | null
+          tracking_status?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_addresses: {
+        Row: {
+          city: string
+          company: string | null
+          country: string
+          created_at: string
+          email: string | null
+          id: string
+          is_validated: boolean | null
+          name: string
+          order_id: string | null
+          phone: string | null
+          shippo_address_id: string | null
+          state: string
+          street1: string
+          street2: string | null
+          zip: string
+        }
+        Insert: {
+          city: string
+          company?: string | null
+          country?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_validated?: boolean | null
+          name: string
+          order_id?: string | null
+          phone?: string | null
+          shippo_address_id?: string | null
+          state: string
+          street1: string
+          street2?: string | null
+          zip: string
+        }
+        Update: {
+          city?: string
+          company?: string | null
+          country?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_validated?: boolean | null
+          name?: string
+          order_id?: string | null
+          phone?: string | null
+          shippo_address_id?: string | null
+          state?: string
+          street1?: string
+          street2?: string | null
+          zip?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_addresses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_rates: {
+        Row: {
+          amount: number
+          carrier: string
+          created_at: string
+          currency: string | null
+          estimated_days: number | null
+          id: string
+          order_id: string | null
+          rate_id: string
+          service_level: string
+        }
+        Insert: {
+          amount: number
+          carrier: string
+          created_at?: string
+          currency?: string | null
+          estimated_days?: number | null
+          id?: string
+          order_id?: string | null
+          rate_id: string
+          service_level: string
+        }
+        Update: {
+          amount?: number
+          carrier?: string
+          created_at?: string
+          currency?: string | null
+          estimated_days?: number | null
+          id?: string
+          order_id?: string | null
+          rate_id?: string
+          service_level?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_rates_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_content: {
         Row: {
           created_at: string | null

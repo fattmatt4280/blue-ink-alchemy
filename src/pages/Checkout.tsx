@@ -8,6 +8,7 @@ import { Minus, Plus, Trash2, ArrowLeft, CheckCircle, XCircle, Loader2 } from "l
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import ShippingRateSelector from "@/components/ShippingRateSelector";
 
 const Checkout = () => {
   const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart();
@@ -22,7 +23,9 @@ const Checkout = () => {
     address: '',
     city: '',
     zipCode: '',
+    state: 'CA', // Default to CA
   });
+  const [selectedShippingRate, setSelectedShippingRate] = useState<any>(null);
 
   useEffect(() => {
     if (success === 'true') {
@@ -279,10 +282,23 @@ const Checkout = () => {
                     <span>Subtotal:</span>
                     <span className="font-semibold">${subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Shipping:</span>
-                    <span className="font-semibold">${shipping.toFixed(2)}</span>
-                  </div>
+                   <div className="flex justify-between">
+                     <span>Shipping:</span>
+                     <span className="font-semibold">
+                       {selectedShippingRate 
+                         ? `$${selectedShippingRate.amount.toFixed(2)}` 
+                         : 'Select shipping method'
+                       }
+                     </span>
+                   </div>
+                   {selectedShippingRate && (
+                     <div className="text-sm text-gray-600">
+                       {selectedShippingRate.carrier.toUpperCase()} - {selectedShippingRate.service_level}
+                       {selectedShippingRate.estimated_days && 
+                         ` (${selectedShippingRate.estimated_days} business days)`
+                       }
+                     </div>
+                   )}
                   <div className="border-t pt-4">
                     <p className="text-sm text-gray-500">
                       Final total and taxes will be calculated by Stripe
@@ -323,24 +339,61 @@ const Checkout = () => {
                     onChange={(e) => setShippingInfo(prev => ({ ...prev, address: e.target.value }))}
                     required
                   />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input 
-                      placeholder="City" 
-                      value={shippingInfo.city}
-                      onChange={(e) => setShippingInfo(prev => ({ ...prev, city: e.target.value }))}
-                      required
-                    />
-                    <Input 
-                      placeholder="ZIP Code" 
-                      value={shippingInfo.zipCode}
-                      onChange={(e) => setShippingInfo(prev => ({ ...prev, zipCode: e.target.value }))}
-                      required
-                    />
-                  </div>
+                   <div className="grid grid-cols-3 gap-4">
+                     <Input 
+                       placeholder="City" 
+                       value={shippingInfo.city}
+                       onChange={(e) => setShippingInfo(prev => ({ ...prev, city: e.target.value }))}
+                       required
+                     />
+                     <select
+                       value={shippingInfo.state}
+                       onChange={(e) => setShippingInfo(prev => ({ ...prev, state: e.target.value }))}
+                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       required
+                     >
+                       <option value="">State</option>
+                       <option value="CA">CA</option>
+                       <option value="NY">NY</option>
+                       <option value="TX">TX</option>
+                       <option value="FL">FL</option>
+                       <option value="IL">IL</option>
+                       <option value="PA">PA</option>
+                       <option value="OH">OH</option>
+                       <option value="GA">GA</option>
+                       <option value="NC">NC</option>
+                       <option value="MI">MI</option>
+                     </select>
+                     <Input 
+                       placeholder="ZIP Code" 
+                       value={shippingInfo.zipCode}
+                       onChange={(e) => setShippingInfo(prev => ({ ...prev, zipCode: e.target.value }))}
+                       required
+                     />
+                   </div>
                 </CardContent>
-              </Card>
+               </Card>
 
-              <div className="space-y-4">
+               {/* Shipping Rate Selector */}
+               {shippingInfo.firstName && shippingInfo.lastName && shippingInfo.address && 
+                shippingInfo.city && shippingInfo.state && shippingInfo.zipCode && (
+                 <ShippingRateSelector
+                   cartItems={items}
+                   shippingAddress={{
+                     name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+                     street1: shippingInfo.address,
+                     city: shippingInfo.city,
+                     state: shippingInfo.state,
+                     zip: shippingInfo.zipCode,
+                     email: shippingInfo.email
+                   }}
+                   onRateSelected={setSelectedShippingRate}
+                   selectedRate={selectedShippingRate}
+                   disabled={loading}
+                 />
+               )}
+
+               <div className="space-y-4">
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
                   size="lg"
