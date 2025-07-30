@@ -45,9 +45,25 @@ const ShippingRateSelector = ({
   const [error, setError] = useState<string>("");
 
   const fetchShippingRates = async () => {
+    console.log("=== SHIPPING RATE SELECTOR DEBUG ===");
+    console.log("Received shippingAddress:", shippingAddress);
+    console.log("Validation check - street1:", shippingAddress.street1);
+    console.log("Validation check - city:", shippingAddress.city);
+    console.log("Validation check - state:", shippingAddress.state);
+    console.log("Validation check - zip:", shippingAddress.zip);
+    
     if (!shippingAddress.street1 || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zip) {
+      console.log("Address validation failed - missing required fields");
+      console.log("Missing fields:", {
+        street1: !shippingAddress.street1,
+        city: !shippingAddress.city,
+        state: !shippingAddress.state,
+        zip: !shippingAddress.zip
+      });
       return;
     }
+    
+    console.log("Address validation passed - fetching rates...");
 
     setLoading(true);
     setError("");
