@@ -133,8 +133,7 @@ serve(async (req) => {
         address_from: validatedFromAddress.object_id,
         address_to: validatedToAddress.object_id,
         parcels: [parcel],
-        async: false,
-        test: true  // Set to true for test API keys
+        async: false
       }),
     });
 
