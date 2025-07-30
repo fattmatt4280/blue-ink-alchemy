@@ -151,9 +151,17 @@ serve(async (req) => {
       messages: shipment.messages
     });
 
-    // Filter and format rates
+    // Filter and format rates - Shippo test rates might not have 'available' property
     const rates = shipment.rates
-      .filter((rate: any) => rate.available)
+      .filter((rate: any) => {
+        logStep("Rate filter check", { 
+          rateId: rate.object_id, 
+          available: rate.available, 
+          amount: rate.amount,
+          provider: rate.provider 
+        });
+        return rate.amount && rate.provider; // Filter by having amount and provider instead
+      })
       .map((rate: any) => ({
         id: rate.object_id,
         carrier: rate.provider,
