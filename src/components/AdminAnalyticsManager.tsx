@@ -324,6 +324,31 @@ export const AdminAnalyticsManager = () => {
     }
   };
 
+  const triggerAutomation = async (orderId: string, triggerStep: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('order-automation-workflow', {
+        body: { orderId, triggerStep }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Automation Triggered",
+        description: `${triggerStep} automation started successfully`,
+      });
+      
+      // Refresh data after a short delay to see updates
+      setTimeout(() => fetchAllData(), 2000);
+    } catch (error) {
+      console.error('Error triggering automation:', error);
+      toast({
+        title: "Error",
+        description: `Failed to trigger ${triggerStep} automation`,
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'paid': return 'default';
@@ -673,13 +698,56 @@ export const AdminAnalyticsManager = () => {
                       </div>
                     )}
 
-                    {/* Shipping Information */}
-                    {(shippingAddress || shipment) && (
-                      <div>
-                        <h4 className="font-medium mb-2 flex items-center gap-2">
-                          <Package className="h-4 w-4" />
-                          Shipping Information
-                        </h4>
+                     {/* Automation Actions */}
+                     <div className="border-t pt-4">
+                       <h4 className="font-medium mb-3 flex items-center gap-2">
+                         🤖 Post-Sale Automation
+                       </h4>
+                       <div className="grid grid-cols-2 gap-2">
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={() => triggerAutomation(selectedOrder.id, 'invoice')}
+                           disabled={selectedOrder.status !== 'paid'}
+                           className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+                         >
+                           📄 Send Invoice
+                         </Button>
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={() => triggerAutomation(selectedOrder.id, 'shipping')}
+                           disabled={selectedOrder.status !== 'paid' || !selectedOrder.shipping_info}
+                           className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                         >
+                           🚚 Create Label
+                         </Button>
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={() => triggerAutomation(selectedOrder.id, 'notification')}
+                           className="bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200"
+                         >
+                           📧 Send Update
+                         </Button>
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={() => updateOrderStatus(selectedOrder.id, selectedOrder.status === 'paid' ? 'shipped' : 'paid')}
+                           className="bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200"
+                         >
+                           ⚡ Quick Update
+                         </Button>
+                       </div>
+                     </div>
+
+                     {/* Shipping Information */}
+                     {(shippingAddress || shipment) && (
+                       <div>
+                         <h4 className="font-medium mb-2 flex items-center gap-2">
+                           <Package className="h-4 w-4" />
+                           Shipping Information
+                         </h4>
                         <div className="space-y-3 text-sm">
                           {shippingAddress && (
                             <div className="bg-muted/50 p-3 rounded-lg">

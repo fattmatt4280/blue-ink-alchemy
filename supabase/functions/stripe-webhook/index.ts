@@ -125,6 +125,77 @@ serve(async (req) => {
                   newStatus: 'paid',
                   updatedOrder: updatedOrder?.[0] 
                 });
+
+                // Trigger automated post-sale workflow
+                logStep("Triggering post-sale automation", { orderId: existingOrder.id });
+                
+                // Generate and send invoice
+                setTimeout(async () => {
+                  try {
+                    await fetch(`${supabaseUrl}/functions/v1/generate-invoice`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseServiceKey}`,
+                      },
+                      body: JSON.stringify({ orderId: existingOrder.id }),
+                    });
+                    logStep("Invoice generation triggered", { orderId: existingOrder.id });
+                  } catch (invoiceError) {
+                    logStep("ERROR: Invoice generation failed", { 
+                      orderId: existingOrder.id, 
+                      error: invoiceError.message 
+                    });
+                  }
+                }, 1000);
+
+                // Send order confirmation
+                setTimeout(async () => {
+                  try {
+                    await fetch(`${supabaseUrl}/functions/v1/send-order-notifications`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseServiceKey}`,
+                      },
+                      body: JSON.stringify({ 
+                        orderId: existingOrder.id,
+                        notificationType: 'order_confirmation'
+                      }),
+                    });
+                    logStep("Order confirmation sent", { orderId: existingOrder.id });
+                  } catch (notificationError) {
+                    logStep("ERROR: Order confirmation failed", { 
+                      orderId: existingOrder.id, 
+                      error: notificationError.message 
+                    });
+                  }
+                }, 2000);
+
+                // Auto-create shipping label if shipping info exists
+                if (existingOrder.shipping_info) {
+                  setTimeout(async () => {
+                    try {
+                      await fetch(`${supabaseUrl}/functions/v1/order-automation-workflow`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${supabaseServiceKey}`,
+                        },
+                        body: JSON.stringify({ 
+                          orderId: existingOrder.id,
+                          triggerStep: 'shipping'
+                        }),
+                      });
+                      logStep("Shipping automation triggered", { orderId: existingOrder.id });
+                    } catch (shippingError) {
+                      logStep("ERROR: Shipping automation failed", { 
+                        orderId: existingOrder.id, 
+                        error: shippingError.message 
+                      });
+                    }
+                  }, 3000);
+                }
               }
             }
           } catch (dbError) {

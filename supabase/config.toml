@@ -1,5 +1,5 @@
 
-project_id = "eddfac78-1921-4963-ae88-c91f314935b4"
+project_id = "vozstxchkgpxzetwdzow"
 
 [api]
 enabled = true
@@ -33,4 +33,16 @@ verify_jwt = false
 
 [[functions]]
 name = "check-subscription"
+verify_jwt = false
+
+[[functions]]
+name = "generate-invoice"
+verify_jwt = false
+
+[[functions]]
+name = "send-order-notifications"
+verify_jwt = false
+
+[[functions]]
+name = "order-automation-workflow"
 verify_jwt = false
