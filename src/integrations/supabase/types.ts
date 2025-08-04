@@ -233,6 +233,44 @@ export type Database = {
         }
         Relationships: []
       }
+      order_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          id: string
+          new_status: string
+          notes: string | null
+          old_status: string | null
+          order_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_status: string
+          notes?: string | null
+          old_status?: string | null
+          order_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_status?: string
+          notes?: string | null
+          old_status?: string | null
+          order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount: number
@@ -683,6 +721,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_daily_metric: {
+        Args: { metric_date: string; metric_name: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: { user_id?: string }
         Returns: boolean
