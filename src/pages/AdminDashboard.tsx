@@ -137,10 +137,19 @@ const AdminDashboard = () => {
         <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="content">Content Management</TabsTrigger>
-            <TabsTrigger value="products">Product Management</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Analytics</span>
+              <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Content Management</span>
+              <span className="sm:hidden">Content</span>
+            </TabsTrigger>
+            <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Product Management</span>
+              <span className="sm:hidden">Products</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-6">
