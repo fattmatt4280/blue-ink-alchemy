@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Eye, AlertTriangle } from "lucide-react";
+import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package } from "lucide-react";
 import { format } from "date-fns";
 
 interface Order {
@@ -19,6 +20,32 @@ interface Order {
   created_at: string;
   updated_at: string;
   user_id: string | null;
+  shipping_info: any;
+}
+
+interface ShippingAddress {
+  id: string;
+  name: string;
+  company: string | null;
+  street1: string;
+  street2: string | null;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  phone: string | null;
+  email: string | null;
+}
+
+interface Shipment {
+  id: string;
+  carrier: string | null;
+  service_level: string | null;
+  tracking_status: string | null;
+  tracking_url: string | null;
+  shippo_tracking_number: string | null;
+  shipped_at: string | null;
+  delivered_at: string | null;
 }
 
 interface OrderHistory {
@@ -43,9 +70,12 @@ export const AdminAnalyticsManager = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orderHistory, setOrderHistory] = useState<OrderHistory[]>([]);
+  const [shippingAddress, setShippingAddress] = useState<ShippingAddress | null>(null);
+  const [shipment, setShipment] = useState<Shipment | null>(null);
   const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -124,7 +154,77 @@ export const AdminAnalyticsManager = () => {
 
   const handleOrderSelect = async (order: Order) => {
     setSelectedOrder(order);
-    await fetchOrderHistory(order.id);
+    await Promise.all([
+      fetchOrderHistory(order.id),
+      fetchShippingInfo(order.id)
+    ]);
+  };
+
+  const fetchShippingInfo = async (orderId: string) => {
+    try {
+      // Fetch shipping address
+      const { data: addressData, error: addressError } = await supabase
+        .from("shipping_addresses")
+        .select("*")
+        .eq("order_id", orderId)
+        .maybeSingle();
+
+      if (addressError) {
+        console.error("Error fetching shipping address:", addressError);
+      } else {
+        setShippingAddress(addressData);
+      }
+
+      // Fetch shipment info
+      const { data: shipmentData, error: shipmentError } = await supabase
+        .from("shipments")
+        .select("*")
+        .eq("order_id", orderId)
+        .maybeSingle();
+
+      if (shipmentError) {
+        console.error("Error fetching shipment:", shipmentError);
+      } else {
+        setShipment(shipmentData);
+      }
+    } catch (error) {
+      console.error("Error fetching shipping info:", error);
+    }
+  };
+
+  const clearAllTransactions = async () => {
+    setClearing(true);
+    try {
+      // Delete all related data in correct order (due to foreign keys)
+      await supabase.from("order_status_history").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("shipping_addresses").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("shipments").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("shipping_rates").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("orders").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      
+      // Clear analytics events as well
+      await supabase.from("analytics_events").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      
+      toast({
+        title: "Success",
+        description: "All transactions and analytics data cleared successfully",
+      });
+      
+      // Refresh data
+      await fetchAllData();
+      setSelectedOrder(null);
+      setShippingAddress(null);
+      setShipment(null);
+    } catch (error) {
+      console.error("Error clearing transactions:", error);
+      toast({
+        title: "Error",
+        description: "Failed to clear transactions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setClearing(false);
+    }
   };
 
   const getStatusBadgeVariant = (status: string) => {
@@ -149,14 +249,42 @@ export const AdminAnalyticsManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Analytics Manager</h2>
-        <Button 
-          onClick={handleRefresh} 
-          disabled={refreshing}
-          variant="outline"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          Refresh Data
-        </Button>
+        <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={clearing}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Clear All Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Clear All Transactions?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete all orders, shipping data, and analytics events. 
+                  This action cannot be undone. Are you sure you want to proceed?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={clearAllTransactions}
+                  className="bg-destructive hover:bg-destructive/90"
+                >
+                  Clear All Data
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button 
+            onClick={handleRefresh} 
+            disabled={refreshing}
+            variant="outline"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="orders" className="space-y-4">
@@ -166,6 +294,17 @@ export const AdminAnalyticsManager = () => {
         </TabsList>
 
         <TabsContent value="orders" className="space-y-4">
+          {orders.length > 0 && (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Launch Preparation</AlertTitle>
+              <AlertDescription>
+                You have {orders.length} transaction(s) in your database. 
+                Consider clearing all test data before launch using the "Clear All Data" button above.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Orders List */}
             <Card>
@@ -175,6 +314,11 @@ export const AdminAnalyticsManager = () => {
                   {orders.filter(o => o.status === 'pending').length > 0 && (
                     <Badge variant="secondary">
                       {orders.filter(o => o.status === 'pending').length} pending
+                    </Badge>
+                  )}
+                  {orders.filter(o => o.status === 'paid').length > 0 && (
+                    <Badge variant="default">
+                      {orders.filter(o => o.status === 'paid').length} completed
                     </Badge>
                   )}
                 </CardTitle>
@@ -277,6 +421,60 @@ export const AdminAnalyticsManager = () => {
                         <p className="text-xs text-muted-foreground font-mono bg-muted p-2 rounded">
                           {selectedOrder.stripe_session_id}
                         </p>
+                      </div>
+                    )}
+
+                    {/* Shipping Information */}
+                    {(shippingAddress || shipment) && (
+                      <div>
+                        <h4 className="font-medium mb-2 flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          Shipping Information
+                        </h4>
+                        <div className="space-y-3 text-sm">
+                          {shippingAddress && (
+                            <div className="bg-muted/50 p-3 rounded-lg">
+                              <p className="font-medium">Shipping Address:</p>
+                              <p>{shippingAddress.name}</p>
+                              {shippingAddress.company && <p>{shippingAddress.company}</p>}
+                              <p>{shippingAddress.street1}</p>
+                              {shippingAddress.street2 && <p>{shippingAddress.street2}</p>}
+                              <p>{shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}</p>
+                              <p>{shippingAddress.country}</p>
+                              {shippingAddress.phone && <p>Phone: {shippingAddress.phone}</p>}
+                            </div>
+                          )}
+                          
+                          {shipment && (
+                            <div className="bg-muted/50 p-3 rounded-lg">
+                              <p className="font-medium">Shipment Details:</p>
+                              {shipment.carrier && <p>Carrier: {shipment.carrier}</p>}
+                              {shipment.service_level && <p>Service: {shipment.service_level}</p>}
+                              {shipment.tracking_status && (
+                                <p>Status: <Badge variant="outline">{shipment.tracking_status}</Badge></p>
+                              )}
+                              {shipment.shippo_tracking_number && (
+                                <p>Tracking: {shipment.shippo_tracking_number}</p>
+                              )}
+                              {shipment.tracking_url && (
+                                <a 
+                                  href={shipment.tracking_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline"
+                                >
+                                  Track Package
+                                </a>
+                              )}
+                              {shipment.shipped_at && (
+                                <p>Shipped: {format(new Date(shipment.shipped_at), 'MMM dd, yyyy HH:mm')}</p>
+                              )}
+                              {shipment.delivered_at && (
+                                <p>Delivered: {format(new Date(shipment.delivered_at), 'MMM dd, yyyy HH:mm')}</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
