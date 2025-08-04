@@ -396,6 +396,42 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          active: boolean
+          auth_key: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh_key: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          auth_key: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh_key: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          auth_key?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh_key?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       shipments: {
         Row: {
           carrier: string | null

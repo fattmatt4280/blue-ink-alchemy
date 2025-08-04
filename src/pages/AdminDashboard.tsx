@@ -16,6 +16,7 @@ import SocialLinksEditor from '@/components/SocialLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { AdminAnalyticsManager } from '@/components/AdminAnalyticsManager';
+import { PushNotificationManager } from '@/components/PushNotificationManager';
 import AccessDenied from '@/components/AccessDenied';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -153,6 +154,7 @@ const AdminDashboard = () => {
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-6">
+            <PushNotificationManager />
             <AnalyticsDashboard />
             <AdminAnalyticsManager />
           </TabsContent>
