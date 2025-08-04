@@ -15,6 +15,7 @@ import FooterLinksEditor from '@/components/FooterLinksEditor';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import { AdminAnalyticsManager } from '@/components/AdminAnalyticsManager';
 import AccessDenied from '@/components/AccessDenied';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -142,8 +143,9 @@ const AdminDashboard = () => {
             <TabsTrigger value="products">Product Management</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="analytics">
+          <TabsContent value="analytics" className="space-y-6">
             <AnalyticsDashboard />
+            <AdminAnalyticsManager />
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">

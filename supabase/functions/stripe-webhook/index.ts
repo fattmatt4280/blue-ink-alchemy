@@ -8,11 +8,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Enhanced logging function
+const logStep = (step: string, details?: any) => {
+  const timestamp = new Date().toISOString();
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[STRIPE-WEBHOOK] ${timestamp} ${step}${detailsStr}`);
+};
+
 serve(async (req) => {
-  console.log(`[STRIPE-WEBHOOK] Request started: ${req.method} ${req.url}`);
+  logStep("Request started", { method: req.method, url: req.url });
 
   if (req.method === "OPTIONS") {
-    console.log("[STRIPE-WEBHOOK] OPTIONS request handled");
+    logStep("OPTIONS request handled");
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -21,8 +28,14 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
+    logStep("Environment variables check", { 
+      hasStripeKey: !!stripeKey, 
+      hasSupabaseUrl: !!supabaseUrl, 
+      hasServiceKey: !!supabaseServiceKey 
+    });
+
     if (!stripeKey) {
-      console.error("[STRIPE-WEBHOOK] Missing STRIPE_SECRET_KEY");
+      logStep("ERROR: Missing STRIPE_SECRET_KEY");
       return new Response("Missing Stripe configuration", { status: 500 });
     }
 
@@ -30,8 +43,14 @@ serve(async (req) => {
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
+    logStep("Request details", { 
+      bodyLength: body.length, 
+      hasSignature: !!signature,
+      headers: Object.fromEntries(req.headers.entries())
+    });
+
     if (!signature) {
-      console.error("[STRIPE-WEBHOOK] Missing stripe signature");
+      logStep("ERROR: Missing stripe signature");
       return new Response("Missing signature", { status: 400 });
     }
 
@@ -40,9 +59,13 @@ serve(async (req) => {
     let event;
     try {
       event = JSON.parse(body);
-      console.log("[STRIPE-WEBHOOK] Event type:", event.type);
+      logStep("Event parsed successfully", { 
+        type: event.type, 
+        id: event.id,
+        created: event.created 
+      });
     } catch (err) {
-      console.error("[STRIPE-WEBHOOK] Invalid JSON:", err);
+      logStep("ERROR: Invalid JSON", { error: err.message });
       return new Response("Invalid JSON", { status: 400 });
     }
 
@@ -50,7 +73,12 @@ serve(async (req) => {
     switch (event.type) {
       case 'checkout.session.completed':
         const session = event.data.object;
-        console.log("[STRIPE-WEBHOOK] Checkout session completed:", session.id);
+        logStep("Processing checkout session", { 
+          sessionId: session.id, 
+          paymentStatus: session.payment_status,
+          customerEmail: session.customer_email,
+          amountTotal: session.amount_total
+        });
         
         if (supabaseUrl && supabaseServiceKey) {
           try {
@@ -58,32 +86,69 @@ serve(async (req) => {
               auth: { persistSession: false } 
             });
 
-            // Update the order status to 'paid'
-            const { error: updateError } = await supabaseClient
+            // First, find the order by session ID
+            const { data: existingOrder, error: findError } = await supabaseClient
               .from("orders")
-              .update({ 
-                status: 'paid',
-                updated_at: new Date().toISOString()
-              })
-              .eq('stripe_session_id', session.id);
+              .select("*")
+              .eq('stripe_session_id', session.id)
+              .single();
 
-            if (updateError) {
-              console.error("[STRIPE-WEBHOOK] Failed to update order:", updateError);
+            if (findError) {
+              logStep("ERROR: Order not found", { 
+                sessionId: session.id, 
+                error: findError.message 
+              });
             } else {
-              console.log("[STRIPE-WEBHOOK] Order updated successfully");
+              logStep("Found existing order", { 
+                orderId: existingOrder.id, 
+                currentStatus: existingOrder.status 
+              });
+
+              // Update the order status to 'paid'
+              const { data: updatedOrder, error: updateError } = await supabaseClient
+                .from("orders")
+                .update({ 
+                  status: 'paid',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('stripe_session_id', session.id)
+                .select();
+
+              if (updateError) {
+                logStep("ERROR: Failed to update order", { 
+                  sessionId: session.id, 
+                  error: updateError.message 
+                });
+              } else {
+                logStep("Order updated successfully", { 
+                  orderId: existingOrder.id, 
+                  newStatus: 'paid',
+                  updatedOrder: updatedOrder?.[0] 
+                });
+              }
             }
           } catch (dbError) {
-            console.error("[STRIPE-WEBHOOK] Database error:", dbError);
+            logStep("ERROR: Database error", { error: dbError.message });
           }
+        } else {
+          logStep("ERROR: Missing Supabase configuration", { 
+            hasUrl: !!supabaseUrl, 
+            hasServiceKey: !!supabaseServiceKey 
+          });
         }
         break;
       
       case 'payment_intent.succeeded':
-        console.log("[STRIPE-WEBHOOK] Payment succeeded:", event.data.object.id);
+        const paymentIntent = event.data.object;
+        logStep("Payment intent succeeded", { 
+          paymentIntentId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency
+        });
         break;
       
       default:
-        console.log("[STRIPE-WEBHOOK] Unhandled event type:", event.type);
+        logStep("Unhandled event type", { type: event.type });
     }
 
     return new Response(JSON.stringify({ received: true }), {
