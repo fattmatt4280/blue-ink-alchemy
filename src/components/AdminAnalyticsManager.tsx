@@ -6,9 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package } from "lucide-react";
+import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package, CheckCircle, Clock, XCircle } from "lucide-react";
 import { format } from "date-fns";
 
 interface Order {
@@ -286,14 +287,68 @@ export const AdminAnalyticsManager = () => {
     }
   };
 
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Order status updated to ${newStatus}`,
+      });
+
+      // Refresh data to show updated status
+      await fetchAllData();
+      
+      // Update selected order if it's the one being modified
+      if (selectedOrder?.id === orderId) {
+        const updatedOrder = orders.find(o => o.id === orderId);
+        if (updatedOrder) {
+          setSelectedOrder({ ...updatedOrder, status: newStatus });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update order status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'paid': return 'default';
       case 'pending': return 'secondary';
       case 'failed': return 'destructive';
+      case 'shipped': return 'default';
+      case 'delivered': return 'default';
       default: return 'outline';
     }
   };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'paid': return <CheckCircle className="h-3 w-3" />;
+      case 'pending': return <Clock className="h-3 w-3" />;
+      case 'failed': return <XCircle className="h-3 w-3" />;
+      case 'shipped': return <Package className="h-3 w-3" />;
+      case 'delivered': return <CheckCircle className="h-3 w-3" />;
+      default: return null;
+    }
+  };
+
+  // Separate orders by status
+  const pendingOrders = orders.filter(o => o.status === 'pending');
+  const completedOrders = orders.filter(o => o.status !== 'pending');
 
   if (loading) {
     return (
@@ -399,14 +454,14 @@ export const AdminAnalyticsManager = () => {
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     Orders ({orders.length})
-                    {orders.filter(o => o.status === 'pending').length > 0 && (
+                    {pendingOrders.length > 0 && (
                       <Badge variant="secondary">
-                        {orders.filter(o => o.status === 'pending').length} pending
+                        {pendingOrders.length} pending
                       </Badge>
                     )}
-                    {orders.filter(o => o.status === 'paid').length > 0 && (
+                    {completedOrders.length > 0 && (
                       <Badge variant="default">
-                        {orders.filter(o => o.status === 'paid').length} completed
+                        {completedOrders.length} completed
                       </Badge>
                     )}
                   </div>
@@ -431,50 +486,118 @@ export const AdminAnalyticsManager = () => {
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className={`p-3 border rounded-lg transition-colors ${
-                          selectedOrder?.id === order.id ? 'bg-accent' : 'hover:bg-muted/50'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            checked={selectedOrders.has(order.id)}
-                            onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
-                            onClick={(e) => e.stopPropagation()}
-                            aria-label={`Select order ${order.id}`}
-                          />
-                          <div 
-                            className="flex-1 cursor-pointer"
-                            onClick={() => handleOrderSelect(order)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="font-medium">{order.email}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <Badge variant={getStatusBadgeVariant(order.status)}>
-                                  {order.status}
-                                </Badge>
-                                {order.stripe_session_id && (
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    Stripe: {order.stripe_session_id.slice(-8)}
-                                  </p>
-                                )}
+                  <div className="space-y-4">
+                    {/* Pending Orders Section */}
+                    {pendingOrders.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Pending Orders ({pendingOrders.length})
+                        </h4>
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {pendingOrders.map((order) => (
+                            <div
+                              key={order.id}
+                              className={`p-3 border rounded-lg transition-colors border-orange-200 bg-orange-50/50 ${
+                                selectedOrder?.id === order.id ? 'bg-accent' : 'hover:bg-muted/50'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={selectedOrders.has(order.id)}
+                                  onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  aria-label={`Select order ${order.id}`}
+                                />
+                                <div 
+                                  className="flex-1 cursor-pointer"
+                                  onClick={() => handleOrderSelect(order)}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="font-medium">{order.email}</p>
+                                      <p className="text-sm text-muted-foreground">
+                                        ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <Badge variant={getStatusBadgeVariant(order.status)} className="flex items-center gap-1">
+                                        {getStatusIcon(order.status)}
+                                        {order.status}
+                                      </Badge>
+                                      {order.stripe_session_id && (
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          Stripe: {order.stripe_session_id.slice(-8)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Completed Orders Section */}
+                    {completedOrders.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          Completed Orders ({completedOrders.length})
+                        </h4>
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {completedOrders.map((order) => (
+                            <div
+                              key={order.id}
+                              className={`p-3 border rounded-lg transition-colors border-green-200 bg-green-50/50 ${
+                                selectedOrder?.id === order.id ? 'bg-accent' : 'hover:bg-muted/50'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={selectedOrders.has(order.id)}
+                                  onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  aria-label={`Select order ${order.id}`}
+                                />
+                                <div 
+                                  className="flex-1 cursor-pointer"
+                                  onClick={() => handleOrderSelect(order)}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="font-medium">{order.email}</p>
+                                      <p className="text-sm text-muted-foreground">
+                                        ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <Badge variant={getStatusBadgeVariant(order.status)} className="flex items-center gap-1">
+                                        {getStatusIcon(order.status)}
+                                        {order.status}
+                                      </Badge>
+                                      {order.stripe_session_id && (
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          Stripe: {order.stripe_session_id.slice(-8)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -491,17 +614,32 @@ export const AdminAnalyticsManager = () => {
               <CardContent>
                 {selectedOrder ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="font-medium">Order ID:</p>
-                        <p className="text-muted-foreground">{selectedOrder.id}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Status:</p>
-                        <Badge variant={getStatusBadgeVariant(selectedOrder.status)}>
-                          {selectedOrder.status}
-                        </Badge>
-                      </div>
+                     <div className="grid grid-cols-2 gap-4 text-sm">
+                       <div>
+                         <p className="font-medium">Order ID:</p>
+                         <p className="text-muted-foreground">{selectedOrder.id}</p>
+                       </div>
+                       <div>
+                         <p className="font-medium">Status:</p>
+                         <div className="flex items-center gap-2">
+                           <Badge variant={getStatusBadgeVariant(selectedOrder.status)} className="flex items-center gap-1">
+                             {getStatusIcon(selectedOrder.status)}
+                             {selectedOrder.status}
+                           </Badge>
+                           <Select onValueChange={(value) => updateOrderStatus(selectedOrder.id, value)}>
+                             <SelectTrigger className="w-24 h-6">
+                               <SelectValue placeholder="Update" />
+                             </SelectTrigger>
+                             <SelectContent>
+                               <SelectItem value="pending">Pending</SelectItem>
+                               <SelectItem value="paid">Paid</SelectItem>
+                               <SelectItem value="shipped">Shipped</SelectItem>
+                               <SelectItem value="delivered">Delivered</SelectItem>
+                               <SelectItem value="failed">Failed</SelectItem>
+                             </SelectContent>
+                           </Select>
+                         </div>
+                       </div>
                       <div>
                         <p className="font-medium">Amount:</p>
                         <p className="text-muted-foreground">
