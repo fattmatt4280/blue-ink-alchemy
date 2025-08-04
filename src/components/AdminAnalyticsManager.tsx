@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package } from "lucide-react";
@@ -69,6 +70,7 @@ interface AnalyticsEvent {
 export const AdminAnalyticsManager = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [orderHistory, setOrderHistory] = useState<OrderHistory[]>([]);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress | null>(null);
   const [shipment, setShipment] = useState<Shipment | null>(null);
@@ -76,6 +78,7 @@ export const AdminAnalyticsManager = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [deletingSelected, setDeletingSelected] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -192,6 +195,43 @@ export const AdminAnalyticsManager = () => {
     }
   };
 
+  const deleteSelectedOrders = async () => {
+    if (selectedOrders.size === 0) return;
+    
+    setDeletingSelected(true);
+    try {
+      const orderIds = Array.from(selectedOrders);
+      
+      // Delete related data for selected orders
+      await supabase.from("order_status_history").delete().in("order_id", orderIds);
+      await supabase.from("shipping_addresses").delete().in("order_id", orderIds);
+      await supabase.from("shipments").delete().in("order_id", orderIds);
+      await supabase.from("shipping_rates").delete().in("order_id", orderIds);
+      await supabase.from("orders").delete().in("id", orderIds);
+      
+      toast({
+        title: "Success",
+        description: `${selectedOrders.size} order(s) deleted successfully`,
+      });
+      
+      // Clear selections and refresh data
+      setSelectedOrders(new Set());
+      setSelectedOrder(null);
+      setShippingAddress(null);
+      setShipment(null);
+      await fetchAllData();
+    } catch (error) {
+      console.error("Error deleting selected orders:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete selected orders. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingSelected(false);
+    }
+  };
+
   const clearAllTransactions = async () => {
     setClearing(true);
     try {
@@ -213,6 +253,7 @@ export const AdminAnalyticsManager = () => {
       // Refresh data
       await fetchAllData();
       setSelectedOrder(null);
+      setSelectedOrders(new Set());
       setShippingAddress(null);
       setShipment(null);
     } catch (error) {
@@ -224,6 +265,24 @@ export const AdminAnalyticsManager = () => {
       });
     } finally {
       setClearing(false);
+    }
+  };
+
+  const handleOrderCheckbox = (orderId: string, checked: boolean) => {
+    const newSelected = new Set(selectedOrders);
+    if (checked) {
+      newSelected.add(orderId);
+    } else {
+      newSelected.delete(orderId);
+    }
+    setSelectedOrders(newSelected);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedOrders(new Set(orders.map(order => order.id)));
+    } else {
+      setSelectedOrders(new Set());
     }
   };
 
@@ -250,6 +309,34 @@ export const AdminAnalyticsManager = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Analytics Manager</h2>
         <div className="flex gap-2">
+          {selectedOrders.size > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={deletingSelected}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Selected ({selectedOrders.size})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Selected Orders?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete {selectedOrders.size} selected order(s) and their related data. 
+                    This action cannot be undone. Are you sure you want to proceed?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={deleteSelectedOrders}
+                    className="bg-destructive hover:bg-destructive/90"
+                  >
+                    Delete Selected
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={clearing}>
@@ -309,17 +396,29 @@ export const AdminAnalyticsManager = () => {
             {/* Orders List */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  Orders ({orders.length})
-                  {orders.filter(o => o.status === 'pending').length > 0 && (
-                    <Badge variant="secondary">
-                      {orders.filter(o => o.status === 'pending').length} pending
-                    </Badge>
-                  )}
-                  {orders.filter(o => o.status === 'paid').length > 0 && (
-                    <Badge variant="default">
-                      {orders.filter(o => o.status === 'paid').length} completed
-                    </Badge>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    Orders ({orders.length})
+                    {orders.filter(o => o.status === 'pending').length > 0 && (
+                      <Badge variant="secondary">
+                        {orders.filter(o => o.status === 'pending').length} pending
+                      </Badge>
+                    )}
+                    {orders.filter(o => o.status === 'paid').length > 0 && (
+                      <Badge variant="default">
+                        {orders.filter(o => o.status === 'paid').length} completed
+                      </Badge>
+                    )}
+                  </div>
+                  {orders.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={selectedOrders.size === orders.length}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all orders"
+                      />
+                      <span className="text-sm text-muted-foreground">Select All</span>
+                    </div>
                   )}
                 </CardTitle>
               </CardHeader>
@@ -336,30 +435,42 @@ export const AdminAnalyticsManager = () => {
                     {orders.map((order) => (
                       <div
                         key={order.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        className={`p-3 border rounded-lg transition-colors ${
                           selectedOrder?.id === order.id ? 'bg-accent' : 'hover:bg-muted/50'
                         }`}
-                        onClick={() => handleOrderSelect(order)}
                       >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">{order.email}</p>
-                            <p className="text-sm text-muted-foreground">
-                              ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <Badge variant={getStatusBadgeVariant(order.status)}>
-                              {order.status}
-                            </Badge>
-                            {order.stripe_session_id && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Stripe: {order.stripe_session_id.slice(-8)}
-                              </p>
-                            )}
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={selectedOrders.has(order.id)}
+                            onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Select order ${order.id}`}
+                          />
+                          <div 
+                            className="flex-1 cursor-pointer"
+                            onClick={() => handleOrderSelect(order)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{order.email}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <Badge variant={getStatusBadgeVariant(order.status)}>
+                                  {order.status}
+                                </Badge>
+                                {order.stripe_session_id && (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Stripe: {order.stripe_session_id.slice(-8)}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
