@@ -53,6 +53,102 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_executions: {
+        Row: {
+          automation_id: string
+          completed_at: string | null
+          created_at: string
+          current_step: number | null
+          error_message: string | null
+          execution_logs: Json | null
+          id: string
+          order_id: string | null
+          started_at: string
+          status: string
+          trigger_data: Json
+        }
+        Insert: {
+          automation_id: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number | null
+          error_message?: string | null
+          execution_logs?: Json | null
+          id?: string
+          order_id?: string | null
+          started_at?: string
+          status?: string
+          trigger_data: Json
+        }
+        Update: {
+          automation_id?: string
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number | null
+          error_message?: string | null
+          execution_logs?: Json | null
+          id?: string
+          order_id?: string | null
+          started_at?: string
+          status?: string
+          trigger_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_executions_automation_id_fkey"
+            columns: ["automation_id"]
+            isOneToOne: false
+            referencedRelation: "automations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_executions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          trigger_conditions: Json | null
+          trigger_type: string
+          updated_at: string
+          workflow_steps: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          trigger_conditions?: Json | null
+          trigger_type: string
+          updated_at?: string
+          workflow_steps: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          trigger_conditions?: Json | null
+          trigger_type?: string
+          updated_at?: string
+          workflow_steps?: Json
+        }
+        Relationships: []
+      }
       conversion_funnel: {
         Row: {
           conversion_rate: number | null
