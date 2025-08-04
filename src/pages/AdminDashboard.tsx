@@ -132,8 +132,8 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 overflow-x-hidden">
+      <div className="max-w-6xl mx-auto overflow-x-hidden">
         <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
