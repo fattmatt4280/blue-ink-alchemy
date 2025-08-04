@@ -76,7 +76,7 @@ const WebsiteMetricsChart = ({ timeRange }: WebsiteMetricsChartProps) => {
           const date = metric.date;
           if (!metricsByDate[date]) {
             metricsByDate[date] = {
-              date: new Date(date).toLocaleDateString(),
+              date: date, // Keep original date for sorting
               visits: 0,
               unique_visitors: 0,
               page_views: 0,
@@ -97,7 +97,11 @@ const WebsiteMetricsChart = ({ timeRange }: WebsiteMetricsChartProps) => {
         });
 
         const chartData = Object.values(metricsByDate)
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .map(item => ({
+            ...item,
+            date: new Date(item.date).toLocaleDateString() // Format for display
+          }));
 
         setTrafficData(chartData);
       }
@@ -116,6 +120,10 @@ const WebsiteMetricsChart = ({ timeRange }: WebsiteMetricsChartProps) => {
       <CardContent>
         {loading ? (
           <div className="h-80 flex items-center justify-center">Loading...</div>
+        ) : trafficData.length === 0 ? (
+          <div className="h-80 flex items-center justify-center text-muted-foreground">
+            No data available for the selected time range
+          </div>
         ) : (
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={trafficData}>
