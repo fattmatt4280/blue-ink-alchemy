@@ -21,6 +21,27 @@ const WebsiteMetricsChart = ({ timeRange }: WebsiteMetricsChartProps) => {
 
   useEffect(() => {
     fetchTrafficData();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('website-metrics-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'website_metrics'
+        },
+        () => {
+          console.log('Website metrics data changed, refetching...');
+          fetchTrafficData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [timeRange]);
 
   const fetchTrafficData = async () => {

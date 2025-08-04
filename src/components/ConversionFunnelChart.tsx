@@ -20,6 +20,27 @@ const ConversionFunnelChart = ({ timeRange }: ConversionFunnelChartProps) => {
 
   useEffect(() => {
     fetchFunnelData();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('funnel-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversion_funnel'
+        },
+        () => {
+          console.log('Conversion funnel data changed, refetching...');
+          fetchFunnelData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [timeRange]);
 
   const fetchFunnelData = async () => {

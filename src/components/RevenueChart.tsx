@@ -20,6 +20,27 @@ const RevenueChart = ({ timeRange }: RevenueChartProps) => {
 
   useEffect(() => {
     fetchRevenueData();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('orders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        () => {
+          console.log('Orders data changed, refetching revenue...');
+          fetchRevenueData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [timeRange]);
 
   const fetchRevenueData = async () => {

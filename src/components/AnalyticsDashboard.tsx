@@ -35,6 +35,51 @@ const AnalyticsDashboard = () => {
 
   useEffect(() => {
     fetchAnalyticsData();
+
+    // Set up real-time subscriptions for all analytics tables
+    const metricsChannel = supabase
+      .channel('analytics-metrics-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'website_metrics'
+        },
+        () => {
+          console.log('Analytics data changed, refetching...');
+          fetchAnalyticsData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        () => {
+          console.log('Orders data changed, refetching analytics...');
+          fetchAnalyticsData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'analytics_events'
+        },
+        () => {
+          console.log('Analytics events changed, refetching...');
+          fetchAnalyticsData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(metricsChannel);
+    };
   }, [timeRange]);
 
   const fetchAnalyticsData = async () => {
