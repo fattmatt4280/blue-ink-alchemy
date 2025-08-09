@@ -190,6 +190,11 @@ All colors MUST be HSL.
   }
 }
 
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
 .gradient-shift-bg {
   background: linear-gradient(135deg, #1e3a8a, #3b82f6, #1d4ed8);
   animation: gradientShift 8s ease-in-out infinite;
