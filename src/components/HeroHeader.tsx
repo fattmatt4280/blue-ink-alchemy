@@ -21,12 +21,14 @@ const HeroHeader = () => {
   };
 
   const navigationItems = [
-    { id: 'hero', label: 'Home' },
-    { id: 'products', label: 'Products' },
-    { id: 'testimonials', label: 'Testimonials' },
-    { id: 'ingredients', label: 'Ingredients' },
-    { id: 'faq', label: 'FAQ' },
-    { id: 'newsletter', label: 'Newsletter' }
+    { id: 'hero', label: 'Home', type: 'scroll' },
+    { id: 'products', label: 'Products', type: 'scroll' },
+    { id: 'testimonials', label: 'Testimonials', type: 'scroll' },
+    { id: 'ingredients', label: 'Ingredients', type: 'scroll' },
+    { id: 'faq', label: 'FAQ', type: 'scroll' },
+    { id: 'newsletter', label: 'Newsletter', type: 'scroll' },
+    { id: '/blog', label: 'Blog', type: 'link' },
+    { id: '/shop', label: 'Shop', type: 'link' }
   ];
 
   return (
@@ -48,14 +50,25 @@ const HeroHeader = () => {
           <div className="flex flex-col gap-4 mt-8">
             <h3 className="text-lg font-semibold text-foreground mb-4">Navigation</h3>
             {navigationItems.map((item) => (
-              <Button
-                key={item.id}
-                variant="ghost"
-                className="justify-start text-left hover:bg-accent hover:text-accent-foreground"
-                onClick={() => scrollToSection(item.id)}
-              >
-                {item.label}
-              </Button>
+              item.type === 'link' ? (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  className="justify-start text-left hover:bg-accent hover:text-accent-foreground"
+                  asChild
+                >
+                  <Link to={item.id}>{item.label}</Link>
+                </Button>
+              ) : (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  className="justify-start text-left hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => scrollToSection(item.id)}
+                >
+                  {item.label}
+                </Button>
+              )
             ))}
           </div>
         </SheetContent>

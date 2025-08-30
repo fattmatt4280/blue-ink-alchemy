@@ -17,6 +17,7 @@ import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { AdminAnalyticsManager } from '@/components/AdminAnalyticsManager';
 import { PushNotificationManager } from '@/components/PushNotificationManager';
+import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -138,7 +139,7 @@ const AdminDashboard = () => {
         <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsList className="grid w-full grid-cols-4 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
@@ -150,6 +151,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Product Management</span>
               <span className="sm:hidden">Products</span>
+            </TabsTrigger>
+            <TabsTrigger value="blog" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Blog</span>
+              <span className="sm:hidden">Blog</span>
             </TabsTrigger>
           </TabsList>
 
@@ -216,6 +221,10 @@ const AdminDashboard = () => {
 
             {/* Product Reorder Tool */}
             <ProductReorderTool />
+          </TabsContent>
+
+          <TabsContent value="blog" className="space-y-6">
+            <BlogManager />
           </TabsContent>
         </Tabs>
       </div>

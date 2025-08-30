@@ -149,6 +149,129 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author: string
+          backlink_sources: string[] | null
+          canonical_url: string
+          categories: string[] | null
+          content_markdown: string
+          created_at: string
+          created_by: string | null
+          cta_text: string | null
+          cta_url: string | null
+          excerpt: string
+          featured_image: string
+          featured_image_alt: string
+          id: string
+          meta_description: string
+          meta_title: string | null
+          publish_date: string
+          publish_status: string
+          related_post_ids: string[] | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          video_embed_url: string | null
+        }
+        Insert: {
+          author: string
+          backlink_sources?: string[] | null
+          canonical_url: string
+          categories?: string[] | null
+          content_markdown: string
+          created_at?: string
+          created_by?: string | null
+          cta_text?: string | null
+          cta_url?: string | null
+          excerpt: string
+          featured_image: string
+          featured_image_alt: string
+          id?: string
+          meta_description: string
+          meta_title?: string | null
+          publish_date: string
+          publish_status?: string
+          related_post_ids?: string[] | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          video_embed_url?: string | null
+        }
+        Update: {
+          author?: string
+          backlink_sources?: string[] | null
+          canonical_url?: string
+          categories?: string[] | null
+          content_markdown?: string
+          created_at?: string
+          created_by?: string | null
+          cta_text?: string | null
+          cta_url?: string | null
+          excerpt?: string
+          featured_image?: string
+          featured_image_alt?: string
+          id?: string
+          meta_description?: string
+          meta_title?: string | null
+          publish_date?: string
+          publish_status?: string
+          related_post_ids?: string[] | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          video_embed_url?: string | null
+        }
+        Relationships: []
+      }
+      blog_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       conversion_funnel: {
         Row: {
           conversion_rate: number | null
