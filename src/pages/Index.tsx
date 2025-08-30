@@ -11,12 +11,24 @@ import AIAssistant from "@/components/AIAssistant";
 const Index = () => {
   return (
     <div className="min-h-screen futuristic-bg">
-      <Hero />
-      <ProductGrid />
-      <Testimonials />
-      <Ingredients />
-      <FAQ />
-      <Newsletter />
+      <div id="hero">
+        <Hero />
+      </div>
+      <div id="products">
+        <ProductGrid />
+      </div>
+      <div id="testimonials">
+        <Testimonials />
+      </div>
+      <div id="ingredients">
+        <Ingredients />
+      </div>
+      <div id="faq">
+        <FAQ />
+      </div>
+      <div id="newsletter">
+        <Newsletter />
+      </div>
       <Footer />
       <AIAssistant />
     </div>
