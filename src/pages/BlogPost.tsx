@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, User, ArrowLeft, ExternalLink, Share2 } from 'lucide-react';
+import { Calendar, User, ArrowLeft, ExternalLink, Share2, Home } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 
@@ -194,14 +194,21 @@ const BlogPost = () => {
 
       <div className="min-h-screen bg-background">
         <article className="container max-w-4xl mx-auto px-4 py-8">
-          {/* Back to Blog */}
-          <div className="mb-8">
+          {/* Navigation */}
+          <div className="mb-8 flex flex-col sm:flex-row gap-4">
             <Link
               to="/blog"
               className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Blog
+            </Link>
+            <Link
+              to="/"
+              className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Back to Home
             </Link>
           </div>
 
@@ -239,11 +246,27 @@ const BlogPost = () => {
             </div>
 
             {/* Featured Image */}
-            <div className="aspect-video overflow-hidden rounded-lg mb-8">
+            <div className="aspect-video overflow-hidden rounded-lg mb-8 bg-muted flex items-center justify-center">
               <img
                 src={post.featured_image}
                 alt={post.featured_image_alt}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
+                      <div class="text-center text-muted-foreground">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
+                        <p class="text-sm">Featured image unavailable</p>
+                      </div>
+                    </div>
+                  `;
+                }}
               />
             </div>
           </header>
@@ -366,12 +389,28 @@ const BlogPost = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {relatedPosts.map((relatedPost) => (
                   <Card key={relatedPost.id} className="group hover:shadow-lg transition-shadow">
-                    <div className="aspect-video overflow-hidden rounded-t-lg">
+                    <div className="aspect-video overflow-hidden rounded-t-lg bg-muted flex items-center justify-center">
                       <img
                         src={relatedPost.featured_image}
                         alt={relatedPost.featured_image_alt}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.parentElement!.innerHTML = `
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
+                              <div class="text-center text-muted-foreground">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-primary/10 flex items-center justify-center">
+                                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                  </svg>
+                                </div>
+                                <p class="text-xs">Image unavailable</p>
+                              </div>
+                            </div>
+                          `;
+                        }}
                       />
                     </div>
                     <CardContent className="p-4">

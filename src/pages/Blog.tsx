@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Calendar, User, ArrowRight } from 'lucide-react';
+import { Search, Calendar, User, ArrowRight, Home } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 interface BlogPost {
@@ -133,6 +133,17 @@ const Blog = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
+        {/* Navigation */}
+        <div className="container max-w-7xl mx-auto px-4 pt-8">
+          <Link
+            to="/"
+            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-primary/10 to-secondary/10 py-16">
           <div className="container max-w-7xl mx-auto px-4">
@@ -186,12 +197,28 @@ const Blog = () => {
                   {paginatedPosts.map((post) => (
                     <article key={post.id} className="group">
                       <Card className="h-full transition-all duration-300 hover:shadow-lg border-0 bg-card">
-                        <div className="aspect-video overflow-hidden rounded-t-lg">
+                        <div className="aspect-video overflow-hidden rounded-t-lg bg-muted flex items-center justify-center">
                           <img
                             src={post.featured_image}
                             alt={post.featured_image_alt}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.parentElement!.innerHTML = `
+                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
+                                  <div class="text-center text-muted-foreground">
+                                    <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-primary/10 flex items-center justify-center">
+                                      <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                      </svg>
+                                    </div>
+                                    <p class="text-xs">Image unavailable</p>
+                                  </div>
+                                </div>
+                              `;
+                            }}
                           />
                         </div>
                         <CardHeader className="pb-2">
