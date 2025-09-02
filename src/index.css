@@ -198,19 +198,19 @@ All colors MUST be HSL.
 @keyframes neonBreathing {
   0%, 100% {
     box-shadow: 
-      0 0 4px rgba(59, 130, 246, 0.4),
-      0 0 8px rgba(59, 130, 246, 0.3),
-      0 0 12px rgba(37, 99, 235, 0.2),
-      inset 0 0 4px rgba(147, 197, 253, 0.1);
-    border-color: rgba(59, 130, 246, 0.4);
+      0 0 4px rgba(239, 68, 68, 0.4),
+      0 0 8px rgba(239, 68, 68, 0.3),
+      0 0 12px rgba(220, 38, 38, 0.2),
+      inset 0 0 4px rgba(252, 165, 165, 0.1);
+    border-color: rgba(239, 68, 68, 0.4);
   }
   50% {
     box-shadow: 
-      0 0 8px rgba(59, 130, 246, 0.8),
-      0 0 16px rgba(59, 130, 246, 0.6),
-      0 0 24px rgba(37, 99, 235, 0.4),
-      inset 0 0 8px rgba(147, 197, 253, 0.2);
-    border-color: rgba(59, 130, 246, 0.8);
+      0 0 8px rgba(239, 68, 68, 0.8),
+      0 0 16px rgba(239, 68, 68, 0.6),
+      0 0 24px rgba(220, 38, 38, 0.4),
+      inset 0 0 8px rgba(252, 165, 165, 0.2);
+    border-color: rgba(239, 68, 68, 0.8);
   }
 }
 
@@ -314,14 +314,14 @@ All colors MUST be HSL.
 
 .neon-breathing-blue {
   position: relative;
-  border: 2px solid rgba(59, 130, 246, 0.4);
+  border: 2px solid rgba(239, 68, 68, 0.4);
   animation: neonBreathing 3.5s ease-in-out infinite;
   transition: all 0.3s ease;
 }
 
 .neon-breathing-chat {
   position: relative;
-  border: 2px solid rgba(59, 130, 246, 0.4);
+  border: 2px solid rgba(239, 68, 68, 0.4);
   animation: neonBreathing 4s ease-in-out infinite;
   transition: all 0.3s ease;
 }
