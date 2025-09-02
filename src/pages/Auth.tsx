@@ -18,12 +18,31 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirect authenticated users away from auth page
+  // Handle OAuth callback and redirect authenticated users
   useEffect(() => {
-    if (!authLoading && user) {
-      console.log('User is authenticated, redirecting to home page');
-      navigate('/', { replace: true });
-    }
+    const handleAuthCallback = async () => {
+      // Check if this is an OAuth callback by looking for common OAuth parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      
+      const hasOAuthParams = urlParams.has('code') || hashParams.has('access_token') || hashParams.has('refresh_token');
+      
+      if (hasOAuthParams) {
+        console.log('Auth page: OAuth callback detected, waiting for auth state to update');
+        // Give more time for OAuth callback to be processed
+        return;
+      }
+      
+      // Only redirect if we're not in the middle of processing an OAuth callback
+      if (!authLoading && user) {
+        console.log('User is authenticated, redirecting to home page');
+        navigate('/', { replace: true });
+      }
+    };
+
+    // Add a small delay to ensure auth state has been processed
+    const timer = setTimeout(handleAuthCallback, 200);
+    return () => clearTimeout(timer);
   }, [user, authLoading, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
