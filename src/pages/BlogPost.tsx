@@ -253,19 +253,9 @@ const BlogPost = () => {
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.parentElement!.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                      <div class="text-center text-muted-foreground">
-                        <div class="w-20 h-20 mx-auto mb-4 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-                          </svg>
-                        </div>
-                        <p class="text-sm">Featured image unavailable</p>
-                      </div>
-                    </div>
-                  `;
+                  target.src = 'https://images.unsplash.com/photo-1590736969955-71cc94901144?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+                  target.alt = 'Default blog image placeholder';
+                  target.style.display = 'block';
                 }}
               />
             </div>
@@ -397,19 +387,9 @@ const BlogPost = () => {
                         loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.parentElement!.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                              <div class="text-center text-muted-foreground">
-                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-primary/10 flex items-center justify-center">
-                                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-                                  </svg>
-                                </div>
-                                <p class="text-xs">Image unavailable</p>
-                              </div>
-                            </div>
-                          `;
+                          target.src = 'https://images.unsplash.com/photo-1590736969955-71cc94901144?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+                          target.alt = 'Default blog image placeholder';
+                          target.style.display = 'block';
                         }}
                       />
                     </div>
