@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Calendar, User, ArrowRight, Home } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
+import { SwipeIndicator } from '@/components/SwipeIndicator';
 
 interface BlogPost {
   id: string;
@@ -30,10 +32,23 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [swipeProgress, setSwipeProgress] = useState(0);
+  const [showSwipeIndicator, setShowSwipeIndicator] = useState(false);
   
   const categoryFilter = searchParams.get('category') || '';
   const currentPage = parseInt(searchParams.get('page') || '1');
   const postsPerPage = 12;
+
+  // Setup swipe navigation
+  useSwipeNavigation({
+    targetRoute: '/',
+    onSwipeStart: () => setShowSwipeIndicator(true),
+    onSwipeProgress: (progress) => setSwipeProgress(progress),
+    onSwipeEnd: () => {
+      setShowSwipeIndicator(false);
+      setSwipeProgress(0);
+    },
+  });
 
   useEffect(() => {
     fetchPosts();
@@ -131,6 +146,8 @@ const Blog = () => {
         <meta name="twitter:description" content="Discover expert tattoo aftercare tips, healing guides, and product recommendations from Blue Dream Budder. Your ultimate resource for tattoo care." />
         <meta name="twitter:image" content="https://bluedreambudder.com/og-blog.jpg" />
       </Helmet>
+
+      <SwipeIndicator progress={swipeProgress} isVisible={showSwipeIndicator} />
 
       <div className="min-h-screen bg-background">
         {/* Navigation */}
