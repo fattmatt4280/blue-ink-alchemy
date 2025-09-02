@@ -29,7 +29,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
             <Button 
               size="lg" 
-              className="font-inter font-semibold bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-4 text-base shadow-lg hover:shadow-xl border-2 border-blue-200 shadow-[0_0_10px_rgba(30,58,138,0.6)] hover:shadow-[0_0_15px_rgba(30,58,138,0.8)] animate-[blink_1s_ease-in-out_infinite]"
+              className="font-inter font-semibold bg-blue-50 text-black hover:bg-blue-100 transition-all duration-300 px-8 py-4 text-base shadow-lg hover:shadow-xl neon-breathing-blue"
               onClick={onShopNowClick}
             >
               Shop Now
