@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Eye, Save, FileText, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import yaml from 'js-yaml';
+import ImageUpload from '@/components/ImageUpload';
 
 interface BlogPost {
   id?: string;
@@ -423,18 +424,16 @@ const BlogManager = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="featured_image">Featured Image URL *</Label>
-                  <Input
-                    id="featured_image"
-                    value={formData.featured_image}
-                    onChange={(e) => {
-                      setFormData(prev => ({ ...prev, featured_image: e.target.value }));
+                  <ImageUpload
+                    title="Featured Image"
+                    description="Upload the main image for your blog post"
+                    currentImage={formData.featured_image}
+                    onImageUploaded={(url) => {
+                      setFormData(prev => ({ ...prev, featured_image: url }));
                       if (validationErrors.featured_image) {
                         setValidationErrors(prev => ({ ...prev, featured_image: '' }));
                       }
                     }}
-                    placeholder="https://example.com/image.jpg"
-                    className={validationErrors.featured_image ? 'border-destructive' : ''}
                   />
                   {validationErrors.featured_image && (
                     <p className="text-sm text-destructive mt-1">{validationErrors.featured_image}</p>
