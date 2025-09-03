@@ -145,7 +145,10 @@ const BlogManager = () => {
 
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
-    setFormData(post);
+    setFormData({
+      ...post,
+      backlink_sources: Array.isArray(post.backlink_sources) ? post.backlink_sources : []
+    });
     setShowForm(true);
   };
 
@@ -430,7 +433,7 @@ const BlogManager = () => {
                 <Label htmlFor="backlink_sources">Backlink Sources (comma-separated URLs)</Label>
                 <Textarea
                   id="backlink_sources"
-                  value={formData.backlink_sources.join(', ')}
+                  value={Array.isArray(formData.backlink_sources) ? formData.backlink_sources.join(', ') : ''}
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
                     backlink_sources: e.target.value.split(',').map(url => url.trim()).filter(Boolean) 
