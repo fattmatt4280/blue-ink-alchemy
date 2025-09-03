@@ -67,6 +67,7 @@ const BlogManager = () => {
   };
 
   const [formData, setFormData] = useState<BlogPost>(initialFormData);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchPosts();
@@ -96,6 +97,46 @@ const BlogManager = () => {
       .replace(/^-+|-+$/g, '');
   };
 
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    // Required field validation
+    if (!formData.title.trim()) errors.title = 'Title is required';
+    if (!formData.slug.trim()) errors.slug = 'Slug is required';
+    if (!formData.author.trim()) errors.author = 'Author is required';
+    if (!formData.excerpt.trim()) errors.excerpt = 'Excerpt is required';
+    if (!formData.meta_description.trim()) errors.meta_description = 'Meta description is required';
+    if (!formData.canonical_url.trim()) errors.canonical_url = 'Canonical URL is required';
+    if (!formData.featured_image.trim()) errors.featured_image = 'Featured image is required';
+    if (!formData.featured_image_alt.trim()) errors.featured_image_alt = 'Featured image alt text is required';
+    if (!formData.content_markdown.trim()) errors.content_markdown = 'Content is required';
+    
+    // Meta description length validation (120-160 chars)
+    if (formData.meta_description.length < 120) {
+      errors.meta_description = 'Meta description must be at least 120 characters';
+    } else if (formData.meta_description.length > 160) {
+      errors.meta_description = 'Meta description must not exceed 160 characters';
+    }
+    
+    // Slug format validation
+    if (formData.slug && !/^[a-z0-9-]+$/.test(formData.slug)) {
+      errors.slug = 'Slug can only contain lowercase letters, numbers, and hyphens';
+    }
+    
+    // Title length validation
+    if (formData.title.length > 65) {
+      errors.title = 'Title must not exceed 65 characters';
+    }
+    
+    // Excerpt length validation
+    if (formData.excerpt.length > 220) {
+      errors.excerpt = 'Excerpt must not exceed 220 characters';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleTitleChange = (title: string) => {
     setFormData(prev => ({
       ...prev,
@@ -103,9 +144,19 @@ const BlogManager = () => {
       slug: prev.slug || generateSlug(title),
       canonical_url: prev.canonical_url || `https://bluedreambudder.com/blog/${generateSlug(title)}`
     }));
+    
+    // Clear validation errors for title
+    if (validationErrors.title) {
+      setValidationErrors(prev => ({ ...prev, title: '' }));
+    }
   };
 
   const handleSubmit = async (status: 'draft' | 'published') => {
+    if (!validateForm()) {
+      toast.error('Please fix validation errors before saving');
+      return;
+    }
+
     setSaving(true);
     try {
       const postData = {
@@ -121,23 +172,40 @@ const BlogManager = () => {
           .from('blog_posts')
           .update(postData)
           .eq('id', editingPost.id);
-        if (error) throw error;
+        if (error) {
+          console.error('Database error:', error);
+          if (error.message.includes('check constraint')) {
+            toast.error('Validation failed: Check meta description length (120-160 chars) and slug format');
+          } else {
+            toast.error(`Database error: ${error.message}`);
+          }
+          throw error;
+        }
         toast.success('Post updated successfully');
       } else {
         const { error } = await supabase
           .from('blog_posts')
           .insert([postData]);
-        if (error) throw error;
+        if (error) {
+          console.error('Database error:', error);
+          if (error.message.includes('check constraint')) {
+            toast.error('Validation failed: Check meta description length (120-160 chars) and slug format');
+          } else {
+            toast.error(`Database error: ${error.message}`);
+          }
+          throw error;
+        }
         toast.success('Post created successfully');
       }
 
       setFormData(initialFormData);
       setEditingPost(null);
       setShowForm(false);
+      setValidationErrors({});
       fetchPosts();
     } catch (error) {
       console.error('Error saving post:', error);
-      toast.error('Failed to save post');
+      // Error handling is done above in the individual blocks
     } finally {
       setSaving(false);
     }
@@ -278,7 +346,14 @@ const BlogManager = () => {
                     onChange={(e) => handleTitleChange(e.target.value)}
                     maxLength={65}
                     placeholder="Post title (max 65 chars)"
+                    className={validationErrors.title ? 'border-destructive' : ''}
                   />
+                  {validationErrors.title && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.title}</p>
+                  )}
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {formData.title.length}/65 characters
+                  </div>
                 </div>
 
                 <div>
@@ -286,10 +361,23 @@ const BlogManager = () => {
                   <Input
                     id="slug"
                     value={formData.slug}
-                    onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                    onChange={(e) => {
+                      const slugValue = e.target.value.toLowerCase();
+                      setFormData(prev => ({ ...prev, slug: slugValue }));
+                      if (validationErrors.slug) {
+                        setValidationErrors(prev => ({ ...prev, slug: '' }));
+                      }
+                    }}
                     placeholder="url-friendly-slug"
                     pattern="^[a-z0-9-]+$"
+                    className={validationErrors.slug ? 'border-destructive' : ''}
                   />
+                  {validationErrors.slug && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.slug}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Only lowercase letters, numbers, and hyphens allowed
+                  </p>
                 </div>
 
                 <div>
@@ -297,9 +385,18 @@ const BlogManager = () => {
                   <Input
                     id="author"
                     value={formData.author}
-                    onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, author: e.target.value }));
+                      if (validationErrors.author) {
+                        setValidationErrors(prev => ({ ...prev, author: '' }));
+                      }
+                    }}
                     placeholder="Author name"
+                    className={validationErrors.author ? 'border-destructive' : ''}
                   />
+                  {validationErrors.author && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.author}</p>
+                  )}
                 </div>
 
                 <div>
@@ -307,10 +404,22 @@ const BlogManager = () => {
                   <Textarea
                     id="excerpt"
                     value={formData.excerpt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, excerpt: e.target.value }));
+                      if (validationErrors.excerpt) {
+                        setValidationErrors(prev => ({ ...prev, excerpt: '' }));
+                      }
+                    }}
                     maxLength={220}
                     placeholder="Brief description (max 220 chars)"
+                    className={validationErrors.excerpt ? 'border-destructive' : ''}
                   />
+                  {validationErrors.excerpt && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.excerpt}</p>
+                  )}
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {formData.excerpt.length}/220 characters
+                  </div>
                 </div>
 
                 <div>
@@ -318,9 +427,18 @@ const BlogManager = () => {
                   <Input
                     id="featured_image"
                     value={formData.featured_image}
-                    onChange={(e) => setFormData(prev => ({ ...prev, featured_image: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, featured_image: e.target.value }));
+                      if (validationErrors.featured_image) {
+                        setValidationErrors(prev => ({ ...prev, featured_image: '' }));
+                      }
+                    }}
                     placeholder="https://example.com/image.jpg"
+                    className={validationErrors.featured_image ? 'border-destructive' : ''}
                   />
+                  {validationErrors.featured_image && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.featured_image}</p>
+                  )}
                 </div>
 
                 <div>
@@ -328,9 +446,18 @@ const BlogManager = () => {
                   <Input
                     id="featured_image_alt"
                     value={formData.featured_image_alt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, featured_image_alt: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, featured_image_alt: e.target.value }));
+                      if (validationErrors.featured_image_alt) {
+                        setValidationErrors(prev => ({ ...prev, featured_image_alt: '' }));
+                      }
+                    }}
                     placeholder="Descriptive alt text"
+                    className={validationErrors.featured_image_alt ? 'border-destructive' : ''}
                   />
+                  {validationErrors.featured_image_alt && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.featured_image_alt}</p>
+                  )}
                 </div>
               </div>
 
@@ -340,12 +467,28 @@ const BlogManager = () => {
                   <Textarea
                     id="meta_description"
                     value={formData.meta_description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, meta_description: e.target.value }))}
-                    placeholder="SEO description (120-160 chars)"
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, meta_description: e.target.value }));
+                      if (validationErrors.meta_description) {
+                        setValidationErrors(prev => ({ ...prev, meta_description: '' }));
+                      }
+                    }}
+                    placeholder="SEO meta description - must be between 120-160 characters for optimal search performance"
+                    minLength={120}
                     maxLength={160}
+                    className={validationErrors.meta_description ? 'border-destructive' : ''}
                   />
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {formData.meta_description.length}/160 characters
+                  {validationErrors.meta_description && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.meta_description}</p>
+                  )}
+                  <div className={`text-sm mt-1 ${
+                    formData.meta_description.length < 120 
+                      ? 'text-destructive' 
+                      : formData.meta_description.length > 160 
+                        ? 'text-destructive' 
+                        : 'text-muted-foreground'
+                  }`}>
+                    {formData.meta_description.length}/160 characters (minimum 120 required)
                   </div>
                 </div>
 
@@ -354,9 +497,18 @@ const BlogManager = () => {
                   <Input
                     id="canonical_url"
                     value={formData.canonical_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, canonical_url: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, canonical_url: e.target.value }));
+                      if (validationErrors.canonical_url) {
+                        setValidationErrors(prev => ({ ...prev, canonical_url: '' }));
+                      }
+                    }}
                     placeholder="https://bluedreambudder.com/blog/post-slug"
+                    className={validationErrors.canonical_url ? 'border-destructive' : ''}
                   />
+                  {validationErrors.canonical_url && (
+                    <p className="text-sm text-destructive mt-1">{validationErrors.canonical_url}</p>
+                  )}
                 </div>
 
                 <div>
@@ -423,10 +575,18 @@ const BlogManager = () => {
                 <Textarea
                   id="content_markdown"
                   value={formData.content_markdown}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content_markdown: e.target.value }))}
-                  className="min-h-[300px] font-mono"
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, content_markdown: e.target.value }));
+                    if (validationErrors.content_markdown) {
+                      setValidationErrors(prev => ({ ...prev, content_markdown: '' }));
+                    }
+                  }}
+                  className={`min-h-[300px] font-mono ${validationErrors.content_markdown ? 'border-destructive' : ''}`}
                   placeholder="# Your Content Here&#10;&#10;Write your blog post content in Markdown format..."
                 />
+                {validationErrors.content_markdown && (
+                  <p className="text-sm text-destructive mt-1">{validationErrors.content_markdown}</p>
+                )}
               </div>
 
               <div>
