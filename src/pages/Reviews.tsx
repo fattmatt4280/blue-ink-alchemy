@@ -3,6 +3,7 @@ import { useState } from 'react';
 import ContentPage from "@/components/ContentPage";
 import Testimonials from "@/components/Testimonials";
 import ReviewForm from "@/components/ReviewForm";
+import PublicReviews from "@/components/PublicReviews";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
@@ -32,6 +33,8 @@ const Reviews = () => {
         )}
         
         <Testimonials />
+        
+        <PublicReviews />
         
         <div className="mt-12 bg-gray-50 rounded-lg p-8">
           <h2 className="text-2xl font-semibold mb-4">Share Your Experience</h2>

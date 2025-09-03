@@ -83,6 +83,9 @@ const CustomerReviewsManager = () => {
     <Card>
       <CardHeader>
         <CardTitle>Customer Reviews Manager</CardTitle>
+        <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+          <strong>Privacy Note:</strong> Customer email addresses are only visible to administrators and are never shown in public review displays to prevent spam harvesting.
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {pendingReviews.length > 0 && (
