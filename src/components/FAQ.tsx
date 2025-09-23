@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     question: "What makes Blue Dream Budder different from other aftercare products?",
-    answer: "Our unique blend combines CBD isolate with Blue Dream terpenes and premium natural butters. This creates a synergistic effect that reduces inflammation, provides pain relief, and promotes faster healing."
+    answer: "Our unique blend combines natural healing ingredients with premium natural butters and botanical oils. This creates a synergistic effect that reduces inflammation, provides comfort, and promotes faster healing naturally."
   },
   {
     question: "How long does shipping take?",

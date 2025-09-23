@@ -109,7 +109,7 @@ const Ingredients = () => {
         <div className="text-center mt-16">
           <div className="inline-flex items-center gap-2 neon-card bg-blue-50/50 text-blue-700 px-6 py-3 rounded-full backdrop-blur-sm">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="font-medium">All Natural • CBD Infused • Cruelty Free</span>
+            <span className="font-medium">All Natural • Plant-Based • Cruelty Free</span>
           </div>
         </div>
       </div>

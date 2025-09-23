@@ -1,4 +1,3 @@
-
 export interface IngredientInfo {
   name: string;
   category: string;
@@ -112,22 +111,6 @@ export const ingredientDatabase: IngredientInfo[] = [
     benefits: ["Uplifting scent", "Aromatherapy", "Mood enhancement", "Energizing"],
     healingProperties: "Natural citrus and tropical fruit essences. Mood-boosting aromatherapy properties.",
     tattooSpecific: "Makes the healing process more pleasant with tropical aromatherapy. Reduces stress during recovery."
-  },
-
-  // Active Compounds
-  {
-    name: "CBD (Cannabidiol)",
-    category: "Active Compound",
-    benefits: ["Powerful anti-inflammatory", "Pain relief", "Anxiety reduction", "Skin calming"],
-    healingProperties: "Interacts with skin's endocannabinoid system. Reduces inflammation without psychoactive effects.",
-    tattooSpecific: "Significantly reduces tattoo pain, swelling, and redness. Accelerates healing process naturally."
-  },
-  {
-    name: "Terpenes",
-    category: "Active Compound",
-    benefits: ["Enhanced absorption", "Aromatherapy", "Synergistic effects", "Anti-inflammatory"],
-    healingProperties: "Natural aromatic compounds that enhance other ingredients' effectiveness (entourage effect).",
-    tattooSpecific: "Improves absorption of healing compounds. Provides signature Blue Dream aromatherapy experience."
   }
 ];
 

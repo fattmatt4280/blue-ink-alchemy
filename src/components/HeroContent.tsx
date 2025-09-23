@@ -23,7 +23,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
           </p>
           
           <p className="font-inter text-sm sm:text-base lg:text-lg opacity-80 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-            {content.hero_description || 'Premium CBD-infused tattoo aftercare balm crafted with all-natural ingredients for optimal healing and skin restoration.'}
+            {content.hero_description || 'Premium all-natural tattoo aftercare balm crafted with botanical ingredients for optimal healing and skin restoration.'}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">

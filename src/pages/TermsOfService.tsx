@@ -33,7 +33,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">2. Product Information</h2>
               <p>
-                Blue Dream Budder provides CBD-infused tattoo aftercare products. All product information, including ingredients and usage instructions, is provided for informational purposes. Results may vary by individual.
+                Blue Dream Budder provides all-natural tattoo aftercare products. All product information, including ingredients and usage instructions, is provided for informational purposes. Results may vary by individual.
               </p>
             </section>
 

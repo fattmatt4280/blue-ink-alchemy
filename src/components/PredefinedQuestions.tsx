@@ -10,7 +10,7 @@ const predefinedQuestions = [
   "What ingredients are in Blue Dream Budder?",
   "How do I use this for tattoo aftercare?",
   "What sizes are available and which is best?",
-  "What are the benefits of CBD for healing?",
+  "What are the natural healing benefits?",
   "How does this help with tattoo inflammation?",
   "Is this all natural and organic?",
   "What makes this different from other aftercare products?",
