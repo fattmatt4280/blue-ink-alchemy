@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Truck, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -225,41 +226,40 @@ const ShippingRateSelector = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {rates.map((rate) => (
-          <div
-            key={rate.id}
-            className={`p-4 border rounded-lg cursor-pointer transition-all ${
-              selectedRate?.id === rate.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
-            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={() => !disabled && onRateSelected(rate)}
+        <div className="space-y-4">
+          <Select
+            value={selectedRate?.id || ""}
+            onValueChange={(value) => {
+              const rate = rates.find(r => r.id === value);
+              if (rate && !disabled) {
+                onRateSelected(rate);
+              }
+            }}
+            disabled={disabled}
           >
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`font-semibold ${getCarrierColor(rate.carrier)}`}>
-                    {formatCarrierName(rate.carrier)}
-                  </span>
-                  <span className="text-gray-600">{rate.service_level}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {rate.estimated_days ? `${rate.estimated_days} business days` : 'Delivery time varies'}
-                  </span>
-                </div>
-                {rate.duration_terms && (
-                  <p className="text-xs text-gray-400 mt-1">{rate.duration_terms}</p>
-                )}
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-lg">${rate.amount.toFixed(2)}</p>
-                <p className="text-xs text-gray-500">{rate.currency.toUpperCase()}</p>
-              </div>
-            </div>
-          </div>
-        ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Select a shipping option" />
+            </SelectTrigger>
+            <SelectContent>
+              {rates.map((rate) => (
+                <SelectItem key={rate.id} value={rate.id}>
+                  <div className="flex justify-between items-center w-full">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {formatCarrierName(rate.carrier)} {rate.service_level}
+                      </span>
+                      <span className="text-muted-foreground text-sm flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {rate.estimated_days ? `${rate.estimated_days} days` : 'Varies'}
+                      </span>
+                    </div>
+                    <span className="font-bold">${rate.amount.toFixed(2)}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         
         {rates.length > 0 && (
           <div className="pt-2 border-t">
