@@ -37,7 +37,7 @@ const Checkout = () => {
   }, [success, cancelled]); // Removed clearCart from dependencies to prevent infinite loop
 
   const subtotal = getTotalPrice();
-  const shipping = 9.99;
+  const shipping = selectedShippingRate ? selectedShippingRate.amount : 0;
 
   const handleCompleteOrder = async () => {
     console.log("=== STARTING CHECKOUT PROCESS ===");
@@ -73,6 +73,12 @@ const Checkout = () => {
       console.log("Items to send:", items);
       console.log("Shipping info:", shippingInfo);
 
+      // Validate shipping rate is selected
+      if (!selectedShippingRate) {
+        toast.error("Please select a shipping option");
+        return;
+      }
+
       // Prepare the payload
       const payload = {
         items: items.map(item => ({
@@ -88,7 +94,16 @@ const Checkout = () => {
           email: String(shippingInfo.email).trim().toLowerCase(),
           address: String(shippingInfo.address).trim(),
           city: String(shippingInfo.city).trim(), 
-          zipCode: String(shippingInfo.zipCode).trim()
+          zipCode: String(shippingInfo.zipCode).trim(),
+          state: String(shippingInfo.state).trim()
+        },
+        shippingRate: {
+          id: selectedShippingRate.id,
+          carrier: selectedShippingRate.carrier,
+          service_level: selectedShippingRate.service_level,
+          amount: selectedShippingRate.amount,
+          currency: selectedShippingRate.currency,
+          estimated_days: selectedShippingRate.estimated_days
         }
       };
 
@@ -299,11 +314,15 @@ const Checkout = () => {
                        }
                      </div>
                    )}
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-500">
-                      Final total and taxes will be calculated by Stripe
-                    </p>
-                  </div>
+                   <div className="border-t pt-4">
+                     <div className="flex justify-between text-lg font-bold">
+                       <span>Total:</span>
+                       <span>${(subtotal + shipping).toFixed(2)}</span>
+                     </div>
+                     <p className="text-sm text-gray-500 mt-2">
+                       Final total and taxes will be calculated by Stripe
+                     </p>
+                   </div>
                 </CardContent>
               </Card>
 
