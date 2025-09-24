@@ -286,46 +286,8 @@ const Checkout = () => {
               ))}
             </div>
 
-            {/* Order Summary & Checkout Form */}
+            {/* Shipping Information & Checkout Form */}
             <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span className="font-semibold">${subtotal.toFixed(2)}</span>
-                  </div>
-                   <div className="flex justify-between">
-                     <span>Shipping:</span>
-                     <span className="font-semibold">
-                       {selectedShippingRate 
-                         ? `$${selectedShippingRate.amount.toFixed(2)}` 
-                         : 'Select shipping method'
-                       }
-                     </span>
-                   </div>
-                   {selectedShippingRate && (
-                     <div className="text-sm text-gray-600">
-                       {selectedShippingRate.carrier.toUpperCase()} - {selectedShippingRate.service_level}
-                       {selectedShippingRate.estimated_days && 
-                         ` (${selectedShippingRate.estimated_days} business days)`
-                       }
-                     </div>
-                   )}
-                   <div className="border-t pt-4">
-                     <div className="flex justify-between text-lg font-bold">
-                       <span>Total:</span>
-                       <span>${(subtotal + shipping).toFixed(2)}</span>
-                     </div>
-                     <p className="text-sm text-gray-500 mt-2">
-                       Final total and taxes will be calculated by Stripe
-                     </p>
-                   </div>
-                </CardContent>
-              </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Shipping Information</CardTitle>
@@ -450,6 +412,44 @@ const Checkout = () => {
                    disabled={loading}
                  />
                )}
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Order Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                  </div>
+                   <div className="flex justify-between">
+                     <span>Shipping:</span>
+                     <span className="font-semibold">
+                       {selectedShippingRate 
+                         ? `$${selectedShippingRate.amount.toFixed(2)}` 
+                         : 'Select shipping method'
+                       }
+                     </span>
+                   </div>
+                   {selectedShippingRate && (
+                     <div className="text-sm text-gray-600">
+                       {selectedShippingRate.carrier.toUpperCase()} - {selectedShippingRate.service_level}
+                       {selectedShippingRate.estimated_days && 
+                         ` (${selectedShippingRate.estimated_days} business days)`
+                       }
+                     </div>
+                   )}
+                   <div className="border-t pt-4">
+                     <div className="flex justify-between text-lg font-bold">
+                       <span>Total:</span>
+                       <span>${(subtotal + shipping).toFixed(2)}</span>
+                     </div>
+                     <p className="text-sm text-gray-500 mt-2">
+                       Final total and taxes will be calculated by Stripe
+                     </p>
+                   </div>
+                </CardContent>
+              </Card>
 
                <div className="space-y-4">
                 <Button 
