@@ -46,20 +46,28 @@ const ShippingRateSelector = ({
 
   const fetchShippingRates = async () => {
     console.log("=== SHIPPING RATE SELECTOR DEBUG ===");
-    console.log("Received shippingAddress:", shippingAddress);
-    console.log("Validation check - street1:", shippingAddress.street1);
-    console.log("Validation check - city:", shippingAddress.city);
-    console.log("Validation check - state:", shippingAddress.state);
-    console.log("Validation check - zip:", shippingAddress.zip);
+    console.log("Received shippingAddress:", JSON.stringify(shippingAddress, null, 2));
+    console.log("Cart items:", JSON.stringify(cartItems, null, 2));
     
-    if (!shippingAddress.street1 || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zip) {
-      console.log("Address validation failed - missing required fields");
-      console.log("Missing fields:", {
-        street1: !shippingAddress.street1,
-        city: !shippingAddress.city,
-        state: !shippingAddress.state,
-        zip: !shippingAddress.zip
-      });
+    // Check each field individually with detailed logging
+    const fields = {
+      street1: shippingAddress.street1,
+      city: shippingAddress.city,
+      state: shippingAddress.state,
+      zip: shippingAddress.zip,
+      name: shippingAddress.name
+    };
+    
+    console.log("Field values:", fields);
+    
+    const missingFields = Object.entries(fields)
+      .filter(([key, value]) => !value || (typeof value === 'string' && value.trim() === ''))
+      .map(([key]) => key);
+    
+    if (missingFields.length > 0) {
+      console.log("Address validation failed - missing required fields:", missingFields);
+      setRates([]);
+      setError("");
       return;
     }
     
@@ -69,50 +77,62 @@ const ShippingRateSelector = ({
     setError("");
     
     try {
-      const { data, error } = await supabase.functions.invoke('get-shipping-rates', {
-        body: {
-          cartItems: cartItems.map(item => ({
-            id: item.id,
-            name: item.name,
-            quantity: item.quantity,
-            weight: 0.5 // Default weight per item in lbs
-          })),
-          toAddress: {
-            name: shippingAddress.name,
-            street1: shippingAddress.street1,
-            street2: shippingAddress.street2 || "",
-            city: shippingAddress.city,
-            state: shippingAddress.state,
-            zip: shippingAddress.zip,
-            country: shippingAddress.country || "US",
-            phone: shippingAddress.phone || "",
-            email: shippingAddress.email || ""
-          }
+      console.log("Calling supabase function with payload:");
+      const payload = {
+        cartItems: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          weight: 0.5 // Default weight per item in lbs
+        })),
+        toAddress: {
+          name: shippingAddress.name,
+          street1: shippingAddress.street1,
+          street2: shippingAddress.street2 || "",
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          zip: shippingAddress.zip,
+          country: shippingAddress.country || "US",
+          phone: shippingAddress.phone || "",
+          email: shippingAddress.email || ""
         }
+      };
+      console.log("Payload:", JSON.stringify(payload, null, 2));
+
+      const { data, error } = await supabase.functions.invoke('get-shipping-rates', {
+        body: payload
       });
 
+      console.log("Supabase function response:", { data, error });
+
       if (error) {
+        console.error("Supabase function error:", error);
         throw new Error(error.message);
       }
 
       if (data?.success && data?.rates) {
-        console.log("=== SHIPPING RATES RESPONSE ===");
-        console.log("Response data:", data);
+        console.log("=== SHIPPING RATES SUCCESS ===");
         console.log("Rates received:", data.rates);
         console.log("Number of rates:", data.rates.length);
         
         setRates(data.rates);
         // Auto-select the cheapest rate
         if (data.rates.length > 0 && !selectedRate) {
+          console.log("Auto-selecting cheapest rate:", data.rates[0]);
           onRateSelected(data.rates[0]);
         }
       } else {
-        console.log("=== SHIPPING RATES ERROR ===");
+        console.log("=== SHIPPING RATES ERROR RESPONSE ===");
         console.log("Response data:", data);
-        throw new Error(data?.error || "Failed to get shipping rates");
+        const errorMsg = data?.error || "Failed to get shipping rates";
+        console.error("Setting error:", errorMsg);
+        throw new Error(errorMsg);
       }
     } catch (err) {
+      console.error("=== SHIPPING RATES CATCH ERROR ===");
+      console.error("Error object:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch shipping rates";
+      console.error("Final error message:", errorMessage);
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
