@@ -5,10 +5,15 @@ import { Star, Plus } from "lucide-react";
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useState } from 'react';
 import ReviewForm from './ReviewForm';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 const Testimonials = () => {
   const { content, loading } = useSiteContent();
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const { elementRef, isIntersecting } = useIntersectionObserver({ 
+    threshold: 0.2,
+    triggerOnce: true 
+  });
 
   if (loading) {
     return (
@@ -21,7 +26,7 @@ const Testimonials = () => {
   }
 
   const testimonials = [];
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 4; i++) {
     const name = content[`testimonial_${i}_name`];
     const role = content[`testimonial_${i}_role`];
     const image = content[`testimonial_${i}_image`];
@@ -39,6 +44,30 @@ const Testimonials = () => {
       });
     }
   }
+
+  // Add placeholder for 4th testimonial if we don't have 4 testimonials
+  while (testimonials.length < 4) {
+    testimonials.push({
+      id: testimonials.length + 1,
+      name: 'Your Name Here',
+      role: 'Future Customer',
+      image: '/placeholder.svg',
+      content: 'Share your experience with Blue Dream Budder and help others discover our amazing products!',
+      rating: 5,
+      isPlaceholder: true
+    });
+  }
+
+  const getAnimationClass = (index: number) => {
+    if (!isIntersecting) return 'opacity-0 translate-x-0';
+    
+    const isEven = index % 2 === 1; // 0-indexed, so second card (index 1) is "even"
+    const delayClass = index === 0 ? '' : index === 1 ? '-delay-1' : '-delay-2';
+    
+    return isEven 
+      ? `animate-slide-in-right${delayClass}` 
+      : `animate-slide-in-left${delayClass}`;
+  };
 
   return (
     <section className="py-20 futuristic-bg">
@@ -66,17 +95,25 @@ const Testimonials = () => {
           </div>
         )}
         
-        <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="neon-card rounded-2xl backdrop-blur-sm">
+        <div ref={elementRef} className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {testimonials.map((testimonial, index) => (
+            <div 
+              key={testimonial.id} 
+              className={`neon-card rounded-2xl backdrop-blur-sm transition-all duration-600 ${getAnimationClass(index)} ${
+                testimonial.isPlaceholder ? 'border-dashed border-2 border-blue-300 bg-blue-50/50' : ''
+              }`}
+            >
               <CardContent className="p-8 relative z-10">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-blue-400 text-blue-400" />
+                    <Star 
+                      key={i} 
+                      className={`w-5 h-5 ${testimonial.isPlaceholder ? 'fill-blue-300 text-blue-300' : 'fill-blue-400 text-blue-400'}`} 
+                    />
                   ))}
                 </div>
                 
-                <blockquote className="text-gray-700 mb-6 leading-relaxed">
+                <blockquote className={`mb-6 leading-relaxed ${testimonial.isPlaceholder ? 'text-blue-600 italic' : 'text-gray-700'}`}>
                   "{testimonial.content}"
                 </blockquote>
                 
@@ -84,13 +121,31 @@ const Testimonials = () => {
                   <img 
                     src={testimonial.image}
                     alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover neon-image"
+                    className={`w-12 h-12 rounded-full object-cover ${testimonial.isPlaceholder ? 'opacity-50' : 'neon-image'}`}
                   />
                   <div>
-                    <div className="font-medium text-gray-900">{testimonial.name}</div>
-                    <div className="text-sm text-gray-600">{testimonial.role}</div>
+                    <div className={`font-medium ${testimonial.isPlaceholder ? 'text-blue-700' : 'text-gray-900'}`}>
+                      {testimonial.name}
+                    </div>
+                    <div className={`text-sm ${testimonial.isPlaceholder ? 'text-blue-500' : 'text-gray-600'}`}>
+                      {testimonial.role}
+                    </div>
                   </div>
                 </div>
+                
+                {testimonial.isPlaceholder && (
+                  <div className="mt-4 pt-4 border-t border-blue-200">
+                    <Button 
+                      onClick={() => setShowReviewForm(true)}
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-blue-300 text-blue-600 hover:bg-blue-50"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add Your Review
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </div>
           ))}
