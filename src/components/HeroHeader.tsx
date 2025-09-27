@@ -32,86 +32,102 @@ const HeroHeader = () => {
   ];
 
   return (
-    <div className="absolute top-6 right-6 z-20 flex gap-2 backdrop-blur-sm rounded-lg p-2">
-      <CartIcon />
-      
-      {/* Navigation Menu */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button 
-            size="sm"
-            className="neon-button bg-white/10 hover:bg-white/20 text-white border-white/30"
-            variant="outline"
-          >
-            <Menu className="w-4 h-4" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="right" className="w-80 bg-background/95 backdrop-blur-lg border-border">
-          <div className="flex flex-col gap-4 mt-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Navigation</h3>
-            {navigationItems.map((item) => (
-              item.type === 'link' ? (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  className="justify-start text-left hover:bg-accent hover:text-accent-foreground"
-                  asChild
-                >
-                  <Link to={item.id}>{item.label}</Link>
-                </Button>
-              ) : (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  className="justify-start text-left hover:bg-accent hover:text-accent-foreground"
-                  onClick={() => scrollToSection(item.id)}
-                >
-                  {item.label}
-                </Button>
-              )
-            ))}
+    <header className="absolute top-0 left-0 right-0 z-50 p-6">
+      <div className="container mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center">
+          <div className="w-16 h-16 rounded-full border-2 border-cyan-400 flex items-center justify-center">
+            <span className="text-cyan-400 font-bold text-lg">BD</span>
           </div>
-        </SheetContent>
-      </Sheet>
-      
-      {user ? (
-        <div className="flex gap-2">
-          {isAdmin && (
-            <Link to="/admin">
-              <Button 
-                size="sm"
-                className="neon-button bg-white/10 hover:bg-white/20 text-white border-white/30"
-                variant="outline"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Admin
-              </Button>
+        </div>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-6">
+          <button 
+            onClick={() => scrollToSection('products')}
+            className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium"
+          >
+            Shop Now
+          </button>
+          <button 
+            onClick={() => scrollToSection('ingredients')}
+            className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium"
+          >
+            View Benefits
+          </button>
+          {user?.user_metadata?.role === 'admin' && (
+            <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
+              Admin
             </Link>
           )}
-          
-          <Button 
-            size="sm"
-            className="neon-button bg-white/10 hover:bg-white/20 text-white border-white/30"
-            variant="outline"
-            onClick={signOut}
-          >
-            <User className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
+          {user ? (
+            <button 
+              onClick={signOut}
+              className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <Link to="/auth" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
+              Sign In
+            </Link>
+          )}
         </div>
-      ) : (
-        <Link to="/auth">
-          <Button 
-            size="sm"
-            className="neon-button bg-white/10 hover:bg-white/20 text-white border-white/30"
-            variant="outline"
-          >
-            <User className="w-4 h-4 mr-2" />
-            Sign In
-          </Button>
-        </Link>
-      )}
-    </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-white">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-80 bg-slate-900 border-slate-800">
+              <nav className="flex flex-col space-y-6 mt-8">
+                {navigationItems.map((item) => (
+                  <div key={item.label}>
+                    {item.type === 'scroll' ? (
+                      <button
+                        onClick={() => {
+                          scrollToSection(item.id);
+                        }}
+                        className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium block w-full text-left"
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <Link
+                        to={item.id}
+                        className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium block"
+                      >
+                        {item.label}
+                      </Link>
+                    )}
+                  </div>
+                ))}
+                {user?.user_metadata?.role === 'admin' && (
+                  <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
+                    Admin
+                  </Link>
+                )}
+                {user ? (
+                  <button 
+                    onClick={signOut}
+                    className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium text-left"
+                  >
+                    Sign Out
+                  </button>
+                ) : (
+                  <Link to="/auth" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
+                    Sign In
+                  </Link>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
   );
 };
 
