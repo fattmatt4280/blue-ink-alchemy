@@ -12,9 +12,9 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
 
   return (
     <div className="container mx-auto px-6 relative z-10 pt-24">
-      <div className="flex items-center justify-between min-h-[80vh]">
-        {/* Left side - Text content */}
-        <div className="flex-1 max-w-2xl">
+      <div className="flex items-center justify-center min-h-[80vh]">
+        {/* Centered content */}
+        <div className="text-center max-w-4xl">
           {/* Main Headline - Multi-line with cyan highlights */}
           <div className="space-y-1 mb-8">
             <h1 className="font-orbitron text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
@@ -48,18 +48,6 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
             >
               View Benefits
             </button>
-          </div>
-        </div>
-        
-        {/* Right side - Product image */}
-        <div className="flex-1 flex justify-end items-center pl-12">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/30 to-transparent rounded-full blur-3xl transform scale-110"></div>
-            <img 
-              src={content.hero_image || "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=500&h=500&fit=crop&crop=center"}
-              alt="Blue Dream Budder Jar"
-              className="relative w-96 h-96 lg:w-[500px] lg:h-[500px] object-cover rounded-3xl shadow-2xl shadow-cyan-400/20"
-            />
           </div>
         </div>
       </div>
