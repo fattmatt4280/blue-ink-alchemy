@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Save, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import ImageOpacityControl from './ImageOpacityControl';
 
 interface SiteContent {
   id: string;
@@ -25,6 +26,7 @@ interface TestimonialsEditorProps {
 
 const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: TestimonialsEditorProps) => {
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [opacities, setOpacities] = useState<Record<string, number>>({});
   const { toast } = useToast();
 
   const handleInputChange = (id: string, value: string) => {
@@ -200,17 +202,28 @@ const TestimonialsEditor = ({ content, onContentUpdate, onSave, saving }: Testim
                         className="hidden"
                         disabled={uploading[imageKey]}
                       />
-                    </div>
-                    {getContentValue(imageKey) && (
-                      <img 
-                        src={getContentValue(imageKey)} 
-                        alt="Profile preview" 
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    )}
-                  </div>
+                     </div>
+                     {getContentValue(imageKey) && (
+                       <div className="space-y-2">
+                         <img 
+                           src={getContentValue(imageKey)} 
+                           alt="Profile preview" 
+                           className="w-16 h-16 rounded-full object-cover"
+                           style={{ opacity: (opacities[imageKey] || 100) / 100 }}
+                         />
+                         <ImageOpacityControl
+                           opacity={opacities[imageKey] || 100}
+                           onOpacityChange={(newOpacity) => {
+                             setOpacities(prev => ({ ...prev, [imageKey]: newOpacity }));
+                           }}
+                           imageUrl={getContentValue(imageKey)}
+                           className="mt-2"
+                         />
+                       </div>
+                     )}
+                   </div>
 
-                  <div className="space-y-2">
+                   <div className="space-y-2">
                     <Label>Rating (1-5)</Label>
                     <Select
                       value={getContentValue(ratingKey)}

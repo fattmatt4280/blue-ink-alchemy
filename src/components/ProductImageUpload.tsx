@@ -7,16 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Upload } from 'lucide-react';
+import ImageOpacityControl from './ImageOpacityControl';
 
 interface ProductImageUploadProps {
-  onImageUploaded: (url: string) => void;
+  onImageUploaded: (url: string, opacity?: number) => void;
   currentImage?: string;
+  currentOpacity?: number;
   productName: string;
 }
 
-const ProductImageUpload = ({ onImageUploaded, currentImage, productName }: ProductImageUploadProps) => {
+const ProductImageUpload = ({ onImageUploaded, currentImage, currentOpacity = 100, productName }: ProductImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [opacity, setOpacity] = useState(currentOpacity);
   const { toast } = useToast();
 
   const uploadImage = async (file: File) => {
@@ -61,7 +64,7 @@ const ProductImageUpload = ({ onImageUploaded, currentImage, productName }: Prod
         .getPublicUrl(filePath);
 
       console.log('Product image upload successful, public URL:', data.publicUrl);
-      onImageUploaded(data.publicUrl);
+      onImageUploaded(data.publicUrl, opacity);
 
       toast({
         title: "Image uploaded!",
@@ -121,13 +124,25 @@ const ProductImageUpload = ({ onImageUploaded, currentImage, productName }: Prod
       <Label>Product Image</Label>
       
       {currentImage && (
-        <div className="relative">
-          <img 
-            src={currentImage} 
-            alt={`${productName} image`} 
-            className="w-full h-64 object-cover rounded-lg"
+        <div className="space-y-4">
+          <div className="relative">
+            <img 
+              src={currentImage} 
+              alt={`${productName} image`} 
+              className="w-full h-64 object-cover rounded-lg"
+              style={{ opacity: opacity / 100 }}
+            />
+            <div className="mt-2 text-sm text-muted-foreground">Current image</div>
+          </div>
+          
+          <ImageOpacityControl
+            opacity={opacity}
+            onOpacityChange={(newOpacity) => {
+              setOpacity(newOpacity);
+              onImageUploaded(currentImage, newOpacity);
+            }}
+            imageUrl={currentImage}
           />
-          <div className="mt-2 text-sm text-gray-600">Current image</div>
         </div>
       )}
       
