@@ -7,26 +7,28 @@ import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import AIAssistant from "@/components/AIAssistant";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 const Index = () => {
   return (
-    <div className="min-h-screen futuristic-bg overflow-x-hidden">
-      <div id="hero">
+    <div className="min-h-screen futuristic-bg overflow-x-hidden relative">
+      <AnimatedBackground />
+      <div id="hero" className="relative z-10">
         <Hero />
       </div>
-      <div id="products">
+      <div id="products" className="relative z-10">
         <ProductGrid />
       </div>
-      <div id="testimonials">
+      <div id="testimonials" className="relative z-10">
         <Testimonials />
       </div>
-      <div id="ingredients">
+      <div id="ingredients" className="relative z-10">
         <Ingredients />
       </div>
-      <div id="faq">
+      <div id="faq" className="relative z-10">
         <FAQ />
       </div>
-      <div id="newsletter">
+      <div id="newsletter" className="relative z-10">
         <Newsletter />
       </div>
       <Footer />

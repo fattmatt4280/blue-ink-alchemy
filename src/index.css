@@ -352,3 +352,134 @@ All colors MUST be HSL.
   color: #000;
   text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
 }
+
+/* Animated Background Orbs */
+.neon-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  box-shadow: 
+    0 0 20px rgba(59, 130, 246, 0.2),
+    0 0 40px rgba(59, 130, 246, 0.1),
+    inset 0 0 20px rgba(147, 197, 253, 0.1);
+  filter: blur(1px);
+}
+
+.neon-orb.large {
+  width: 200px;
+  height: 200px;
+}
+
+.neon-orb.medium {
+  width: 120px;
+  height: 120px;
+}
+
+.neon-orb.small {
+  width: 80px;
+  height: 80px;
+}
+
+.neon-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+}
+
+/* Floating animations with different speeds and patterns */
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  25% { transform: translate(30px, -20px) scale(1.1); opacity: 0.5; }
+  50% { transform: translate(-20px, -40px) scale(0.9); opacity: 0.7; }
+  75% { transform: translate(-30px, -10px) scale(1.05); opacity: 0.4; }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  33% { transform: translate(-25px, 30px) scale(1.2); opacity: 0.6; }
+  66% { transform: translate(40px, -25px) scale(0.8); opacity: 0.3; }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  20% { transform: translate(20px, 35px) scale(0.9); opacity: 0.3; }
+  40% { transform: translate(-30px, 15px) scale(1.1); opacity: 0.6; }
+  60% { transform: translate(10px, -30px) scale(1.05); opacity: 0.4; }
+  80% { transform: translate(-15px, -10px) scale(0.95); opacity: 0.7; }
+}
+
+@keyframes float-4 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  50% { transform: translate(-40px, 20px) scale(1.15); opacity: 0.6; }
+}
+
+@keyframes float-5 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  30% { transform: translate(35px, -30px) scale(0.85); opacity: 0.7; }
+  70% { transform: translate(-20px, 25px) scale(1.1); opacity: 0.3; }
+}
+
+@keyframes float-6 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25% { transform: translate(-15px, -35px) scale(1.05); opacity: 0.4; }
+  75% { transform: translate(25px, 15px) scale(0.9); opacity: 0.5; }
+}
+
+@keyframes drift-1 {
+  0% { transform: translateY(0px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+@keyframes drift-2 {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+}
+
+@keyframes drift-3 {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) translateX(-15px); opacity: 0; }
+}
+
+@keyframes drift-4 {
+  0% { transform: translateY(0px); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+@keyframes drift-5 {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  8% { opacity: 0.9; }
+  92% { opacity: 0.9; }
+  100% { transform: translateY(-100vh) translateX(30px); opacity: 0; }
+}
+
+@keyframes drift-6 {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  12% { opacity: 0.7; }
+  88% { opacity: 0.7; }
+  100% { transform: translateY(-100vh) translateX(-25px); opacity: 0; }
+}
+
+.animate-float-1 { animation: float-1 8s ease-in-out infinite; }
+.animate-float-2 { animation: float-2 10s ease-in-out infinite; }
+.animate-float-3 { animation: float-3 12s ease-in-out infinite; }
+.animate-float-4 { animation: float-4 9s ease-in-out infinite; }
+.animate-float-5 { animation: float-5 11s ease-in-out infinite; }
+.animate-float-6 { animation: float-6 7s ease-in-out infinite; }
+
+.animate-drift-1 { animation: drift-1 15s linear infinite; }
+.animate-drift-2 { animation: drift-2 18s linear infinite 2s; }
+.animate-drift-3 { animation: drift-3 20s linear infinite 5s; }
+.animate-drift-4 { animation: drift-4 16s linear infinite 8s; }
+.animate-drift-5 { animation: drift-5 22s linear infinite 3s; }
+.animate-drift-6 { animation: drift-6 19s linear infinite 7s; }
