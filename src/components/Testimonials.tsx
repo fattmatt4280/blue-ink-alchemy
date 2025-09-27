@@ -5,15 +5,9 @@ import { Star, Plus } from "lucide-react";
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useState } from 'react';
 import ReviewForm from './ReviewForm';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-
 const Testimonials = () => {
   const { content, loading } = useSiteContent();
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const { elementRef, isIntersecting } = useIntersectionObserver({ 
-    threshold: 0.2,
-    triggerOnce: true 
-  });
 
   if (loading) {
     return (
@@ -58,20 +52,6 @@ const Testimonials = () => {
     });
   }
 
-  const getAnimationClass = (index: number) => {
-    if (!isIntersecting) {
-      // Initial state: cards start off-screen
-      const isEven = index % 2 === 1;
-      return isEven ? 'opacity-0 translate-x-full' : 'opacity-0 -translate-x-full';
-    }
-    
-    const isEven = index % 2 === 1; // 0-indexed, so second card (index 1) is "even"
-    const delayClass = index === 0 ? '' : index === 1 ? '-delay-1' : index === 2 ? '-delay-1' : '-delay-2';
-    
-    return isEven 
-      ? `animate-slide-in-right${delayClass}` 
-      : `animate-slide-in-left${delayClass}`;
-  };
 
   return (
     <section className="py-20 futuristic-bg">
@@ -99,11 +79,11 @@ const Testimonials = () => {
           </div>
         )}
         
-        <div ref={elementRef} className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {testimonials.map((testimonial, index) => (
             <div 
               key={testimonial.id} 
-              className={`neon-card rounded-2xl backdrop-blur-sm transition-all duration-600 ${getAnimationClass(index)} ${
+              className={`neon-card rounded-2xl backdrop-blur-sm opacity-100 ${
                 testimonial.isPlaceholder ? 'border-dashed border-2 border-blue-300 bg-blue-50/50' : ''
               }`}
             >
