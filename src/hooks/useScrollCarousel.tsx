@@ -20,7 +20,7 @@ export const useScrollCarousel = (
   const [isScrolling, setIsScrolling] = useState(false);
   const lastScrollY = useRef(0);
   const scrollDirection = useRef<'up' | 'down' | null>(null);
-  const throttleTimer = useRef<NodeJS.Timeout>();
+  const throttleTimer = useRef<number>();
   const scrollTimer = useRef<NodeJS.Timeout>();
 
   const handleScroll = useCallback(() => {
@@ -29,7 +29,7 @@ export const useScrollCarousel = (
     const currentScrollY = window.scrollY;
     const scrollDelta = currentScrollY - lastScrollY.current;
 
-    // Determine scroll direction
+    // Determine scroll direction with optimized threshold
     if (Math.abs(scrollDelta) > scrollThreshold) {
       const newDirection = scrollDelta > 0 ? 'down' : 'up';
       
@@ -53,20 +53,22 @@ export const useScrollCarousel = (
         scrollTimer.current = setTimeout(() => {
           setIsScrolling(false);
           scrollDirection.current = null;
-        }, 500);
+        }, 300);
       }
     }
 
     lastScrollY.current = currentScrollY;
   }, [carouselApi, scrollThreshold]);
 
-  const throttledHandleScroll = useCallback(() => {
+  const rafHandleScroll = useCallback(() => {
     if (throttleTimer.current) {
-      clearTimeout(throttleTimer.current);
+      cancelAnimationFrame(throttleTimer.current);
     }
     
-    throttleTimer.current = setTimeout(handleScroll, throttleMs);
-  }, [handleScroll, throttleMs]);
+    throttleTimer.current = requestAnimationFrame(() => {
+      handleScroll();
+    });
+  }, [handleScroll]);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -74,19 +76,19 @@ export const useScrollCarousel = (
     // Initialize scroll position
     lastScrollY.current = window.scrollY;
 
-    // Add scroll listener
-    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    // Add optimized scroll listener
+    window.addEventListener('scroll', rafHandleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', throttledHandleScroll);
+      window.removeEventListener('scroll', rafHandleScroll);
       if (throttleTimer.current) {
-        clearTimeout(throttleTimer.current);
+        cancelAnimationFrame(throttleTimer.current);
       }
       if (scrollTimer.current) {
         clearTimeout(scrollTimer.current);
       }
     };
-  }, [carouselApi, throttledHandleScroll]);
+  }, [carouselApi, rafHandleScroll]);
 
   return {
     isScrolling,

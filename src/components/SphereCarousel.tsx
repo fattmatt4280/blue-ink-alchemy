@@ -126,11 +126,13 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
           className={`relative w-full h-full transition-transform ease-out ${isDragging ? '' : 'duration-300'}`}
           style={{
             transformStyle: 'preserve-3d',
-            transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
+            transform: `translate3d(0,0,0) rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
             transformOrigin: 'center center',
-            willChange: 'transform',
+            willChange: isDragging ? 'transform' : 'auto',
             touchAction: 'pan-y',
             transitionDuration: isDragging ? '0ms' : undefined,
+            backfaceVisibility: 'hidden',
+            contain: 'layout style paint',
           }}
         >
           {products.map((product, index) => {
@@ -138,7 +140,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
             return (
               <div
                 key={product.id}
-                className="absolute transition-all duration-500 ease-out"
+                className="absolute transition-all duration-300 ease-out"
                 style={{
                   ...position,
                   left: '50%',
@@ -149,6 +151,8 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
                   marginTop: '-160px',
                   transformOrigin: 'center center',
                   backfaceVisibility: 'hidden',
+                  willChange: 'transform, opacity',
+                  contain: 'layout style paint',
                 }}
               >
                 <div 

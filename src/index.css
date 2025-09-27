@@ -353,16 +353,15 @@ All colors MUST be HSL.
   text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
 }
 
-/* Animated Background Orbs */
+/* Optimized Animated Background Orbs */
 .neon-orb {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-  box-shadow: 
-    0 0 20px rgba(59, 130, 246, 0.2),
-    0 0 40px rgba(59, 130, 246, 0.1),
-    inset 0 0 20px rgba(147, 197, 253, 0.1);
-  filter: blur(1px);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .neon-orb.large {
@@ -389,43 +388,35 @@ All colors MUST be HSL.
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
 }
 
-/* Floating animations with different speeds and patterns */
+/* Optimized floating animations - simpler transforms for better performance */
 @keyframes float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-  25% { transform: translate(30px, -20px) scale(1.1); opacity: 0.5; }
-  50% { transform: translate(-20px, -40px) scale(0.9); opacity: 0.7; }
-  75% { transform: translate(-30px, -10px) scale(1.05); opacity: 0.4; }
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+  50% { transform: translate3d(20px, -30px, 0); opacity: 0.6; }
 }
 
 @keyframes float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  33% { transform: translate(-25px, 30px) scale(1.2); opacity: 0.6; }
-  66% { transform: translate(40px, -25px) scale(0.8); opacity: 0.3; }
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.4; }
+  50% { transform: translate3d(-30px, 25px, 0); opacity: 0.5; }
 }
 
 @keyframes float-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-  20% { transform: translate(20px, 35px) scale(0.9); opacity: 0.3; }
-  40% { transform: translate(-30px, 15px) scale(1.1); opacity: 0.6; }
-  60% { transform: translate(10px, -30px) scale(1.05); opacity: 0.4; }
-  80% { transform: translate(-15px, -10px) scale(0.95); opacity: 0.7; }
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.5; }
+  50% { transform: translate3d(25px, -20px, 0); opacity: 0.3; }
 }
 
 @keyframes float-4 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-  50% { transform: translate(-40px, 20px) scale(1.15); opacity: 0.6; }
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+  50% { transform: translate3d(-35px, 15px, 0); opacity: 0.6; }
 }
 
 @keyframes float-5 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  30% { transform: translate(35px, -30px) scale(0.85); opacity: 0.7; }
-  70% { transform: translate(-20px, 25px) scale(1.1); opacity: 0.3; }
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.4; }
+  50% { transform: translate3d(30px, -25px, 0); opacity: 0.5; }
 }
 
 @keyframes float-6 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
-  25% { transform: translate(-15px, -35px) scale(1.05); opacity: 0.4; }
-  75% { transform: translate(25px, 15px) scale(0.9); opacity: 0.5; }
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.6; }
+  50% { transform: translate3d(-20px, 30px, 0); opacity: 0.4; }
 }
 
 @keyframes drift-1 {
@@ -470,12 +461,12 @@ All colors MUST be HSL.
   100% { transform: translateY(-100vh) translateX(-25px); opacity: 0; }
 }
 
-.animate-float-1 { animation: float-1 8s ease-in-out infinite; }
-.animate-float-2 { animation: float-2 10s ease-in-out infinite; }
-.animate-float-3 { animation: float-3 12s ease-in-out infinite; }
-.animate-float-4 { animation: float-4 9s ease-in-out infinite; }
-.animate-float-5 { animation: float-5 11s ease-in-out infinite; }
-.animate-float-6 { animation: float-6 7s ease-in-out infinite; }
+.animate-float-1 { animation: float-1 6s ease-in-out infinite; animation-fill-mode: both; }
+.animate-float-2 { animation: float-2 8s ease-in-out infinite; animation-fill-mode: both; }
+.animate-float-3 { animation: float-3 7s ease-in-out infinite; animation-fill-mode: both; }
+.animate-float-4 { animation: float-4 9s ease-in-out infinite; animation-fill-mode: both; }
+.animate-float-5 { animation: float-5 7.5s ease-in-out infinite; animation-fill-mode: both; }
+.animate-float-6 { animation: float-6 8.5s ease-in-out infinite; animation-fill-mode: both; }
 
 .animate-drift-1 { animation: drift-1 15s linear infinite; }
 .animate-drift-2 { animation: drift-2 18s linear infinite 2s; }
