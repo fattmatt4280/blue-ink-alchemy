@@ -59,10 +59,14 @@ const Testimonials = () => {
   }
 
   const getAnimationClass = (index: number) => {
-    if (!isIntersecting) return 'opacity-0 translate-x-0';
+    if (!isIntersecting) {
+      // Initial state: cards start off-screen
+      const isEven = index % 2 === 1;
+      return isEven ? 'opacity-0 translate-x-full' : 'opacity-0 -translate-x-full';
+    }
     
     const isEven = index % 2 === 1; // 0-indexed, so second card (index 1) is "even"
-    const delayClass = index === 0 ? '' : index === 1 ? '-delay-1' : '-delay-2';
+    const delayClass = index === 0 ? '' : index === 1 ? '-delay-1' : index === 2 ? '-delay-1' : '-delay-2';
     
     return isEven 
       ? `animate-slide-in-right${delayClass}` 
