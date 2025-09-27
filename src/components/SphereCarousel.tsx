@@ -37,38 +37,39 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
 
   const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
 
-  useEffect(() => {
-    // Initialize to prevent a large first delta
-    lastScrollY.current = window.scrollY;
+  // Disabled scroll-to-rotate functionality to prevent unwanted side-to-side movement
+  // useEffect(() => {
+  //   // Initialize to prevent a large first delta
+  //   lastScrollY.current = window.scrollY;
 
-    const onScroll = () => {
-      if (rafId.current !== null) return;
-      rafId.current = requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        const scrollDelta = currentScrollY - lastScrollY.current;
+  //   const onScroll = () => {
+  //     if (rafId.current !== null) return;
+  //     rafId.current = requestAnimationFrame(() => {
+  //       const currentScrollY = window.scrollY;
+  //       const scrollDelta = currentScrollY - lastScrollY.current;
 
-        if (Math.abs(scrollDelta) > 8) {
-          setIsScrolling(true);
-          // Smooth proportional rotation with normalization
-          setRotationY(prev => normalizeAngle(prev + scrollDelta * 0.25));
+  //       if (Math.abs(scrollDelta) > 8) {
+  //         setIsScrolling(true);
+  //         // Smooth proportional rotation with normalization
+  //         setRotationY(prev => normalizeAngle(prev + scrollDelta * 0.25));
 
-          if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-          scrollTimeout.current = setTimeout(() => setIsScrolling(false), 600);
-        }
+  //         if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+  //         scrollTimeout.current = setTimeout(() => setIsScrolling(false), 600);
+  //       }
 
-        lastScrollY.current = currentScrollY;
-        rafId.current = null;
-      });
-    };
+  //       lastScrollY.current = currentScrollY;
+  //       rafId.current = null;
+  //     });
+  //   };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+  //   window.addEventListener('scroll', onScroll, { passive: true });
 
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('scroll', onScroll);
+  //     if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+  //     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+  //   };
+  // }, []);
 
   const getProductPosition = (index: number) => {
     const angleY = (index / itemsPerRow) * 360;
