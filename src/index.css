@@ -214,6 +214,15 @@ All colors MUST be HSL.
   }
 }
 
+@keyframes cyberPulse {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .gradient-shift-bg {
   background: linear-gradient(135deg, #1e3a8a, #3b82f6, #1d4ed8);
   animation: gradientShift 8s ease-in-out infinite;
@@ -324,4 +333,19 @@ All colors MUST be HSL.
   border: 2px solid rgba(239, 68, 68, 0.4);
   animation: neonBreathing 4s ease-in-out infinite;
   transition: all 0.3s ease;
+}
+
+.cyber-chat-header {
+  background: linear-gradient(
+    90deg,
+    #00f5ff 0%,
+    #00d4ff 25%,
+    #0099ff 50%,
+    #00d4ff 75%,
+    #00f5ff 100%
+  );
+  background-size: 200% 100%;
+  animation: cyberPulse 2s ease-in-out infinite;
+  color: #000;
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
 }

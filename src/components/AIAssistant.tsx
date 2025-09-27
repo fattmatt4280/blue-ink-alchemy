@@ -173,7 +173,7 @@ const AIAssistant = () => {
       isExpanded ? 'w-80 sm:w-96' : 'w-72 sm:w-80'
     }`}>
       <Card className="shadow-2xl border-2 border-blue-200">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <CardHeader className="cyber-chat-header rounded-t-lg">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <MessageCircle className="w-5 h-5" />
