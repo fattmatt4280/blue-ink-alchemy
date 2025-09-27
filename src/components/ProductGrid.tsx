@@ -1,6 +1,6 @@
 
 import { useProductGrid } from '@/hooks/useProductGrid';
-import ProductCarousel from './ProductCarousel';
+import SphereCarousel from './SphereCarousel';
 import ProductGridHeader from './ProductGridHeader';
 import ProductGridLoading from './ProductGridLoading';
 import ProductGridEmpty from './ProductGridEmpty';
@@ -28,7 +28,7 @@ const ProductGrid = () => {
           <ProductGridHeader />
 
           <div className="mt-8">
-            <ProductCarousel
+            <SphereCarousel
               products={products}
               onAddToCart={handleAddToCart}
               onProductView={handleProductView}
