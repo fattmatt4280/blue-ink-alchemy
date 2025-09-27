@@ -42,7 +42,7 @@ const HeroHeader = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden lg:flex items-center space-x-6">
           <button 
             onClick={() => scrollToSection('products')}
             className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium"
@@ -75,7 +75,7 @@ const HeroHeader = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-white">
