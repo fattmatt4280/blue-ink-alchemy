@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ProductCard from './ProductCard';
 
 interface Product {
@@ -26,46 +26,47 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const [isScrolling, setIsScrolling] = useState(false);
   const lastScrollY = useRef(0);
   const scrollTimeout = useRef<NodeJS.Timeout>();
+  const rafId = useRef<number | null>(null);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const lastTouchXRef = useRef(0);
   
   const radius = 250; // Sphere radius - reduced for better screen fit
   const itemsPerRow = Math.min(8, products.length); // Maximum 8 items in a circle
 
+  const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
+
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDelta = currentScrollY - lastScrollY.current;
-      
-      if (Math.abs(scrollDelta) > 50) {
-        setIsScrolling(true);
-        
-        // Rotate sphere based on scroll direction
-        setRotationY(prev => prev + (scrollDelta > 0 ? 45 : -45));
-        
-        // Clear existing timeout
-        if (scrollTimeout.current) {
-          clearTimeout(scrollTimeout.current);
+    // Initialize to prevent a large first delta
+    lastScrollY.current = window.scrollY;
+
+    const onScroll = () => {
+      if (rafId.current !== null) return;
+      rafId.current = requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrollDelta = currentScrollY - lastScrollY.current;
+
+        if (Math.abs(scrollDelta) > 8) {
+          setIsScrolling(true);
+          // Smooth proportional rotation with normalization
+          setRotationY(prev => normalizeAngle(prev + scrollDelta * 0.25));
+
+          if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+          scrollTimeout.current = setTimeout(() => setIsScrolling(false), 600);
         }
-        
-        // Hide scroll indicator after delay
-        scrollTimeout.current = setTimeout(() => {
-          setIsScrolling(false);
-        }, 1000);
-      }
-      
-      lastScrollY.current = currentScrollY;
+
+        lastScrollY.current = currentScrollY;
+        rafId.current = null;
+      });
     };
 
-    const throttledScroll = () => {
-      requestAnimationFrame(handleScroll);
-    };
+    window.addEventListener('scroll', onScroll, { passive: true });
 
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    
     return () => {
-      window.removeEventListener('scroll', throttledScroll);
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
+      window.removeEventListener('scroll', onScroll);
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     };
   }, []);
 
@@ -84,6 +85,31 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
     };
   };
 
+  const handleTouchStart = useCallback((e: any) => {
+    const t = e.touches[0];
+    touchStartRef.current = { x: t.clientX, y: t.clientY };
+    lastTouchXRef.current = t.clientX;
+    setIsDragging(true);
+  }, []);
+
+  const handleTouchMove = useCallback((e: any) => {
+    if (!isDragging) return;
+    const t = e.touches[0];
+    const dxTotal = t.clientX - touchStartRef.current.x;
+    const dyTotal = t.clientY - touchStartRef.current.y;
+
+    if (Math.abs(dxTotal) > Math.abs(dyTotal) && Math.abs(dxTotal) > 6) {
+      e.preventDefault();
+      const dx = t.clientX - lastTouchXRef.current;
+      setRotationY(prev => normalizeAngle(prev - dx * 0.35));
+      lastTouchXRef.current = t.clientX;
+    }
+  }, [isDragging]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
   return (
     <div className="relative w-full h-[400px] overflow-hidden">
       {/* 3D Container */}
@@ -96,11 +122,18 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       >
         {/* Sphere Container */}
         <div
-          className="relative w-full h-full transition-transform duration-700 ease-out"
+          className={`relative w-full h-full transition-transform ease-out ${isDragging ? '' : 'duration-300'}`}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
           style={{
             transformStyle: 'preserve-3d',
             transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
             transformOrigin: 'center center',
+            willChange: 'transform',
+            touchAction: 'pan-y',
+            transitionDuration: isDragging ? '0ms' : undefined,
           }}
         >
           {products.map((product, index) => {
@@ -143,7 +176,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       {/* Navigation Controls */}
       <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10">
         <button
-          onClick={() => setRotationY(prev => prev - 45)}
+          onClick={() => setRotationY(prev => normalizeAngle(prev - 45))}
           className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors"
           aria-label="Rotate left"
         >
@@ -153,7 +186,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       
       <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10">
         <button
-          onClick={() => setRotationY(prev => prev + 45)}
+          onClick={() => setRotationY(prev => normalizeAngle(prev + 45))}
           className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors"
           aria-label="Rotate right"
         >
