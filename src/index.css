@@ -338,11 +338,11 @@ All colors MUST be HSL.
 .cyber-chat-header {
   background: linear-gradient(
     90deg,
-    #00f5ff 0%,
-    #00d4ff 25%,
-    #0099ff 50%,
-    #00d4ff 75%,
-    #00f5ff 100%
+    #00d4ff 0%,
+    #0099ff 20%,
+    #0066cc 50%,
+    #0099ff 80%,
+    #00d4ff 100%
   );
   background-size: 200% 100%;
   animation: cyberPulse 2s ease-in-out infinite;
