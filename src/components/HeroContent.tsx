@@ -12,9 +12,9 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
 
   return (
     <div className="container mx-auto px-6 relative z-10 pt-24">
-      <div className="flex items-center justify-center min-h-[80vh]">
-        {/* Centered content */}
-        <div className="text-center max-w-4xl">
+      <div className="flex items-center justify-start min-h-[80vh]">
+        {/* Left-aligned content */}
+        <div className="text-left max-w-4xl">
           {/* Main Headline - Multi-line with cyan highlights */}
           <div className="space-y-1 mb-8">
             <h1 className="font-orbitron text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
