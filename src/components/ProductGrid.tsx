@@ -1,6 +1,6 @@
 
 import { useProductGrid } from '@/hooks/useProductGrid';
-import ProductCard from './ProductCard';
+import ProductCarousel from './ProductCarousel';
 import ProductGridHeader from './ProductGridHeader';
 import ProductGridLoading from './ProductGridLoading';
 import ProductGridEmpty from './ProductGridEmpty';
@@ -27,15 +27,12 @@ const ProductGrid = () => {
         <div className="max-w-6xl mx-auto">
           <ProductGridHeader />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={handleAddToCart}
-                onProductView={handleProductView}
-              />
-            ))}
+          <div className="mt-8">
+            <ProductCarousel
+              products={products}
+              onAddToCart={handleAddToCart}
+              onProductView={handleProductView}
+            />
           </div>
 
           {products.length === 0 && <ProductGridEmpty />}
