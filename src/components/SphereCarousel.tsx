@@ -27,7 +27,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const lastScrollY = useRef(0);
   const scrollTimeout = useRef<NodeJS.Timeout>();
   
-  const radius = 400; // Sphere radius
+  const radius = 250; // Sphere radius - reduced for better screen fit
   const itemsPerRow = Math.min(8, products.length); // Maximum 8 items in a circle
 
   useEffect(() => {
@@ -85,12 +85,12 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   };
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden">
+    <div className="relative w-full h-[400px] overflow-hidden">
       {/* 3D Container */}
       <div 
         className="relative w-full h-full"
         style={{
-          perspective: '1200px',
+          perspective: '800px',
           perspectiveOrigin: 'center center',
         }}
       >
@@ -113,10 +113,10 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
                   ...position,
                   left: '50%',
                   top: '50%',
-                  width: '280px',
-                  height: '400px',
-                  marginLeft: '-140px',
-                  marginTop: '-200px',
+                  width: '220px',
+                  height: '320px',
+                  marginLeft: '-110px',
+                  marginTop: '-160px',
                   transformOrigin: 'center center',
                   backfaceVisibility: 'hidden',
                 }}
