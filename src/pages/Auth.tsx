@@ -14,7 +14,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, user, loading: authLoading } = useAuth();
+  const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -35,15 +35,24 @@ const Auth = () => {
       
       // Only redirect if we're not in the middle of processing an OAuth callback
       if (!authLoading && user) {
-        console.log('User is authenticated, redirecting to home page');
-        navigate('/', { replace: true });
+        if (isAdmin) {
+          console.log('Admin user detected, redirecting to admin dashboard');
+          toast({
+            title: "Admin access detected",
+            description: "Redirecting to your dashboard...",
+          });
+          navigate('/admin', { replace: true });
+        } else {
+          console.log('User is authenticated, redirecting to home page');
+          navigate('/', { replace: true });
+        }
       }
     };
 
     // Add a small delay to ensure auth state has been processed
     const timer = setTimeout(handleAuthCallback, 200);
     return () => clearTimeout(timer);
-  }, [user, authLoading, navigate]);
+  }, [user, isAdmin, authLoading, navigate, toast]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +71,7 @@ const Auth = () => {
         title: "Welcome back!",
         description: "You have been signed in successfully.",
       });
-      navigate('/');
+      // Let the useEffect handle navigation based on admin status
     }
 
     setLoading(false);

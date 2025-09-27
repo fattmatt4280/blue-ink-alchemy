@@ -55,7 +55,7 @@ const HeroHeader = () => {
           >
             View Benefits
           </button>
-          {user?.user_metadata?.role === 'admin' && (
+          {isAdmin && (
             <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
               Admin
             </Link>
@@ -105,7 +105,7 @@ const HeroHeader = () => {
                     )}
                   </div>
                 ))}
-                {user?.user_metadata?.role === 'admin' && (
+                {isAdmin && (
                   <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
                     Admin
                   </Link>
