@@ -10,7 +10,7 @@ import AIAssistant from "@/components/AIAssistant";
 
 const Index = () => {
   return (
-    <div className="min-h-screen futuristic-bg">
+    <div className="min-h-screen futuristic-bg overflow-x-hidden">
       <div id="hero">
         <Hero />
       </div>

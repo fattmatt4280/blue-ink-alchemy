@@ -124,10 +124,6 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
         {/* Sphere Container */}
         <div
           className={`relative w-full h-full transition-transform ease-out ${isDragging ? '' : 'duration-300'}`}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onTouchCancel={handleTouchEnd}
           style={{
             transformStyle: 'preserve-3d',
             transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
