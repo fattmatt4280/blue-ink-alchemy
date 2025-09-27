@@ -103,18 +103,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAdminStatus = async () => {
       if (user) {
         try {
-          const { data } = await supabase.rpc('is_admin');
+          console.log('AuthContext: Checking admin status for user:', user.email);
+          const { data, error } = await supabase.rpc('is_admin');
+          
+          if (error) {
+            console.error('AuthContext: RPC error checking admin status:', error);
+            setIsAdmin(false);
+            return;
+          }
+          
+          console.log('AuthContext: Admin check result:', data);
           setIsAdmin(data || false);
         } catch (error) {
-          console.error('Error checking admin status:', error);
+          console.error('AuthContext: Error checking admin status:', error);
           setIsAdmin(false);
         }
       } else {
+        console.log('AuthContext: No user, setting isAdmin to false');
         setIsAdmin(false);
       }
     };
 
-    checkAdminStatus();
+    // Add a small delay to ensure user state is fully set
+    if (user) {
+      setTimeout(() => {
+        checkAdminStatus();
+      }, 100);
+    } else {
+      checkAdminStatus();
+    }
   }, [user]);
 
   const signIn = async (email: string, password: string) => {
