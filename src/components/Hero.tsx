@@ -4,41 +4,21 @@ import { useState } from "react";
 import EmailSignupPopup from "./EmailSignupPopup";
 import HeroHeader from "./HeroHeader";
 import HeroContent from "./HeroContent";
-import HeroDebugDialog from "./HeroDebugDialog";
 
 const Hero = () => {
   const { content, loading } = useSiteContent();
   const [showEmailPopup, setShowEmailPopup] = useState(false);
-  const [debugMessages, setDebugMessages] = useState<string[]>([]);
-  const [showDebugDialog, setShowDebugDialog] = useState(false);
-
-  const addDebugMessage = (message: string) => {
-    const timestampedMessage = `${new Date().toLocaleTimeString()}: ${message}`;
-    setDebugMessages(prev => [...prev, timestampedMessage]);
-    console.log(timestampedMessage);
-  };
 
   const scrollToProducts = () => {
     document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleDiscountClick = () => {
-    setDebugMessages([]); // Clear previous messages
-    setShowDebugDialog(true); // Show the debug dialog immediately
-    addDebugMessage('🎯 Get 10% Off button clicked');
-    addDebugMessage('📝 Setting showEmailPopup to true');
     setShowEmailPopup(true);
-    addDebugMessage('✅ EmailSignupPopup should now be visible');
   };
 
   const handleEmailPopupClose = () => {
-    addDebugMessage('❌ EmailSignupPopup close requested');
     setShowEmailPopup(false);
-    addDebugMessage('✅ EmailSignupPopup closed');
-    // Keep debug dialog open for a few more seconds
-    setTimeout(() => {
-      setShowDebugDialog(false);
-    }, 3000);
   };
 
   if (loading) {
@@ -75,12 +55,6 @@ const Hero = () => {
       <EmailSignupPopup 
         isOpen={showEmailPopup} 
         onClose={handleEmailPopupClose} 
-      />
-
-      <HeroDebugDialog 
-        isOpen={showDebugDialog}
-        onClose={() => setShowDebugDialog(false)}
-        debugMessages={debugMessages}
       />
     </>
   );

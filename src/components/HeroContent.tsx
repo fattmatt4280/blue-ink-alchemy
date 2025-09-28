@@ -46,7 +46,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
               className="border-2 border-gray-400 text-gray-300 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-gray-800 hover:border-gray-300 hover:text-white transition-all duration-300 bg-transparent"
               onClick={onDiscountClick}
             >
-              View Benefits
+              10% off
             </button>
           </div>
         </div>
