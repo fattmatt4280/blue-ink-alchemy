@@ -32,10 +32,13 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const lastTouchXRef = useRef(0);
   
-  const radius = 250; // Sphere radius - reduced for better screen fit
-  const itemsPerRow = Math.min(8, products.length); // Maximum 8 items in a circle
+  const radius = 280; // Sphere radius - optimized for 4 products
+  const totalProducts = Math.max(products.length, 4); // Ensure at least 4 positions
 
   const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
+
+  // Debug logging
+  console.log('SphereCarousel products:', products.length, products.map(p => p.name));
 
   // Disabled scroll-to-rotate functionality to prevent unwanted side-to-side movement
   // useEffect(() => {
@@ -72,17 +75,26 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   // }, []);
 
   const getProductPosition = (index: number) => {
-    const angleY = (index / itemsPerRow) * 360;
-    const angleX = Math.sin(index * 0.5) * 30; // Slight vertical variation
+    // Distribute products evenly around the sphere (90 degrees apart for 4 products)
+    const angleY = (index / totalProducts) * 360;
+    const angleX = Math.sin(index * 0.3) * 15; // Reduced vertical variation
     
     const x = Math.sin((angleY * Math.PI) / 180) * radius;
     const z = Math.cos((angleY * Math.PI) / 180) * radius;
-    const y = Math.sin((angleX * Math.PI) / 180) * 100;
+    const y = Math.sin((angleX * Math.PI) / 180) * 50; // Reduced Y variation
+
+    // Better visibility calculations
+    const isVisible = z > -radius * 0.7;
+    const opacity = isVisible ? Math.max(0.7, (z + radius) / (radius * 2)) : 0.4;
+    const scale = isVisible ? Math.max(0.8, (z + radius) / (radius * 2)) : 0.6;
+
+    console.log(`Product ${index}: angleY=${angleY}, x=${x}, z=${z}, opacity=${opacity}, scale=${scale}`);
 
     return {
       transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(${-angleY}deg)`,
-      opacity: z > -200 ? 1 : 0.3, // Fade products that are far back
-      scale: z > -200 ? 1 : 0.8, // Scale down distant products
+      opacity,
+      scale,
+      zIndex: Math.round(z + radius), // Better layering
     };
   };
 
@@ -95,11 +107,14 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
 
   const handleTouchMove = useCallback((e: any) => {
     if (!isDragging) return;
+    
+    // Only prevent default for horizontal movements to allow clicks
     const t = e.touches[0];
     const dxTotal = t.clientX - touchStartRef.current.x;
     const dyTotal = t.clientY - touchStartRef.current.y;
 
-    if (Math.abs(dxTotal) > Math.abs(dyTotal) && Math.abs(dxTotal) > 6) {
+    // Only rotate if significant horizontal movement
+    if (Math.abs(dxTotal) > Math.abs(dyTotal) && Math.abs(dxTotal) > 10) {
       e.preventDefault();
       const dx = t.clientX - lastTouchXRef.current;
       setRotationY(prev => normalizeAngle(prev - dx * 0.35));
@@ -129,11 +144,14 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
             transform: `translate3d(0,0,0) rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
             transformOrigin: 'center center',
             willChange: isDragging ? 'transform' : 'auto',
-            touchAction: 'pan-y',
+            touchAction: 'manipulation', // Better for clicks
             transitionDuration: isDragging ? '0ms' : undefined,
             backfaceVisibility: 'hidden',
             contain: 'layout style paint',
           }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {products.map((product, index) => {
             const position = getProductPosition(index);
@@ -142,24 +160,27 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
                 key={product.id}
                 className="absolute transition-all duration-300 ease-out"
                 style={{
-                  ...position,
+                  transform: position.transform,
                   left: '50%',
                   top: '50%',
-                  width: '220px',
-                  height: '320px',
-                  marginLeft: '-110px',
-                  marginTop: '-160px',
+                  width: '240px',
+                  height: '340px',
+                  marginLeft: '-120px',
+                  marginTop: '-170px',
                   transformOrigin: 'center center',
                   backfaceVisibility: 'hidden',
                   willChange: 'transform, opacity',
                   contain: 'layout style paint',
+                  zIndex: position.zIndex,
+                  pointerEvents: 'auto', // Ensure clicks work
                 }}
               >
                 <div 
-                  className="w-full h-full transition-transform duration-300"
+                  className="w-full h-full transition-all duration-300 hover:scale-105"
                   style={{
                     transform: `scale(${position.scale})`,
                     opacity: position.opacity,
+                    pointerEvents: 'auto', // Ensure clicks work
                   }}
                 >
                   <ProductCard
