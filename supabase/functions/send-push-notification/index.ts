@@ -125,11 +125,12 @@ serve(async (req) => {
 
         return { success: webPushResponse.ok, endpoint: subscription.endpoint };
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         logStep('Error sending to subscription', { 
           endpoint: subscription.endpoint,
-          error: error.message 
+          error: errorMessage 
         });
-        return { success: false, endpoint: subscription.endpoint, error: error.message };
+        return { success: false, endpoint: subscription.endpoint, error: errorMessage };
       }
     });
 
@@ -151,9 +152,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     logStep('Error in send-push-notification function', error);
     return new Response(JSON.stringify({ 
-      error: error.message 
+      error: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

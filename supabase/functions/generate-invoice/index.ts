@@ -179,8 +179,9 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    logStep("ERROR in generate-invoice", { error: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR in generate-invoice", { error: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

@@ -65,7 +65,8 @@ serve(async (req) => {
         created: event.created 
       });
     } catch (err) {
-      logStep("ERROR: Invalid JSON", { error: err.message });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      logStep("ERROR: Invalid JSON", { error: errorMessage });
       return new Response("Invalid JSON", { status: 400 });
     }
 
@@ -142,9 +143,10 @@ serve(async (req) => {
                     });
                     logStep("Invoice generation triggered", { orderId: existingOrder.id });
                   } catch (invoiceError) {
+                    const errorMessage = invoiceError instanceof Error ? invoiceError.message : String(invoiceError);
                     logStep("ERROR: Invoice generation failed", { 
                       orderId: existingOrder.id, 
-                      error: invoiceError.message 
+                      error: errorMessage
                     });
                   }
                 }, 1000);
@@ -165,9 +167,10 @@ serve(async (req) => {
                     });
                     logStep("Order confirmation sent", { orderId: existingOrder.id });
                   } catch (notificationError) {
+                    const errorMessage = notificationError instanceof Error ? notificationError.message : String(notificationError);
                     logStep("ERROR: Order confirmation failed", { 
                       orderId: existingOrder.id, 
-                      error: notificationError.message 
+                      error: errorMessage
                     });
                   }
                 }, 2000);
@@ -189,17 +192,19 @@ serve(async (req) => {
                       });
                       logStep("Shipping automation triggered", { orderId: existingOrder.id });
                     } catch (shippingError) {
+                      const errorMessage = shippingError instanceof Error ? shippingError.message : String(shippingError);
                       logStep("ERROR: Shipping automation failed", { 
                         orderId: existingOrder.id, 
-                        error: shippingError.message 
+                        error: errorMessage
                       });
                     }
                   }, 3000);
                 }
               }
             }
-          } catch (dbError) {
-            logStep("ERROR: Database error", { error: dbError.message });
+        } catch (dbError) {
+            const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+            logStep("ERROR: Database error", { error: errorMessage });
           }
         } else {
           logStep("ERROR: Missing Supabase configuration", { 
@@ -228,8 +233,9 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("[STRIPE-WEBHOOK] Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

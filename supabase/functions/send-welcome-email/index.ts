@@ -63,10 +63,11 @@ serve(async (req) => {
       requestData = JSON.parse(rawBody);
       logStep("📝 Parsed request data", { requestData, type: typeof requestData });
     } catch (parseError) {
-      logStep("❌ Failed to parse request body", { error: parseError.message });
+      const errorMessage = parseError instanceof Error ? parseError.message : String(parseError);
+      logStep("❌ Failed to parse request body", { error: errorMessage });
       return new Response(JSON.stringify({ 
         error: "Invalid JSON in request body",
-        details: parseError.message 
+        details: errorMessage
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,

@@ -63,8 +63,9 @@ serve(async (req) => {
           throw new Error('Invoice generation failed');
         }
       } catch (error) {
-        automationResults.push({ step: 'invoice', status: 'failed', error: error.message });
-        logStep("Invoice generation failed", { orderId, error: error.message });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        automationResults.push({ step: 'invoice', status: 'failed', error: errorMessage });
+        logStep("Invoice generation failed", { orderId, error: errorMessage });
       }
     }
 
@@ -140,8 +141,9 @@ serve(async (req) => {
           throw new Error('Failed to get shipping rates');
         }
       } catch (error) {
-        automationResults.push({ step: 'shipping', status: 'failed', error: error.message });
-        logStep("Shipping label creation failed", { orderId, error: error.message });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        automationResults.push({ step: 'shipping', status: 'failed', error: errorMessage });
+        logStep("Shipping label creation failed", { orderId, error: errorMessage });
       }
     }
 
@@ -173,8 +175,9 @@ serve(async (req) => {
           throw new Error('Notification sending failed');
         }
       } catch (error) {
-        automationResults.push({ step: 'notification', status: 'failed', error: error.message });
-        logStep("Notification sending failed", { orderId, error: error.message });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        automationResults.push({ step: 'notification', status: 'failed', error: errorMessage });
+        logStep("Notification sending failed", { orderId, error: errorMessage });
       }
     }
 
@@ -200,8 +203,9 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    logStep("ERROR in automation workflow", { error: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR in automation workflow", { error: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

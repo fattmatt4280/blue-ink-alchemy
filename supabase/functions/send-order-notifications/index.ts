@@ -180,8 +180,9 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    logStep("ERROR in send-order-notifications", { error: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR in send-order-notifications", { error: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
