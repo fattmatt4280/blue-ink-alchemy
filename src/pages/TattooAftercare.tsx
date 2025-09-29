@@ -54,7 +54,7 @@ const TattooAftercare = () => {
       <section className="relative z-10 min-h-[70vh] flex items-center justify-center px-4 pt-20 pb-12">
         <div className="absolute top-8 left-8">
           <Link to="/">
-            <Button variant="outline" size="sm" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+            <Button variant="outline" size="sm" className="bg-white/95 backdrop-blur-sm border-gray-200 text-gray-900 hover:bg-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
@@ -62,15 +62,15 @@ const TattooAftercare = () => {
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-light mb-6 text-white leading-tight">
+          <h1 className="text-4xl md:text-6xl font-light mb-6 text-gray-900 leading-tight">
             Premium Tattoo Aftercare
             <br />
-            <span className="font-normal bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
+            <span className="font-normal bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               For Optimal Healing
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto leading-relaxed">
             Blue Dream Budder provides professional-grade tattoo aftercare using natural, plant-based ingredients. 
             Soothe inflammation, lock in moisture, and protect your new ink for vibrant, long-lasting results.
           </p>
@@ -79,7 +79,7 @@ const TattooAftercare = () => {
             <Button 
               size="lg" 
               onClick={scrollToProducts}
-              className="bg-white text-primary hover:bg-gray-100 font-medium px-8"
+              className="bg-primary text-white hover:bg-primary/90 font-medium px-8"
             >
               Shop Tattoo Aftercare
             </Button>
@@ -90,7 +90,7 @@ const TattooAftercare = () => {
                 const element = document.getElementById('benefits');
                 if (element) element.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+              className="bg-white/95 backdrop-blur-sm border-gray-200 text-gray-900 hover:bg-white"
             >
               Learn More
             </Button>
@@ -104,39 +104,39 @@ const TattooAftercare = () => {
       </div>
 
       {/* Why Blue Dream Budder for Tattoos */}
-      <section id="benefits" className="relative z-10 py-20 px-4 bg-white/5 backdrop-blur-sm">
+      <section id="benefits" className="relative z-10 py-20 px-4 bg-white/95 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-light mb-4 text-white">
+            <h2 className="text-4xl font-light mb-4 text-gray-900">
               Why Choose Blue Dream Budder for Tattoo Aftercare?
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Professional tattoo artists and enthusiasts trust our natural formula for superior healing
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <h3 className="text-2xl font-light mb-4 text-white">The Healing Process</h3>
-              <div className="space-y-4 text-gray-200">
+            <div className="bg-white backdrop-blur-md rounded-xl p-8 border border-gray-200">
+              <h3 className="text-2xl font-light mb-4 text-gray-900">The Healing Process</h3>
+              <div className="space-y-4 text-gray-700">
                 <div>
-                  <strong className="text-white">Days 1-3:</strong> Apply thin layer 3-4 times daily to reduce inflammation and protect from infection
+                  <strong className="text-gray-900">Days 1-3:</strong> Apply thin layer 3-4 times daily to reduce inflammation and protect from infection
                 </div>
                 <div>
-                  <strong className="text-white">Days 4-14:</strong> Continue application 2-3 times daily as skin begins to heal and peel
+                  <strong className="text-gray-900">Days 4-14:</strong> Continue application 2-3 times daily as skin begins to heal and peel
                 </div>
                 <div>
-                  <strong className="text-white">Days 15-30:</strong> Maintain moisture with 1-2 daily applications for optimal color retention
+                  <strong className="text-gray-900">Days 15-30:</strong> Maintain moisture with 1-2 daily applications for optimal color retention
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <h3 className="text-2xl font-light mb-4 text-white">Best Practices</h3>
+            <div className="bg-white backdrop-blur-md rounded-xl p-8 border border-gray-200">
+              <h3 className="text-2xl font-light mb-4 text-gray-900">Best Practices</h3>
               <div className="space-y-4">
                 <div>
-                  <strong className="text-emerald-300">Do:</strong>
-                  <ul className="list-disc list-inside text-gray-200 mt-2 space-y-1">
+                  <strong className="text-emerald-600">Do:</strong>
+                  <ul className="list-disc list-inside text-gray-700 mt-2 space-y-1">
                     <li>Wash hands before application</li>
                     <li>Apply thin, even layers</li>
                     <li>Keep tattoo clean and moisturized</li>
@@ -144,8 +144,8 @@ const TattooAftercare = () => {
                   </ul>
                 </div>
                 <div>
-                  <strong className="text-rose-300">Don't:</strong>
-                  <ul className="list-disc list-inside text-gray-200 mt-2 space-y-1">
+                  <strong className="text-rose-600">Don't:</strong>
+                  <ul className="list-disc list-inside text-gray-700 mt-2 space-y-1">
                     <li>Over-apply product</li>
                     <li>Scratch or pick at healing skin</li>
                     <li>Expose to direct sunlight</li>
@@ -156,23 +156,23 @@ const TattooAftercare = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-md rounded-xl p-8 border border-white/20">
-            <h3 className="text-2xl font-light mb-4 text-white text-center">What Makes Our Formula Special</h3>
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 backdrop-blur-md rounded-xl p-8 border border-gray-200">
+            <h3 className="text-2xl font-light mb-4 text-gray-900 text-center">What Makes Our Formula Special</h3>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
                 <div className="text-3xl mb-2">🌿</div>
-                <h4 className="text-lg font-medium text-white mb-2">100% Natural</h4>
-                <p className="text-gray-200 text-sm">Plant-based ingredients free from harsh chemicals and synthetic additives</p>
+                <h4 className="text-lg font-medium text-gray-900 mb-2">100% Natural</h4>
+                <p className="text-gray-700 text-sm">Plant-based ingredients free from harsh chemicals and synthetic additives</p>
               </div>
               <div>
                 <div className="text-3xl mb-2">💧</div>
-                <h4 className="text-lg font-medium text-white mb-2">Deep Moisture</h4>
-                <p className="text-gray-200 text-sm">Locks in hydration without clogging pores or feeling greasy</p>
+                <h4 className="text-lg font-medium text-gray-900 mb-2">Deep Moisture</h4>
+                <p className="text-gray-700 text-sm">Locks in hydration without clogging pores or feeling greasy</p>
               </div>
               <div>
                 <div className="text-3xl mb-2">🛡️</div>
-                <h4 className="text-lg font-medium text-white mb-2">Anti-Inflammatory</h4>
-                <p className="text-gray-200 text-sm">Soothes irritation and reduces redness for comfortable healing</p>
+                <h4 className="text-lg font-medium text-gray-900 mb-2">Anti-Inflammatory</h4>
+                <p className="text-gray-700 text-sm">Soothes irritation and reduces redness for comfortable healing</p>
               </div>
             </div>
           </div>
