@@ -103,18 +103,19 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
     const z = Math.cos((angleY * Math.PI) / 180) * radius;
     const y = Math.sin((angleX * Math.PI) / 180) * 30;
 
-    // Always show all cards with reasonable visibility
+    // Ensure all cards are visible with proper depth sorting
     const normalizedZ = (z + radius) / (2 * radius); // 0 to 1
-    const opacity = Math.max(0.6, normalizedZ * 0.4 + 0.6);
-    const scale = Math.max(0.8, normalizedZ * 0.2 + 0.8);
-
-    console.log(`Product ${index}: baseAngle=${baseAngle}, finalAngle=${angleY.toFixed(1)}, x=${x.toFixed(1)}, z=${z.toFixed(1)}`);
+    const opacity = Math.max(0.7, normalizedZ * 0.3 + 0.7); // Minimum 70% opacity
+    const scale = Math.max(0.85, normalizedZ * 0.15 + 0.85); // Minimum 85% scale
+    
+    // Better z-index calculation to prevent overlap issues
+    const zIndex = Math.round((z + radius) * 10) + index;
 
     return {
       transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(${-angleY}deg)`,
       opacity,
       scale,
-      zIndex: Math.round(z + radius),
+      zIndex,
     };
   };
 
@@ -178,7 +179,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
           {products.map((product, index) => {
             const position = getProductPosition(index);
             return (
-              <div
+                <div
                 key={product.id}
                 className="absolute transition-all duration-300 ease-out"
                 style={{
@@ -190,11 +191,10 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
                   marginLeft: `${-cardWidth / 2}px`,
                   marginTop: `${-cardHeight / 2}px`,
                   transformOrigin: 'center center',
-                  backfaceVisibility: 'hidden',
-                  willChange: 'transform, opacity',
-                  contain: 'layout style paint',
+                  backfaceVisibility: 'visible',
+                  willChange: isDragging ? 'transform, opacity' : 'auto',
                   zIndex: position.zIndex,
-                  pointerEvents: 'auto', // Ensure clicks work
+                  pointerEvents: 'auto',
                 }}
               >
                 <div 
