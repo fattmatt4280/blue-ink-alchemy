@@ -22,6 +22,7 @@ import Wholesale from "./pages/Wholesale";
 import Contact from "./pages/Contact";
 import SizeGuide from "./pages/SizeGuide";
 import Tracking from "./pages/Tracking";
+import TattooAftercare from "./pages/TattooAftercare";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
                <Route path="/contact" element={<Contact />} />
                <Route path="/size-guide" element={<SizeGuide />} />
                <Route path="/tracking" element={<Tracking />} />
+               <Route path="/tattoo-aftercare" element={<TattooAftercare />} />
                <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
