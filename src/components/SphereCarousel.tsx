@@ -24,21 +24,40 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const [rotationY, setRotationY] = useState(0);
   const [rotationX, setRotationX] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(800);
   const lastScrollY = useRef(0);
   const scrollTimeout = useRef<NodeJS.Timeout>();
   const rafId = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const lastTouchXRef = useRef(0);
   
-  const radius = 280; // Sphere radius - optimized for 4 products
-  const totalProducts = Math.max(products.length, 4); // Ensure at least 4 positions
+  // Responsive sizing
+  const cardWidth = Math.max(180, Math.min(260, containerWidth * 0.55));
+  const cardHeight = cardWidth * 1.4;
+  const radius = Math.max(110, Math.min(260, containerWidth / 2 - cardWidth / 2 - 16));
+  const totalProducts = Math.max(products.length, 4);
 
   const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
+  const snapToNearest90 = (angle: number) => Math.round(angle / 90) * 90;
 
-  // Debug logging
-  console.log('SphereCarousel products:', products.length, products.map(p => p.name));
+  // Set up ResizeObserver for responsive sizing
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    
+    resizeObserver.observe(containerRef.current);
+    setContainerWidth(containerRef.current.clientWidth);
+    
+    return () => resizeObserver.disconnect();
+  }, []);
 
   // Disabled scroll-to-rotate functionality to prevent unwanted side-to-side movement
   // useEffect(() => {
@@ -77,24 +96,22 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const getProductPosition = (index: number) => {
     // Distribute products evenly around the sphere (90 degrees apart for 4 products)
     const angleY = (index / totalProducts) * 360;
-    const angleX = Math.sin(index * 0.3) * 15; // Reduced vertical variation
+    const angleX = Math.sin(index * 0.3) * 10; // Subtle vertical variation
     
     const x = Math.sin((angleY * Math.PI) / 180) * radius;
     const z = Math.cos((angleY * Math.PI) / 180) * radius;
-    const y = Math.sin((angleX * Math.PI) / 180) * 50; // Reduced Y variation
+    const y = Math.sin((angleX * Math.PI) / 180) * 30;
 
-    // Better visibility calculations
-    const isVisible = z > -radius * 0.7;
-    const opacity = isVisible ? Math.max(0.7, (z + radius) / (radius * 2)) : 0.4;
-    const scale = isVisible ? Math.max(0.8, (z + radius) / (radius * 2)) : 0.6;
-
-    console.log(`Product ${index}: angleY=${angleY}, x=${x}, z=${z}, opacity=${opacity}, scale=${scale}`);
+    // Improved visibility - make side cards more visible
+    const isVisible = z > -radius * 0.8;
+    const opacity = isVisible ? Math.max(0.75, (z + radius) / (radius * 1.8)) : 0.5;
+    const scale = isVisible ? Math.max(0.85, (z + radius) / (radius * 1.8)) : 0.7;
 
     return {
       transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(${-angleY}deg)`,
       opacity,
       scale,
-      zIndex: Math.round(z + radius), // Better layering
+      zIndex: Math.round(z + radius),
     };
   };
 
@@ -124,10 +141,12 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
+    // Snap to nearest 90 degrees for clean alignment
+    setRotationY(prev => snapToNearest90(prev));
   }, []);
 
   return (
-    <div className="relative w-full h-[400px] overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-[400px] overflow-hidden">
       {/* 3D Container */}
       <div 
         className="relative w-full h-full"
@@ -163,10 +182,10 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
                   transform: position.transform,
                   left: '50%',
                   top: '50%',
-                  width: '240px',
-                  height: '340px',
-                  marginLeft: '-120px',
-                  marginTop: '-170px',
+                  width: `${cardWidth}px`,
+                  height: `${cardHeight}px`,
+                  marginLeft: `${-cardWidth / 2}px`,
+                  marginTop: `${-cardHeight / 2}px`,
                   transformOrigin: 'center center',
                   backfaceVisibility: 'hidden',
                   willChange: 'transform, opacity',
@@ -198,7 +217,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       {/* Navigation Controls */}
       <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10">
         <button
-          onClick={() => setRotationY(prev => normalizeAngle(prev - 45))}
+          onClick={() => setRotationY(prev => snapToNearest90(prev - 90))}
           className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors"
           aria-label="Rotate left"
         >
@@ -208,7 +227,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       
       <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10">
         <button
-          onClick={() => setRotationY(prev => normalizeAngle(prev + 45))}
+          onClick={() => setRotationY(prev => snapToNearest90(prev + 90))}
           className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors"
           aria-label="Rotate right"
         >
