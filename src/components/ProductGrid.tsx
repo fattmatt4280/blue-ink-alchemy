@@ -17,10 +17,7 @@ const ProductGrid = () => {
     handleProductView,
   } = useProductGrid();
 
-  console.log('🎠 ProductGrid render - products:', products?.length, 'loading:', loading);
-
   if (loading) {
-    console.log('⏳ Still loading products...');
     return <ProductGridLoading />;
   }
 
@@ -31,19 +28,14 @@ const ProductGrid = () => {
           <ProductGridHeader />
 
           <div className="mt-8">
-            {products.length > 0 ? (
-              <SphereCarousel
-                products={products}
-                onAddToCart={handleAddToCart}
-                onProductView={handleProductView}
-              />
-            ) : (
-              <div className="text-center text-muted-foreground py-8">
-                <p>No products available</p>
-                <p className="text-sm mt-2">Check console for debugging info</p>
-              </div>
-            )}
+            <SphereCarousel
+              products={products}
+              onAddToCart={handleAddToCart}
+              onProductView={handleProductView}
+            />
           </div>
+
+          {products.length === 0 && <ProductGridEmpty />}
         </div>
       </section>
 

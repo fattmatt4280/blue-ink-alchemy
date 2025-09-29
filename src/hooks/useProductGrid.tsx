@@ -27,37 +27,27 @@ export const useProductGrid = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('🚀 useProductGrid effect running...');
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
-    console.log('🔄 Starting to fetch products...');
     try {
-      console.log('📡 Making Supabase query...');
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('display_order');
 
-      console.log('📦 Supabase response:', { data, error });
-
-      if (error) {
-        console.error('❌ Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
       
-      console.log(`✅ Successfully fetched ${data?.length || 0} products:`, data);
       setProducts(data || []);
     } catch (error) {
-      console.error('💥 Error fetching products:', error);
+      console.error('Error fetching products:', error);
       toast({
         title: "Error loading products",
         description: "Failed to load products. Please try again.",
         variant: "destructive",
       });
     } finally {
-      console.log('🏁 Finished fetching products, setting loading to false');
       setLoading(false);
     }
   };

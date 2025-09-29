@@ -24,40 +24,18 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const [rotationY, setRotationY] = useState(0);
   const [rotationX, setRotationX] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(800);
   const lastScrollY = useRef(0);
   const scrollTimeout = useRef<NodeJS.Timeout>();
   const rafId = useRef<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const lastTouchXRef = useRef(0);
   
-  // Responsive sizing
-  const cardWidth = Math.max(180, Math.min(260, containerWidth * 0.55));
-  const cardHeight = cardWidth * 1.4;
-  const radius = Math.max(110, Math.min(260, containerWidth / 2 - cardWidth / 2 - 16));
-  const totalProducts = Math.max(products.length, 4);
+  const radius = 250; // Sphere radius - reduced for better screen fit
+  const itemsPerRow = Math.min(8, products.length); // Maximum 8 items in a circle
 
   const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
-  const snapToNearest90 = (angle: number) => Math.round(angle / 90) * 90;
-
-  // Set up ResizeObserver for responsive sizing
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
-    
-    resizeObserver.observe(containerRef.current);
-    setContainerWidth(containerRef.current.clientWidth);
-    
-    return () => resizeObserver.disconnect();
-  }, []);
 
   // Disabled scroll-to-rotate functionality to prevent unwanted side-to-side movement
   // useEffect(() => {
@@ -94,28 +72,17 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   // }, []);
 
   const getProductPosition = (index: number) => {
-    // Distribute products evenly around the sphere (90 degrees apart for 4 products)
-    const baseAngle = (index / totalProducts) * 360;
-    const angleY = baseAngle + rotationY; // Add rotation state
-    const angleX = Math.sin(index * 0.3) * 10; // Subtle vertical variation
+    const angleY = (index / itemsPerRow) * 360;
+    const angleX = Math.sin(index * 0.5) * 30; // Slight vertical variation
     
     const x = Math.sin((angleY * Math.PI) / 180) * radius;
     const z = Math.cos((angleY * Math.PI) / 180) * radius;
-    const y = Math.sin((angleX * Math.PI) / 180) * 30;
-
-    // Ensure all cards are visible with proper depth sorting
-    const normalizedZ = (z + radius) / (2 * radius); // 0 to 1
-    const opacity = Math.max(0.7, normalizedZ * 0.3 + 0.7); // Minimum 70% opacity
-    const scale = Math.max(0.85, normalizedZ * 0.15 + 0.85); // Minimum 85% scale
-    
-    // Better z-index calculation to prevent overlap issues
-    const zIndex = Math.round((z + radius) * 10) + index;
+    const y = Math.sin((angleX * Math.PI) / 180) * 100;
 
     return {
       transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(${-angleY}deg)`,
-      opacity,
-      scale,
-      zIndex,
+      opacity: z > -200 ? 1 : 0.3, // Fade products that are far back
+      scale: z > -200 ? 1 : 0.8, // Scale down distant products
     };
   };
 
@@ -128,14 +95,11 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
 
   const handleTouchMove = useCallback((e: any) => {
     if (!isDragging) return;
-    
-    // Only prevent default for horizontal movements to allow clicks
     const t = e.touches[0];
     const dxTotal = t.clientX - touchStartRef.current.x;
     const dyTotal = t.clientY - touchStartRef.current.y;
 
-    // Only rotate if significant horizontal movement
-    if (Math.abs(dxTotal) > Math.abs(dyTotal) && Math.abs(dxTotal) > 10) {
+    if (Math.abs(dxTotal) > Math.abs(dyTotal) && Math.abs(dxTotal) > 6) {
       e.preventDefault();
       const dx = t.clientX - lastTouchXRef.current;
       setRotationY(prev => normalizeAngle(prev - dx * 0.35));
@@ -145,12 +109,10 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
-    // Snap to nearest 90 degrees for clean alignment
-    setRotationY(prev => snapToNearest90(prev));
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[400px] overflow-hidden">
+    <div className="relative w-full h-[400px] overflow-hidden">
       {/* 3D Container */}
       <div 
         className="relative w-full h-full"
@@ -164,45 +126,36 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
           className={`relative w-full h-full transition-transform ease-out ${isDragging ? '' : 'duration-300'}`}
           style={{
             transformStyle: 'preserve-3d',
-            transform: `translate3d(0,0,0) rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
+            transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
             transformOrigin: 'center center',
-            willChange: isDragging ? 'transform' : 'auto',
-            touchAction: 'manipulation', // Better for clicks
+            willChange: 'transform',
+            touchAction: 'pan-y',
             transitionDuration: isDragging ? '0ms' : undefined,
-            backfaceVisibility: 'hidden',
-            contain: 'layout style paint',
           }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           {products.map((product, index) => {
             const position = getProductPosition(index);
             return (
-                <div
+              <div
                 key={product.id}
-                className="absolute transition-all duration-300 ease-out"
+                className="absolute transition-all duration-500 ease-out"
                 style={{
-                  transform: position.transform,
+                  ...position,
                   left: '50%',
                   top: '50%',
-                  width: `${cardWidth}px`,
-                  height: `${cardHeight}px`,
-                  marginLeft: `${-cardWidth / 2}px`,
-                  marginTop: `${-cardHeight / 2}px`,
+                  width: '220px',
+                  height: '320px',
+                  marginLeft: '-110px',
+                  marginTop: '-160px',
                   transformOrigin: 'center center',
-                  backfaceVisibility: 'visible',
-                  willChange: isDragging ? 'transform, opacity' : 'auto',
-                  zIndex: position.zIndex,
-                  pointerEvents: 'auto',
+                  backfaceVisibility: 'hidden',
                 }}
               >
                 <div 
-                  className="w-full h-full transition-all duration-300 hover:scale-105"
+                  className="w-full h-full transition-transform duration-300"
                   style={{
                     transform: `scale(${position.scale})`,
                     opacity: position.opacity,
-                    pointerEvents: 'auto', // Ensure clicks work
                   }}
                 >
                   <ProductCard
@@ -220,7 +173,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       {/* Navigation Controls */}
       <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10">
         <button
-          onClick={() => setRotationY(prev => snapToNearest90(prev - 90))}
+          onClick={() => setRotationY(prev => normalizeAngle(prev - 45))}
           className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors"
           aria-label="Rotate left"
         >
@@ -230,7 +183,7 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
       
       <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10">
         <button
-          onClick={() => setRotationY(prev => snapToNearest90(prev + 90))}
+          onClick={() => setRotationY(prev => normalizeAngle(prev + 45))}
           className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20 flex items-center justify-center hover:bg-primary/10 transition-colors"
           aria-label="Rotate right"
         >
