@@ -56,7 +56,11 @@ serve(async (req) => {
       throw new Error("Product not found");
     }
 
-    logStep("Product found", { productName: product.name, price: product.price });
+    if (!product.stripe_price_id) {
+      throw new Error("Product does not have a Stripe Price ID configured");
+    }
+
+    logStep("Product found", { productName: product.name, price: product.price, stripePriceId: product.stripe_price_id });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
@@ -68,27 +72,13 @@ serve(async (req) => {
       logStep("Existing customer found", { customerId });
     }
 
-    // Calculate subscription price with 5% discount
-    const originalPrice = Math.round(product.price * 100); // Convert to cents
-    const subscriptionPrice = Math.round(originalPrice * 0.95); // 5% discount
-
-    logStep("Pricing calculated", { originalPrice, subscriptionPrice });
-
-    // Create checkout session
+    // Create checkout session using the Stripe Price ID
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : email,
       line_items: [
         {
-          price_data: {
-            currency: "usd",
-            product_data: { 
-              name: `${product.name} - Monthly Subscription`,
-              description: `Monthly subscription for ${product.name} with 5% discount`
-            },
-            unit_amount: subscriptionPrice,
-            recurring: { interval: "month" },
-          },
+          price: product.stripe_price_id,
           quantity: 1,
         },
       ],
@@ -109,7 +99,7 @@ serve(async (req) => {
       email: email,
       stripe_session_id: session.id,
       product_id: productId,
-      amount: subscriptionPrice,
+      amount: Math.round(product.price * 100),
       subscription_discount: true,
       is_guest: isGuest,
       shipping_info: shippingInfo,

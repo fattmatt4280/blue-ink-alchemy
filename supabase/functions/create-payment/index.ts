@@ -52,7 +52,7 @@ serve(async (req) => {
       hasShippingInfo: !!body.shippingInfo
     });
 
-    const { items, shippingInfo } = body;
+    const { items, shippingInfo, shippingRate } = body;
 
     // Validate required data
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -115,37 +115,61 @@ serve(async (req) => {
       });
     }
 
+    // Validate shipping rate is provided
+    if (!shippingRate || !shippingRate.amount) {
+      console.error("[CREATE-PAYMENT] Missing or invalid shipping rate");
+      return new Response(JSON.stringify({ error: "Shipping rate is required" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Create Supabase client to fetch product details with stripe_price_id
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
     // Create line items with validation
     console.log("[CREATE-PAYMENT] Creating line items...");
-    const lineItems = items.map((item, index) => {
-      const unitAmount = Math.round((item.price || 0) * 100);
-      console.log(`[CREATE-PAYMENT] Item ${index}: ${item.name} - $${item.price} (${unitAmount} cents)`);
+    const lineItems = [];
+    
+    for (const item of items) {
+      console.log(`[CREATE-PAYMENT] Fetching product details for: ${item.name}`);
       
-      if (unitAmount <= 0) {
-        throw new Error(`Invalid price for item: ${item.name}`);
-      }
-      
-      return {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name || "Product",
-            images: item.image_url ? [item.image_url] : [],
-          },
-          unit_amount: unitAmount,
-        },
-        quantity: item.quantity || 1,
-      };
-    });
+      // Fetch product from database to get stripe_price_id
+      const { data: product, error: productError } = await supabaseClient
+        .from('products')
+        .select('stripe_price_id')
+        .eq('id', item.id)
+        .single();
 
-    // Add shipping
+      if (productError || !product?.stripe_price_id) {
+        console.error(`[CREATE-PAYMENT] Product not found or missing stripe_price_id: ${item.name}`);
+        throw new Error(`Product ${item.name} is not configured for payments`);
+      }
+
+      console.log(`[CREATE-PAYMENT] Using Stripe Price ID: ${product.stripe_price_id}`);
+      
+      lineItems.push({
+        price: product.stripe_price_id,
+        quantity: item.quantity || 1,
+      });
+    }
+
+    // Add shipping as a line item using the selected rate
+    const shippingAmount = Math.round(parseFloat(shippingRate.amount) * 100);
+    console.log(`[CREATE-PAYMENT] Adding shipping: ${shippingRate.carrier} ${shippingRate.service_level} - $${shippingRate.amount} (${shippingAmount} cents)`);
+    
     lineItems.push({
       price_data: {
-        currency: "usd",
+        currency: shippingRate.currency?.toLowerCase() || "usd",
         product_data: {
-          name: "Shipping",
+          name: `Shipping - ${shippingRate.carrier} ${shippingRate.service_level}`,
+          description: shippingRate.estimated_days ? `Estimated delivery: ${shippingRate.estimated_days} days` : undefined,
         },
-        unit_amount: 999, // $9.99 shipping
+        unit_amount: shippingAmount,
       },
       quantity: 1,
     });
@@ -211,36 +235,31 @@ serve(async (req) => {
       });
     }
 
-    // Try to create order record (but don't fail if it doesn't work)
-    if (supabaseUrl && supabaseServiceKey) {
-      try {
-        console.log("[CREATE-PAYMENT] Attempting to create order record...");
-        const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, { 
-          auth: { persistSession: false } 
-        });
+    // Create order record
+    try {
+      console.log("[CREATE-PAYMENT] Attempting to create order record...");
 
-        const totalAmount = items.reduce((sum, item) => {
-          return sum + ((item.price || 0) * (item.quantity || 1));
-        }, 0) + 9.99;
+      const totalAmount = items.reduce((sum, item) => {
+        return sum + ((item.price || 0) * (item.quantity || 1));
+      }, 0) + parseFloat(shippingRate.amount);
 
-        const { error: orderError } = await supabaseClient.from("orders").insert({
-          email: shippingInfo.email,
-          stripe_session_id: session.id,
-          amount: Math.round(totalAmount * 100),
-          shipping_info: shippingInfo,
-          status: 'pending',
-          is_guest: true,
-          currency: 'usd'
-        });
+      const { error: orderError } = await supabaseClient.from("orders").insert({
+        email: shippingInfo.email,
+        stripe_session_id: session.id,
+        amount: Math.round(totalAmount * 100),
+        shipping_info: { ...shippingInfo, shippingRate },
+        status: 'pending',
+        is_guest: true,
+        currency: shippingRate.currency?.toLowerCase() || 'usd'
+      });
 
-        if (orderError) {
-          console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", orderError.message);
-        } else {
-          console.log("[CREATE-PAYMENT] Order record created successfully");
-        }
-      } catch (orderError) {
+      if (orderError) {
         console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", orderError.message);
+      } else {
+        console.log("[CREATE-PAYMENT] Order record created successfully");
       }
+    } catch (orderError) {
+      console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", orderError.message);
     }
 
     // Return success response
