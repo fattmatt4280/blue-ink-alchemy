@@ -32,8 +32,11 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
   const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const lastTouchXRef = useRef(0);
   
+  // Create 8 display products (2 of each original product) for seamless carousel
+  const displayProducts = products.flatMap(product => [product, product]).slice(0, 8);
+  
   const radius = 250; // Sphere radius - reduced for better screen fit
-  const itemsPerRow = Math.min(8, products.length); // Maximum 8 items in a circle
+  const itemsPerRow = 8; // Always 8 items for perfect circle
 
   const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
 
@@ -133,11 +136,11 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
             transitionDuration: isDragging ? '0ms' : undefined,
           }}
         >
-          {products.map((product, index) => {
+          {displayProducts.map((product, index) => {
             const position = getProductPosition(index);
             return (
               <div
-                key={product.id}
+                key={`${product.id}-${index}`}
                 className="absolute transition-all duration-500 ease-out"
                 style={{
                   ...position,
@@ -148,14 +151,17 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
                   marginLeft: '-110px',
                   marginTop: '-160px',
                   transformOrigin: 'center center',
-                  backfaceVisibility: 'hidden',
+                  backfaceVisibility: 'visible',
                 }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 <div 
                   className="w-full h-full transition-transform duration-300"
                   style={{
                     transform: `scale(${position.scale})`,
-                    opacity: position.opacity,
+                    opacity: Math.max(position.opacity, 0.7),
                   }}
                 >
                   <ProductCard
