@@ -151,6 +151,27 @@ serve(async (req) => {
                   }
                 }, 1000);
 
+                // Send admin notification
+                setTimeout(async () => {
+                  try {
+                    await fetch(`${supabaseUrl}/functions/v1/send-admin-notification`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseServiceKey}`,
+                      },
+                      body: JSON.stringify({ orderId: existingOrder.id }),
+                    });
+                    logStep("Admin notification sent", { orderId: existingOrder.id });
+                  } catch (adminError) {
+                    const errorMessage = adminError instanceof Error ? adminError.message : String(adminError);
+                    logStep("ERROR: Admin notification failed", { 
+                      orderId: existingOrder.id, 
+                      error: errorMessage
+                    });
+                  }
+                }, 1500);
+
                 // Send order confirmation
                 setTimeout(async () => {
                   try {

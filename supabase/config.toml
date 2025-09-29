@@ -46,3 +46,7 @@ verify_jwt = false
 [[functions]]
 name = "order-automation-workflow"
 verify_jwt = false
+
+[[functions]]
+name = "send-admin-notification"
+verify_jwt = false

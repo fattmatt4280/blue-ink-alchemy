@@ -75,8 +75,8 @@ serve(async (req) => {
       </head>
       <body>
         <div class="header">
-          <h1>INVOICE</h1>
-          <h2>Your Company Name</h2>
+          <h1 style="color: #667eea; font-size: 32px;">INVOICE</h1>
+          <h2 style="color: #333; margin: 10px 0;">Blue Dream Budder</h2>
         </div>
         
         <div class="invoice-details">
@@ -157,7 +157,7 @@ serve(async (req) => {
 
     // Send invoice email
     const emailResponse = await resend.emails.send({
-      from: "Your Store <orders@yourdomain.com>",
+      from: "Blue Dream Budder <orders@bluebudder.com>",
       to: [order.email],
       subject: `Invoice ${invoiceNumber} - Order Confirmation`,
       html: invoiceHtml,
