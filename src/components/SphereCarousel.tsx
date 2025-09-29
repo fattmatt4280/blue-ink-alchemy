@@ -95,17 +95,20 @@ const SphereCarousel = ({ products, onAddToCart, onProductView }: SphereCarousel
 
   const getProductPosition = (index: number) => {
     // Distribute products evenly around the sphere (90 degrees apart for 4 products)
-    const angleY = (index / totalProducts) * 360;
+    const baseAngle = (index / totalProducts) * 360;
+    const angleY = baseAngle + rotationY; // Add rotation state
     const angleX = Math.sin(index * 0.3) * 10; // Subtle vertical variation
     
     const x = Math.sin((angleY * Math.PI) / 180) * radius;
     const z = Math.cos((angleY * Math.PI) / 180) * radius;
     const y = Math.sin((angleX * Math.PI) / 180) * 30;
 
-    // Improved visibility - make side cards more visible
-    const isVisible = z > -radius * 0.8;
-    const opacity = isVisible ? Math.max(0.75, (z + radius) / (radius * 1.8)) : 0.5;
-    const scale = isVisible ? Math.max(0.85, (z + radius) / (radius * 1.8)) : 0.7;
+    // Always show all cards with reasonable visibility
+    const normalizedZ = (z + radius) / (2 * radius); // 0 to 1
+    const opacity = Math.max(0.6, normalizedZ * 0.4 + 0.6);
+    const scale = Math.max(0.8, normalizedZ * 0.2 + 0.8);
+
+    console.log(`Product ${index}: baseAngle=${baseAngle}, finalAngle=${angleY.toFixed(1)}, x=${x.toFixed(1)}, z=${z.toFixed(1)}`);
 
     return {
       transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(${-angleY}deg)`,
