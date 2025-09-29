@@ -17,7 +17,14 @@ serve(async (req) => {
   }
 
   try {
-    // Check environment variables first
+    // Initialize Supabase client first
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    // Check environment variables
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -124,13 +131,6 @@ serve(async (req) => {
       });
     }
 
-    // Create Supabase client to fetch product details with stripe_price_id
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
     // Create line items with validation
     console.log("[CREATE-PAYMENT] Creating line items...");
     const lineItems = [];
@@ -204,11 +204,12 @@ serve(async (req) => {
       
       console.log(`[CREATE-PAYMENT] Stripe session created successfully: ${session.id}`);
     } catch (sessionError) {
+      const error = sessionError as any;
       console.error("[CREATE-PAYMENT] Session creation failed:", {
-        error: sessionError.message,
-        type: sessionError.type,
-        code: sessionError.code,
-        param: sessionError.param,
+        error: error?.message,
+        type: error?.type,
+        code: error?.code,
+        param: error?.param,
         isLiveMode: stripeKey.startsWith('sk_live_'),
         customerExists: !!customerId
       });
@@ -216,19 +217,19 @@ serve(async (req) => {
       // Provide more specific error messages for live key issues
       let errorMessage = "Failed to create checkout session";
       if (stripeKey.startsWith('sk_live_')) {
-        if (sessionError.code === 'rate_limit') {
+        if (error?.code === 'rate_limit') {
           errorMessage = "Too many requests. Please try again in a moment.";
-        } else if (sessionError.code === 'invalid_request_error') {
+        } else if (error?.code === 'invalid_request_error') {
           errorMessage = "Invalid payment configuration. Please contact support.";
-        } else if (sessionError.message?.includes('price')) {
+        } else if (error?.message?.includes('price')) {
           errorMessage = "Product pricing configuration error. Please contact support.";
         }
       }
       
       return new Response(JSON.stringify({ 
         error: errorMessage, 
-        details: sessionError.message,
-        code: sessionError.code
+        details: error?.message,
+        code: error?.code
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
@@ -254,12 +255,14 @@ serve(async (req) => {
       });
 
       if (orderError) {
-        console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", orderError.message);
+        const err = orderError as any;
+        console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", err?.message);
       } else {
         console.log("[CREATE-PAYMENT] Order record created successfully");
       }
     } catch (orderError) {
-      console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", orderError.message);
+      const err = orderError as any;
+      console.warn("[CREATE-PAYMENT] Order creation failed (continuing anyway):", err?.message);
     }
 
     // Return success response
@@ -270,15 +273,16 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    const err = error as any;
     console.error("[CREATE-PAYMENT] Critical error:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: err?.message,
+      stack: err?.stack,
+      name: err?.name
     });
     
     return new Response(JSON.stringify({ 
       error: "Payment processing failed", 
-      details: error.message 
+      details: err?.message 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
