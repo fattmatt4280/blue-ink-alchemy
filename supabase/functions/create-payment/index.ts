@@ -24,8 +24,8 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Check environment variables
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    // Check environment variables and trim whitespace
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY")?.trim();
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -41,6 +41,14 @@ serve(async (req) => {
     if (!stripeKey) {
       console.error("[CREATE-PAYMENT] Missing STRIPE_SECRET_KEY");
       return new Response(JSON.stringify({ error: "Stripe configuration missing" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
+    if (!stripeKey.startsWith('sk_live_') && !stripeKey.startsWith('sk_test_')) {
+      console.error("[CREATE-PAYMENT] Invalid STRIPE_SECRET_KEY format");
+      return new Response(JSON.stringify({ error: "Invalid Stripe key configuration" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
       });
@@ -214,16 +222,23 @@ serve(async (req) => {
         customerExists: !!customerId
       });
       
-      // Provide more specific error messages for live key issues
+      // Provide more specific error messages
       let errorMessage = "Failed to create checkout session";
-      if (stripeKey.startsWith('sk_live_')) {
-        if (error?.code === 'rate_limit') {
-          errorMessage = "Too many requests. Please try again in a moment.";
-        } else if (error?.code === 'invalid_request_error') {
-          errorMessage = "Invalid payment configuration. Please contact support.";
-        } else if (error?.message?.includes('price')) {
-          errorMessage = "Product pricing configuration error. Please contact support.";
-        }
+      
+      // Detect test/live mode mismatch
+      if (error?.message?.includes('similar object exists in live mode') || 
+          error?.message?.includes('similar object exists in test mode')) {
+        errorMessage = "Payment configuration error: Price ID mode doesn't match API key mode. Please contact support.";
+        console.error("[CREATE-PAYMENT] MODE MISMATCH: Stripe key mode doesn't match price IDs");
+      } else if (error?.code === 'resource_missing' && error?.param?.includes('price')) {
+        errorMessage = "Product pricing not found. Please contact support.";
+        console.error("[CREATE-PAYMENT] Price ID not found in Stripe");
+      } else if (error?.code === 'rate_limit') {
+        errorMessage = "Too many requests. Please try again in a moment.";
+      } else if (error?.code === 'invalid_request_error') {
+        errorMessage = "Invalid payment configuration. Please contact support.";
+      } else if (error?.message?.includes('price')) {
+        errorMessage = "Product pricing configuration error. Please contact support.";
       }
       
       return new Response(JSON.stringify({ 
