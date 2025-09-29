@@ -18,6 +18,39 @@ const PublicReviews = () => {
 
   useEffect(() => {
     fetchPublicReviews();
+
+    // Set up real-time subscription for approved reviews
+    const channel = supabase
+      .channel('customer-reviews-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'customer_reviews',
+          filter: 'approved=eq.true'
+        },
+        () => {
+          fetchPublicReviews();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'customer_reviews',
+          filter: 'approved=eq.true'
+        },
+        () => {
+          fetchPublicReviews();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchPublicReviews = async () => {
@@ -26,7 +59,8 @@ const PublicReviews = () => {
       .from('customer_reviews')
       .select('id, name, rating, title, content, created_at')
       .eq('approved', true)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(20);
 
     if (!error && data) {
       setReviews(data);
@@ -52,7 +86,12 @@ const PublicReviews = () => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-2xl font-semibold mb-6">Customer Reviews</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-2xl font-semibold">Customer Reviews</h3>
+        <div className="text-sm text-gray-500">
+          {reviews.length} review{reviews.length !== 1 ? 's' : ''} (showing up to 20)
+        </div>
+      </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {reviews.map((review) => (
           <Card key={review.id} className="h-full">
