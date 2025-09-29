@@ -3,11 +3,51 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Plus } from "lucide-react";
 import { useSiteContent } from '@/hooks/useSiteContent';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from "@/integrations/supabase/client";
 import ReviewForm from './ReviewForm';
 const Testimonials = () => {
   const { content, loading } = useSiteContent();
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [customerReviews, setCustomerReviews] = useState([]);
+
+  useEffect(() => {
+    fetchCustomerReviews();
+    
+    // Set up real-time subscription for new approved reviews
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'customer_reviews',
+          filter: 'approved=eq.true'
+        },
+        () => {
+          fetchCustomerReviews();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchCustomerReviews = async () => {
+    const { data, error } = await supabase
+      .from('customer_reviews')
+      .select('id, name, content, rating, created_at')
+      .eq('approved', true)
+      .order('created_at', { ascending: false })
+      .limit(4);
+
+    if (!error && data) {
+      setCustomerReviews(data);
+    }
+  };
 
   if (loading) {
     return (
@@ -19,7 +59,20 @@ const Testimonials = () => {
     );
   }
 
-  const testimonials = [];
+  // Transform customer reviews to testimonial format
+  const customerTestimonials = customerReviews.map((review) => ({
+    id: review.id,
+    name: review.name,
+    role: 'Verified Customer',
+    image: '/placeholder.svg',
+    content: review.content,
+    rating: review.rating,
+    isCustomerReview: true,
+    isPlaceholder: false
+  }));
+
+  // Get static testimonials from site content
+  const staticTestimonials = [];
   for (let i = 1; i <= 4; i++) {
     const name = content[`testimonial_${i}_name`];
     const role = content[`testimonial_${i}_role`];
@@ -28,26 +81,38 @@ const Testimonials = () => {
     const rating = parseInt(content[`testimonial_${i}_rating`]) || 5;
     
     if (name) {
-      testimonials.push({
-        id: i,
+      staticTestimonials.push({
+        id: `static_${i}`,
         name,
         role,
         image,
         content: testimonialContent,
-        rating
+        rating,
+        isCustomerReview: false,
+        isPlaceholder: false
       });
     }
   }
 
-  // Add placeholder for 4th testimonial if we don't have 4 testimonials
+  // Combine testimonials: prioritize customer reviews, then static, then placeholder
+  let testimonials = [...customerTestimonials];
+  
+  // Fill remaining spots with static testimonials
+  const remainingSlots = 4 - testimonials.length;
+  if (remainingSlots > 0) {
+    testimonials = [...testimonials, ...staticTestimonials.slice(0, remainingSlots)];
+  }
+
+  // Add placeholder for remaining spots if needed
   while (testimonials.length < 4) {
     testimonials.push({
-      id: testimonials.length + 1,
+      id: `placeholder_${testimonials.length + 1}`,
       name: 'Your Name Here',
       role: 'Future Customer',
       image: '/placeholder.svg',
       content: 'Share your experience with Blue Dream Budder and help others discover our amazing products!',
       rating: 5,
+      isCustomerReview: false,
       isPlaceholder: true
     });
   }
