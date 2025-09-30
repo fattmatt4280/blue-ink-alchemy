@@ -112,12 +112,12 @@ const AIAssistant = () => {
     }
   }, [hasShown, welcomePopupShown]);
 
-  // Auto-close chat after 30 seconds when opened
+  // Auto-close chat after 10 seconds when opened
   useEffect(() => {
     if (isOpen) {
       const autoCloseTimer = setTimeout(() => {
         setIsOpen(false);
-      }, 30000); // 30 seconds
+      }, 10000); // 10 seconds
 
       return () => clearTimeout(autoCloseTimer);
     }
