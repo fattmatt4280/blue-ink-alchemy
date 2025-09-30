@@ -248,7 +248,7 @@ const AIAssistant = () => {
         
         <CardContent className="p-0">
           <div className={`overflow-y-auto p-4 space-y-4 transition-all duration-300 ${
-            isExpanded ? 'h-80' : 'h-48'
+            isExpanded ? 'h-96' : 'h-64'
           }`}>
             <ChatMessages 
               messages={messages} 
