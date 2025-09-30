@@ -43,7 +43,7 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our all-natural tattoo aftercare products. Click a question below or ask me anything!",
+      text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our all-natural tattoo aftercare products. Click a question below or ask me anything! When you're done, I'll be living down in the tab below.",
       isUser: false,
       timestamp: new Date()
     }
@@ -108,6 +108,17 @@ const AIAssistant = () => {
       return () => clearTimeout(timer);
     }
   }, [hasShown, welcomePopupShown]);
+
+  // Auto-close chat after 30 seconds when opened
+  useEffect(() => {
+    if (isOpen) {
+      const autoCloseTimer = setTimeout(() => {
+        setIsOpen(false);
+      }, 30000); // 30 seconds
+
+      return () => clearTimeout(autoCloseTimer);
+    }
+  }, [isOpen]);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
