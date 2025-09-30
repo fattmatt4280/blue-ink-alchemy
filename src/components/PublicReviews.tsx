@@ -2,18 +2,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-
-interface PublicReview {
-  id: string;
-  name: string;
-  rating: number;
-  title: string | null;
-  content: string;
-  created_at: string;
-}
+import { PublicCustomerReview, PUBLIC_REVIEW_COLUMNS } from '@/types/reviews';
 
 const PublicReviews = () => {
-  const [reviews, setReviews] = useState<PublicReview[]>([]);
+  const [reviews, setReviews] = useState<PublicCustomerReview[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,7 +49,7 @@ const PublicReviews = () => {
     // Only select public-safe fields, email is excluded for privacy
     const { data, error } = await supabase
       .from('customer_reviews')
-      .select('id, name, rating, title, content, created_at')
+      .select(PUBLIC_REVIEW_COLUMNS)
       .eq('approved', true)
       .order('created_at', { ascending: false })
       .limit(20);

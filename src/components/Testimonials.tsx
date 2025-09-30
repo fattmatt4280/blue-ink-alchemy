@@ -6,10 +6,11 @@ import { useSiteContent } from '@/hooks/useSiteContent';
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import ReviewForm from './ReviewForm';
+import { PublicCustomerReview, PUBLIC_REVIEW_COLUMNS } from '@/types/reviews';
 const Testimonials = () => {
   const { content, loading } = useSiteContent();
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [customerReviews, setCustomerReviews] = useState([]);
+  const [customerReviews, setCustomerReviews] = useState<PublicCustomerReview[]>([]);
 
   useEffect(() => {
     fetchCustomerReviews();
@@ -39,7 +40,7 @@ const Testimonials = () => {
   const fetchCustomerReviews = async () => {
     const { data, error } = await supabase
       .from('customer_reviews')
-      .select('id, name, content, rating, created_at')
+      .select(PUBLIC_REVIEW_COLUMNS)
       .eq('approved', true)
       .order('created_at', { ascending: false })
       .limit(4);

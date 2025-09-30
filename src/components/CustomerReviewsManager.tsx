@@ -6,20 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Check, X, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { CustomerReviewForAdmin, ADMIN_REVIEW_COLUMNS } from '@/types/reviews';
 
-interface CustomerReview {
-  id: string;
-  name: string;
-  email: string;
-  rating: number;
-  title: string | null;
-  content: string;
-  approved: boolean;
-  created_at: string;
-}
+// SECURITY: This component is for admin use only - it accesses customer email addresses
 
 const CustomerReviewsManager = () => {
-  const [reviews, setReviews] = useState<CustomerReview[]>([]);
+  const [reviews, setReviews] = useState<CustomerReviewForAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -28,9 +20,10 @@ const CustomerReviewsManager = () => {
   }, []);
 
   const fetchReviews = async () => {
+    // SECURITY: Admin-only access to all customer review data including emails
     const { data, error } = await supabase
       .from('customer_reviews')
-      .select('*')
+      .select(ADMIN_REVIEW_COLUMNS)
       .order('created_at', { ascending: false });
 
     if (error) {
