@@ -44,7 +44,7 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our all-natural tattoo aftercare products. Click a question below or ask me anything! When you're done, I'll be living down in the tab below.",
+      text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our all-natural tattoo aftercare products. Click a question below or ask me anything! When you're done, I'll be living in the chat tab to the right.",
       isUser: false,
       timestamp: new Date(),
       isTyping: true
