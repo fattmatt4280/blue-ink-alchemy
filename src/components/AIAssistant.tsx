@@ -214,9 +214,20 @@ const AIAssistant = () => {
           isVisible={showWelcomePopup}
           onClose={handleWelcomePopupClose}
         />
+        {/* Floating tab on the right edge */}
+        <div 
+          onClick={() => setIsOpen(true)}
+          className="fixed top-1/2 right-0 -translate-y-1/2 z-50 bg-blue-600 hover:bg-blue-700 text-white px-3 py-6 rounded-l-lg cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 hover:pr-4 group"
+        >
+          <div className="flex flex-col items-center gap-1">
+            <MessageCircle className="w-5 h-5" />
+            <span className="text-xs font-medium writing-mode-vertical-rl text-orientation-mixed">CHAT</span>
+          </div>
+        </div>
+        {/* Original floating button */}
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 neon-breathing-chat"
+          className="fixed bottom-6 right-6 z-40 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 neon-breathing-chat"
         >
           <MessageCircle className="w-6 h-6" />
         </Button>
