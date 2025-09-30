@@ -9,6 +9,7 @@ import { generateAIResponse } from '@/utils/aiResponseGenerator';
 import PredefinedQuestions from './PredefinedQuestions';
 import ChatMessages from './ChatMessages';
 import TypingIndicator from './TypingIndicator';
+import WelcomeConciergePopup from './WelcomeConciergePopup';
 
 interface Message {
   id: string;
@@ -34,6 +35,11 @@ const AIAssistant = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showQuestions, setShowQuestions] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [welcomePopupShown, setWelcomePopupShown] = useState(() => {
+    // Check if welcome popup has been shown in this browser session
+    return sessionStorage.getItem('welcome-popup-shown') === 'true';
+  });
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -65,9 +71,35 @@ const AIAssistant = () => {
     fetchProducts();
   }, []);
 
-  // Auto-open after 3 seconds
+  // Show welcome popup and then auto-open chat
   useEffect(() => {
-    if (!hasShown) {
+    if (!hasShown && !welcomePopupShown) {
+      // Show welcome popup first
+      const welcomeTimer = setTimeout(() => {
+        setShowWelcomePopup(true);
+        sessionStorage.setItem('welcome-popup-shown', 'true');
+        setWelcomePopupShown(true);
+        
+        // Auto-close welcome popup after 4 seconds
+        const closeTimer = setTimeout(() => {
+          setShowWelcomePopup(false);
+        }, 4000);
+
+        return () => clearTimeout(closeTimer);
+      }, 2000);
+
+      // Auto-open chat after welcome popup sequence
+      const chatTimer = setTimeout(() => {
+        setIsOpen(true);
+        setHasShown(true);
+      }, 8000); // 2s delay + 4s popup display + 2s buffer
+
+      return () => {
+        clearTimeout(welcomeTimer);
+        clearTimeout(chatTimer);
+      };
+    } else if (!hasShown && welcomePopupShown) {
+      // If welcome popup was already shown, just auto-open chat
       const timer = setTimeout(() => {
         setIsOpen(true);
         setHasShown(true);
@@ -75,7 +107,7 @@ const AIAssistant = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [hasShown]);
+  }, [hasShown, welcomePopupShown]);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -157,14 +189,24 @@ const AIAssistant = () => {
     }
   };
 
+  const handleWelcomePopupClose = () => {
+    setShowWelcomePopup(false);
+  };
+
   if (!isOpen) {
     return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 neon-breathing-chat"
-      >
-        <MessageCircle className="w-6 h-6" />
-      </Button>
+      <>
+        <WelcomeConciergePopup 
+          isVisible={showWelcomePopup}
+          onClose={handleWelcomePopupClose}
+        />
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-50 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 neon-breathing-chat"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </Button>
+      </>
     );
   }
 
