@@ -26,7 +26,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ messages, onGreetingComplet
             <TypeWriterMessage
               key={message.id}
               text={message.text}
-              speed={60}
+              speed={35}
               isUser={message.isUser}
               onComplete={onGreetingComplete}
             />
