@@ -16,6 +16,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  isTyping?: boolean;
 }
 
 interface Product {
@@ -45,9 +46,11 @@ const AIAssistant = () => {
       id: '1',
       text: "Hi! I'm your Blue Dream Budder assistant. I can help you with questions about our all-natural tattoo aftercare products. Click a question below or ask me anything! When you're done, I'll be living down in the tab below.",
       isUser: false,
-      timestamp: new Date()
+      timestamp: new Date(),
+      isTyping: true
     }
   ]);
+  const [greetingTyped, setGreetingTyped] = useState(false);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -247,9 +250,18 @@ const AIAssistant = () => {
           <div className={`overflow-y-auto p-4 space-y-4 transition-all duration-300 ${
             isExpanded ? 'h-80' : 'h-48'
           }`}>
-            <ChatMessages messages={messages} />
+            <ChatMessages 
+              messages={messages} 
+              onGreetingComplete={() => {
+                setGreetingTyped(true);
+                // Update the greeting message to remove typing flag
+                setMessages(prev => prev.map((msg, idx) => 
+                  idx === 0 ? { ...msg, isTyping: false } : msg
+                ));
+              }}
+            />
             
-            {showQuestions && (
+            {showQuestions && greetingTyped && (
               <PredefinedQuestions onQuestionClick={handleQuestionClick} />
             )}
             
