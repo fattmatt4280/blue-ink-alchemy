@@ -20,6 +20,9 @@ import { PushNotificationManager } from '@/components/PushNotificationManager';
 import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { HealingAssessmentReviewer } from '@/components/HealingAssessmentReviewer';
+import { ExpertKnowledgeEditor } from '@/components/ExpertKnowledgeEditor';
+import { AITrainingAnalytics } from '@/components/AITrainingAnalytics';
 
 interface SiteContent {
   id: string;
@@ -139,7 +142,7 @@ const AdminDashboard = () => {
         <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
@@ -155,6 +158,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="blog" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Blog</span>
               <span className="sm:hidden">Blog</span>
+            </TabsTrigger>
+            <TabsTrigger value="ai-training" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">AI Training</span>
+              <span className="sm:hidden">AI</span>
             </TabsTrigger>
           </TabsList>
 
@@ -225,6 +232,12 @@ const AdminDashboard = () => {
 
           <TabsContent value="blog" className="space-y-6">
             <BlogManager />
+          </TabsContent>
+
+          <TabsContent value="ai-training" className="space-y-6">
+            <AITrainingAnalytics />
+            <HealingAssessmentReviewer />
+            <ExpertKnowledgeEditor />
           </TabsContent>
         </Tabs>
       </div>

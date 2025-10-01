@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_assessment_ratings: {
+        Row: {
+          created_at: string | null
+          expert_user_id: string | null
+          healing_progress_id: string | null
+          healing_stage_accuracy: number | null
+          id: string
+          notes: string | null
+          overall_accuracy: number | null
+          progress_score_accuracy: number | null
+          recommendations_accuracy: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          expert_user_id?: string | null
+          healing_progress_id?: string | null
+          healing_stage_accuracy?: number | null
+          id?: string
+          notes?: string | null
+          overall_accuracy?: number | null
+          progress_score_accuracy?: number | null
+          recommendations_accuracy?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          expert_user_id?: string | null
+          healing_progress_id?: string | null
+          healing_stage_accuracy?: number | null
+          id?: string
+          notes?: string | null
+          overall_accuracy?: number | null
+          progress_score_accuracy?: number | null
+          recommendations_accuracy?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_assessment_ratings_healing_progress_id_fkey"
+            columns: ["healing_progress_id"]
+            isOneToOne: false
+            referencedRelation: "healing_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -332,6 +376,116 @@ export type Database = {
           rating?: number
           title?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      expert_assessments: {
+        Row: {
+          common_mistakes_corrected: string | null
+          created_at: string | null
+          expert_notes: string | null
+          expert_user_id: string | null
+          healing_progress_id: string | null
+          healing_stage: string
+          id: string
+          key_indicators: string[] | null
+          product_recommendations: string[] | null
+          progress_score: number | null
+          recommendations: string[]
+          risk_assessment: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          common_mistakes_corrected?: string | null
+          created_at?: string | null
+          expert_notes?: string | null
+          expert_user_id?: string | null
+          healing_progress_id?: string | null
+          healing_stage: string
+          id?: string
+          key_indicators?: string[] | null
+          product_recommendations?: string[] | null
+          progress_score?: number | null
+          recommendations?: string[]
+          risk_assessment?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          common_mistakes_corrected?: string | null
+          created_at?: string | null
+          expert_notes?: string | null
+          expert_user_id?: string | null
+          healing_progress_id?: string | null
+          healing_stage?: string
+          id?: string
+          key_indicators?: string[] | null
+          product_recommendations?: string[] | null
+          progress_score?: number | null
+          recommendations?: string[]
+          risk_assessment?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_assessments_healing_progress_id_fkey"
+            columns: ["healing_progress_id"]
+            isOneToOne: true
+            referencedRelation: "healing_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expert_knowledge_base: {
+        Row: {
+          common_causes: string[] | null
+          condition_description: string
+          condition_name: string
+          created_at: string | null
+          created_by: string | null
+          healing_stage: string
+          id: string
+          last_used: string | null
+          product_recommendations: string[] | null
+          recommended_actions: string[]
+          severity_level: string | null
+          timeline_expectations: string | null
+          times_referenced: number | null
+          updated_at: string | null
+          visual_indicators: string[]
+        }
+        Insert: {
+          common_causes?: string[] | null
+          condition_description: string
+          condition_name: string
+          created_at?: string | null
+          created_by?: string | null
+          healing_stage: string
+          id?: string
+          last_used?: string | null
+          product_recommendations?: string[] | null
+          recommended_actions?: string[]
+          severity_level?: string | null
+          timeline_expectations?: string | null
+          times_referenced?: number | null
+          updated_at?: string | null
+          visual_indicators?: string[]
+        }
+        Update: {
+          common_causes?: string[] | null
+          condition_description?: string
+          condition_name?: string
+          created_at?: string | null
+          created_by?: string | null
+          healing_stage?: string
+          id?: string
+          last_used?: string | null
+          product_recommendations?: string[] | null
+          recommended_actions?: string[]
+          severity_level?: string | null
+          timeline_expectations?: string | null
+          times_referenced?: number | null
+          updated_at?: string | null
+          visual_indicators?: string[]
         }
         Relationships: []
       }

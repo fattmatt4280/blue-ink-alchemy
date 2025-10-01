@@ -1,10 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Initialize Supabase client to access expert knowledge
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,40 +19,101 @@ serve(async (req) => {
   try {
     const { imageUrl, tattooAge, previousAnalyses } = await req.json();
     
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
+    console.log('Analyzing healing progress:', { imageUrl, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0 });
+    
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Construct detailed prompt for healing analysis
-    const systemPrompt = `You are an expert tattoo aftercare specialist with extensive knowledge of tattoo healing processes. Analyze tattoo healing progress from photos and provide detailed, accurate assessments.
+    // Fetch expert knowledge from database to enhance AI analysis
+    const { data: expertKnowledge } = await supabase
+      .from('expert_knowledge_base')
+      .select('*')
+      .order('times_referenced', { ascending: false })
+      .limit(10);
 
-Your analysis should include:
-1. Healing Stage: Identify if the tattoo is in Fresh (0-3 days), Peeling (4-14 days), Settling (15-30 days), or Healed (30+ days) stage
-2. Visual Assessment: Color, redness, swelling, scabbing, peeling, clarity
-3. Progress Score: Rate 1-10 (1=concerning, 10=excellent healing)
-4. Recommendations: Specific aftercare advice based on current stage
-5. Risk Factors: Identify any signs of infection, poor healing, or concerns
-6. Product Suggestions: Recommend appropriate Blue Dream Budder products for this healing stage
+    // Fetch similar expert assessments for context
+    const { data: expertAssessments } = await supabase
+      .from('expert_assessments')
+      .select('*')
+      .limit(5);
 
-Be thorough but reassuring. If you see warning signs, clearly state them but avoid causing panic.`;
+    // Build expert context for AI prompt
+    let expertContext = '';
+    if (expertKnowledge && expertKnowledge.length > 0) {
+      expertContext = '\n\nEXPERT KNOWLEDGE FROM 25-YEAR TATTOO ARTIST:\n';
+      expertKnowledge.forEach((entry: any) => {
+        expertContext += `\n- ${entry.condition_name} (${entry.severity_level}):\n`;
+        expertContext += `  Description: ${entry.condition_description}\n`;
+        if (entry.visual_indicators?.length) {
+          expertContext += `  Visual Signs: ${entry.visual_indicators.join(', ')}\n`;
+        }
+        if (entry.recommended_actions?.length) {
+          expertContext += `  Expert Recommendations: ${entry.recommended_actions.join('; ')}\n`;
+        }
+        if (entry.product_recommendations?.length) {
+          expertContext += `  Product Recommendations: ${entry.product_recommendations.join(', ')}\n`;
+        }
+      });
+    }
 
-    const userPrompt = `Analyze this tattoo healing progress photo. ${tattooAge ? `The tattoo is ${tattooAge} days old.` : ''} ${previousAnalyses?.length > 0 ? `Previous analysis showed ${previousAnalyses[0]?.healing_stage} stage.` : ''}
+    // Add expert assessment patterns if available
+    if (expertAssessments && expertAssessments.length > 0) {
+      expertContext += '\n\nEXPERT ASSESSMENT PATTERNS:\n';
+      expertAssessments.forEach((assessment: any) => {
+        if (assessment.expert_notes) {
+          expertContext += `- ${assessment.expert_notes}\n`;
+        }
+        if (assessment.common_mistakes_corrected) {
+          expertContext += `  Common AI mistakes to avoid: ${assessment.common_mistakes_corrected}\n`;
+        }
+      });
+    }
 
-Provide a comprehensive assessment in JSON format with these fields:
-- healingStage: string (Fresh/Peeling/Settling/Healed)
-- progressScore: number (1-10)
-- visualAssessment: { color, redness, swelling, texture, overall }
-- recommendations: string[] (array of specific advice)
-- riskFactors: string[] (any concerns or warning signs)
-- productRecommendations: string[] (Blue Dream Budder products that would help)
-- summary: string (2-3 sentence overall assessment)`;
+    // Build previous analyses context
+    let previousAnalysesContext = '';
+    if (previousAnalyses && previousAnalyses.length > 0) {
+      previousAnalysesContext = '\nPrevious analyses for this tattoo:\n';
+      previousAnalyses.forEach((prev: any, idx: number) => {
+        previousAnalysesContext += `Analysis ${idx + 1}: Stage=${prev.healingStage}, Score=${prev.progressScore}\n`;
+      });
+    }
+
+    const systemPrompt = `You are a professional tattoo aftercare specialist with access to expert knowledge from a 25-year tattoo artist.
+    
+Analyze the provided tattoo image and determine:
+1. Current healing stage (Fresh, Early Healing, Peeling Phase, Late Healing, or Settled)
+2. Progress score (0-100, where 100 is fully healed)
+3. Specific recommendations for care
+4. Any concerns or issues visible
+
+${previousAnalysesContext}
+${expertContext}
+
+IMPORTANT: Use the expert knowledge provided above to inform your assessment. Pay special attention to:
+- Visual indicators that experts have documented
+- Common conditions and their severity levels
+- Expert-recommended products and actions
+- Patterns from previous expert corrections
+
+Respond with valid JSON only, no markdown formatting:
+{
+  "healingStage": "stage name",
+  "progressScore": number,
+  "recommendations": ["rec1", "rec2"],
+  "concerns": "any concerns or 'None'"
+}`;
+
+    const userPrompt = `Analyze this tattoo healing progress photo. ${tattooAge ? `The tattoo is ${tattooAge} days old.` : ''}
+
+Provide your assessment following the expert guidance provided in the system prompt.`;
 
     // Call Lovable AI for analysis
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -62,7 +128,6 @@ Provide a comprehensive assessment in JSON format with these fields:
             ]
           }
         ],
-        temperature: 0.7,
       }),
     });
 
@@ -74,6 +139,8 @@ Provide a comprehensive assessment in JSON format with these fields:
 
     const aiData = await response.json();
     const analysisText = aiData.choices[0].message.content;
+    
+    console.log('Raw AI response:', analysisText);
     
     // Parse JSON response from AI
     let analysis;
@@ -88,14 +155,9 @@ Provide a comprehensive assessment in JSON format with these fields:
       // Fallback response if parsing fails
       analysis = {
         healingStage: 'Unknown',
-        progressScore: 5,
-        visualAssessment: {
-          overall: 'Unable to analyze image automatically. Please consult with a professional.'
-        },
+        progressScore: 50,
         recommendations: ['Upload a clearer photo', 'Consult with your tattoo artist'],
-        riskFactors: [],
-        productRecommendations: ['Blue Dream Budder Original Formula'],
-        summary: 'Analysis unavailable. Please try again with a clearer photo.'
+        concerns: 'Unable to analyze image automatically. Please consult with a professional.'
       };
     }
 
