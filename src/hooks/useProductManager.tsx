@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logAdminAction } from '@/utils/adminLogger';
 import { ProductFormData } from '@/components/ProductForm';
 
 interface Product {
@@ -106,16 +106,32 @@ export const useProductManager = () => {
 
         if (error) throw error;
         
+        await logAdminAction({
+          action: 'update',
+          resourceType: 'product',
+          resourceId: editingProduct.id,
+          details: { name: productData.name }
+        });
+        
         toast({
           title: "Product updated!",
           description: "Product has been updated successfully.",
         });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
-          .insert([productData]);
+          .insert([productData])
+          .select()
+          .single();
 
         if (error) throw error;
+        
+        await logAdminAction({
+          action: 'create',
+          resourceType: 'product',
+          resourceId: data?.id,
+          details: { name: productData.name }
+        });
         
         toast({
           title: "Product created!",
@@ -141,12 +157,21 @@ export const useProductManager = () => {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
     try {
+      const product = products.find(p => p.id === id);
+      
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      
+      await logAdminAction({
+        action: 'delete',
+        resourceType: 'product',
+        resourceId: id,
+        details: { name: product?.name }
+      });
       
       toast({
         title: "Product deleted!",

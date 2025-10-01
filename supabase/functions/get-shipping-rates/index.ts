@@ -11,6 +11,37 @@ const logStep = (step: string, details?: any) => {
   console.log(`[GET-SHIPPING-RATES] ${step}${detailsStr}`);
 };
 
+// Input validation schema
+const validateInput = (data: any) => {
+  const errors: string[] = [];
+  
+  if (!data.cartItems || !Array.isArray(data.cartItems) || data.cartItems.length === 0) {
+    errors.push('cartItems must be a non-empty array');
+  }
+  
+  if (!data.toAddress || typeof data.toAddress !== 'object') {
+    errors.push('toAddress is required');
+  } else {
+    if (!data.toAddress.name || data.toAddress.name.length > 200) {
+      errors.push('toAddress.name is required and must be less than 200 characters');
+    }
+    if (!data.toAddress.street1 || data.toAddress.street1.length > 200) {
+      errors.push('toAddress.street1 is required and must be less than 200 characters');
+    }
+    if (!data.toAddress.city || data.toAddress.city.length > 100) {
+      errors.push('toAddress.city is required and must be less than 100 characters');
+    }
+    if (!data.toAddress.state || data.toAddress.state.length > 50) {
+      errors.push('toAddress.state is required and must be less than 50 characters');
+    }
+    if (!data.toAddress.zip || data.toAddress.zip.length > 20) {
+      errors.push('toAddress.zip is required and must be less than 20 characters');
+    }
+  }
+  
+  return errors;
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -30,8 +61,23 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const { cartItems, toAddress, fromAddress, orderId } = await req.json();
-    logStep("Request data parsed", { cartItems: cartItems?.length, orderId });
+    const requestData = await req.json();
+    
+    // Validate input
+    const validationErrors = validateInput(requestData);
+    if (validationErrors.length > 0) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Validation failed',
+        details: validationErrors
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+    
+    const { cartItems, toAddress, fromAddress, orderId } = requestData;
+    logStep("Request data validated", { cartItems: cartItems?.length, orderId });
 
     // Default from address (your business address) - using a real address for testing
     const defaultFromAddress = fromAddress || {

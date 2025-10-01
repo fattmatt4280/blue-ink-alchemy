@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import { checkRateLimit, getRateLimitKey } from '@/utils/rateLimiter';
 
 const reviewSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -34,6 +34,20 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting check
+    const rateLimitKey = getRateLimitKey(formData.email, 'review_submission');
+    const rateLimitCheck = checkRateLimit(rateLimitKey, { maxAttempts: 3, windowMs: 3600000 });
+    
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too many attempts",
+        description: "You've submitted too many reviews. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSubmitting(true);
 
     try {

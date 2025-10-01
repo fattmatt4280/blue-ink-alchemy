@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from 'zod';
+import { checkRateLimit, getRateLimitKey } from '@/utils/rateLimiter';
 
 const emailSchema = z.object({
   email: z.string().trim().email('Invalid email address').max(255, 'Email must be less than 255 characters')
@@ -23,6 +23,20 @@ const NewsletterForm = ({ onSubscribed, onDebugMessage, onShowDebugDialog }: New
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting check
+    const rateLimitKey = getRateLimitKey(email, 'newsletter_signup');
+    const rateLimitCheck = checkRateLimit(rateLimitKey, { maxAttempts: 3, windowMs: 3600000 });
+    
+    if (!rateLimitCheck.allowed) {
+      toast({
+        title: "Too many attempts",
+        description: "You've tried to subscribe too many times. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     onShowDebugDialog(); // Show the debug dialog immediately
 
