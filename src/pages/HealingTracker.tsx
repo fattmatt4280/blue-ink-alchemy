@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -135,23 +135,33 @@ const HealingTracker = () => {
     <div className="min-h-screen futuristic-bg">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/')}
-            className="neon-border"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold gradient-text mb-2">
-              Tattoo Healing Tracker
-            </h1>
-            <p className="text-muted-foreground">
-              AI-powered healing progress assessment for your tattoo aftercare journey
-            </p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="neon-border"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-4xl font-bold gradient-text mb-2">
+                Tattoo Healing Tracker
+              </h1>
+              <p className="text-muted-foreground">
+                AI-powered healing progress assessment for your tattoo aftercare journey
+              </p>
+            </div>
           </div>
+          {user && (
+            <Link to="/healing-history">
+              <Button variant="outline" className="neon-border">
+                <History className="mr-2 h-4 w-4" />
+                View History
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Info Alert */}
