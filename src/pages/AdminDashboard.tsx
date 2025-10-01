@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HealingAssessmentReviewer } from '@/components/HealingAssessmentReviewer';
 import { ExpertKnowledgeEditor } from '@/components/ExpertKnowledgeEditor';
 import { AITrainingAnalytics } from '@/components/AITrainingAnalytics';
+import { AIInstructionsEditor } from '@/components/AIInstructionsEditor';
 
 interface SiteContent {
   id: string;
@@ -234,11 +235,12 @@ const AdminDashboard = () => {
             <BlogManager />
           </TabsContent>
 
-          <TabsContent value="ai-training" className="space-y-6">
-            <AITrainingAnalytics />
-            <HealingAssessmentReviewer />
-            <ExpertKnowledgeEditor />
-          </TabsContent>
+              <TabsContent value="ai-training" className="space-y-6">
+                <AITrainingAnalytics />
+                <AIInstructionsEditor />
+                <HealingAssessmentReviewer />
+                <ExpertKnowledgeEditor />
+              </TabsContent>
         </Tabs>
       </div>
     </div>

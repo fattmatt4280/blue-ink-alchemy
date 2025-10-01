@@ -26,6 +26,13 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Fetch custom AI instructions
+    const { data: customInstructions } = await supabase
+      .from('ai_custom_instructions')
+      .select('*')
+      .eq('active', true)
+      .order('priority', { ascending: false });
+
     // Fetch expert knowledge from database to enhance AI analysis
     const { data: expertKnowledge } = await supabase
       .from('expert_knowledge_base')
@@ -80,6 +87,16 @@ serve(async (req) => {
       });
     }
 
+    // Build custom instructions context
+    let customInstructionsContext = '';
+    if (customInstructions && customInstructions.length > 0) {
+      customInstructionsContext = '\n\nCUSTOM AI INSTRUCTIONS:\n';
+      customInstructions.forEach((instruction: any) => {
+        customInstructionsContext += `\n[${instruction.category.toUpperCase()}] ${instruction.title}:\n`;
+        customInstructionsContext += `${instruction.instruction_text}\n`;
+      });
+    }
+
     const systemPrompt = `You are a professional tattoo aftercare specialist with access to expert knowledge from a 25-year tattoo artist.
     
 Analyze the provided tattoo image and determine:
@@ -89,6 +106,7 @@ Analyze the provided tattoo image and determine:
 4. Any concerns or issues visible
 
 ${previousAnalysesContext}
+${customInstructionsContext}
 ${expertContext}
 
 IMPORTANT: Use the expert knowledge provided above to inform your assessment. Pay special attention to:
@@ -96,6 +114,7 @@ IMPORTANT: Use the expert knowledge provided above to inform your assessment. Pa
 - Common conditions and their severity levels
 - Expert-recommended products and actions
 - Patterns from previous expert corrections
+- Follow ALL custom instructions provided above
 
 Respond with valid JSON only, no markdown formatting:
 {

@@ -58,6 +58,42 @@ export type Database = {
           },
         ]
       }
+      ai_custom_instructions: {
+        Row: {
+          active: boolean | null
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          instruction_text: string
+          priority: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          instruction_text: string
+          priority?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          instruction_text?: string
+          priority?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
