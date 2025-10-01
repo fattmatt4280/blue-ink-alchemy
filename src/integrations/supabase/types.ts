@@ -1100,7 +1100,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      approved_customer_reviews: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string | null
+          name: string | null
+          rating: number | null
+          title: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          rating?: number | null
+          title?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          rating?: number | null
+          title?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       increment_daily_metric: {

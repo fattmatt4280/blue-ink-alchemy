@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { PublicCustomerReview, PUBLIC_REVIEW_COLUMNS } from '@/types/reviews';
+import { PublicCustomerReview } from '@/types/reviews';
 
 const PublicReviews = () => {
   const [reviews, setReviews] = useState<PublicCustomerReview[]>([]);
@@ -13,23 +13,11 @@ const PublicReviews = () => {
 
     // Set up real-time subscription for approved reviews
     const channel = supabase
-      .channel('customer-reviews-changes')
+      .channel('approved-reviews-changes')
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'customer_reviews',
-          filter: 'approved=eq.true'
-        },
-        () => {
-          fetchPublicReviews();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'customer_reviews',
           filter: 'approved=eq.true'
@@ -46,12 +34,10 @@ const PublicReviews = () => {
   }, []);
 
   const fetchPublicReviews = async () => {
-    // Only select public-safe fields, email is excluded for privacy
+    // Query from secure view that excludes email addresses
     const { data, error } = await supabase
-      .from('customer_reviews')
-      .select(PUBLIC_REVIEW_COLUMNS)
-      .eq('approved', true)
-      .order('created_at', { ascending: false })
+      .from('approved_customer_reviews')
+      .select('*')
       .limit(20);
 
     if (!error && data) {
