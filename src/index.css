@@ -331,27 +331,6 @@ All colors MUST be HSL.
   transition: all 0.3s ease;
 }
 
-.neon-breathing-chat {
-  position: relative;
-  border: 2px solid rgba(239, 68, 68, 0.4);
-  animation: neonBreathing 4s ease-in-out infinite;
-  transition: all 0.3s ease;
-}
-
-.cyber-chat-header {
-  background: linear-gradient(
-    90deg,
-    #00d4ff 0%,
-    #0099ff 20%,
-    #0066cc 50%,
-    #0099ff 80%,
-    #00d4ff 100%
-  );
-  background-size: 200% 100%;
-  animation: cyberPulse 2s ease-in-out infinite;
-  color: #000;
-  text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
-}
 
 /* Animated Background Orbs */
 .neon-orb {

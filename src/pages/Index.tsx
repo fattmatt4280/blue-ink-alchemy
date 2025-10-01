@@ -6,7 +6,6 @@ import Ingredients from "@/components/Ingredients";
 import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
-import AIAssistant from "@/components/AIAssistant";
 import AnimatedBackground from "@/components/AnimatedBackground";
 
 const Index = () => {
@@ -32,7 +31,6 @@ const Index = () => {
         <Newsletter />
       </div>
       <Footer />
-      <AIAssistant />
     </div>
   );
 };
