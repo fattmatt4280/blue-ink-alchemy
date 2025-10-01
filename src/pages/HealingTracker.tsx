@@ -16,16 +16,15 @@ interface AnalysisResult {
   healingStage: string;
   progressScore: number;
   visualAssessment: {
-    color?: string;
-    redness?: string;
-    swelling?: string;
-    texture?: string;
-    overall?: string;
+    colorAssessment?: string;
+    textureAssessment?: string;
+    overallCondition?: string;
   };
   recommendations: string[];
   riskFactors?: string[];
   productRecommendations?: string[];
   summary: string;
+  tattooAgeDays?: number | null;
 }
 
 const HealingTracker = () => {
@@ -126,8 +125,9 @@ const HealingTracker = () => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return 'text-green-500';
-    if (score >= 5) return 'text-yellow-500';
+    if (score >= 80) return 'text-green-500';
+    if (score >= 60) return 'text-yellow-500';
+    if (score >= 40) return 'text-orange-500';
     return 'text-red-500';
   };
 
@@ -297,9 +297,14 @@ const HealingTracker = () => {
                   <CardContent className="space-y-6">
                     <div className="text-center">
                       <div className={`text-6xl font-bold ${getScoreColor(analysis.progressScore)}`}>
-                        {analysis.progressScore}/10
+                        {analysis.progressScore}/100
                       </div>
                       <p className="text-muted-foreground mt-2">Overall Progress Score</p>
+                      {tattooAge && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Tattoo Age: {tattooAge} days
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -309,14 +314,34 @@ const HealingTracker = () => {
                           {analysis.healingStage}
                         </Badge>
                       </div>
-                      <Progress value={analysis.progressScore * 10} className="h-2" />
+                      <Progress value={analysis.progressScore} className="h-2" />
                     </div>
 
-                    <div>
-                      <p className="text-sm leading-relaxed">
-                        {analysis.summary}
-                      </p>
-                    </div>
+                    {analysis.summary && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-2">Analysis Summary</h3>
+                        <p className="text-sm leading-relaxed">
+                          {analysis.summary}
+                        </p>
+                      </div>
+                    )}
+
+                    {analysis.visualAssessment && Object.keys(analysis.visualAssessment).length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-2">Visual Assessment</h3>
+                        <div className="space-y-1 text-sm">
+                          {analysis.visualAssessment.colorAssessment && (
+                            <p><span className="font-medium">Color:</span> {analysis.visualAssessment.colorAssessment}</p>
+                          )}
+                          {analysis.visualAssessment.textureAssessment && (
+                            <p><span className="font-medium">Texture:</span> {analysis.visualAssessment.textureAssessment}</p>
+                          )}
+                          {analysis.visualAssessment.overallCondition && (
+                            <p><span className="font-medium">Overall:</span> {analysis.visualAssessment.overallCondition}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 

@@ -191,6 +191,27 @@ const HealingHistory = () => {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.summary}</p>
+                      {selectedEntry.analysis_result?.tattooAgeDays && (
+                        <Badge variant="outline" className="mt-3">
+                          Tattoo Age: {selectedEntry.analysis_result.tattooAgeDays} days
+                        </Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {!selectedEntry.analysis_result?.summary && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Analysis Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm leading-relaxed">
+                        Assessed stage: {selectedEntry.healing_stage}. Progress score: {selectedEntry.progress_score}/100. 
+                        {selectedEntry.analysis_result?.concerns && selectedEntry.analysis_result.concerns !== 'None' 
+                          ? ` ${selectedEntry.analysis_result.concerns}` 
+                          : ' No major concerns observed.'}
+                      </p>
                     </CardContent>
                   </Card>
                 )}

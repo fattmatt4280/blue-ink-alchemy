@@ -66,8 +66,14 @@ export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) 
                 {entry.analysis_result.summary}
               </p>
             )}
-            <div className="text-xs text-muted-foreground">
-              {entry.recommendations.length} recommendation{entry.recommendations.length !== 1 ? 's' : ''}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>{entry.recommendations.length} recommendation{entry.recommendations.length !== 1 ? 's' : ''}</span>
+              {entry.analysis_result?.tattooAgeDays && (
+                <>
+                  <span>•</span>
+                  <span>{entry.analysis_result.tattooAgeDays} days old</span>
+                </>
+              )}
             </div>
           </div>
         </div>

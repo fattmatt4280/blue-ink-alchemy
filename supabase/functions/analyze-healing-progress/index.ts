@@ -136,8 +136,17 @@ ANALYSIS PRIORITY:
 Respond with valid JSON only, no markdown formatting:
 {
   "healingStage": "stage name",
-  "progressScore": number,
+  "progressScore": number (0-100),
+  "summary": "Brief summary mentioning tattoo age and overall assessment",
+  "tattooAgeDays": number or null,
+  "visualAssessment": {
+    "colorAssessment": "description",
+    "textureAssessment": "description",
+    "overallCondition": "description"
+  },
   "recommendations": ["rec1", "rec2"],
+  "riskFactors": ["any concerns or empty array"],
+  "productRecommendations": ["product suggestions based on healing stage"],
   "concerns": "any concerns or 'None'"
 }`;
 
@@ -186,13 +195,48 @@ Provide your assessment following the expert guidance provided in the system pro
                         analysisText.match(/```\n([\s\S]*?)\n```/);
       const jsonText = jsonMatch ? jsonMatch[1] : analysisText;
       analysis = JSON.parse(jsonText);
+      
+      // Normalize keys and ensure required fields
+      analysis.healingStage = analysis.healingStage || analysis.healing_stage || 'Unknown';
+      analysis.progressScore = analysis.progressScore || analysis.progress_score || 50;
+      analysis.recommendations = analysis.recommendations || [];
+      analysis.riskFactors = analysis.riskFactors || analysis.risk_factors || [];
+      analysis.productRecommendations = analysis.productRecommendations || analysis.product_recommendations || [];
+      analysis.tattooAgeDays = tattooAge || analysis.tattooAgeDays || analysis.tattoo_age_days || null;
+      
+      // Normalize visualAssessment
+      if (analysis.visual_assessment) {
+        analysis.visualAssessment = {
+          colorAssessment: analysis.visual_assessment.color_assessment || analysis.visual_assessment.colorAssessment,
+          textureAssessment: analysis.visual_assessment.texture_assessment || analysis.visual_assessment.textureAssessment,
+          overallCondition: analysis.visual_assessment.overall_condition || analysis.visual_assessment.overallCondition
+        };
+      }
+      
+      // Ensure progressScore is 0-100 scale
+      if (analysis.progressScore > 0 && analysis.progressScore <= 10) {
+        analysis.progressScore = analysis.progressScore * 10;
+      }
+      
+      // Generate summary if missing
+      if (!analysis.summary) {
+        const ageText = analysis.tattooAgeDays ? `Tattoo age: ${analysis.tattooAgeDays} days. ` : '';
+        const concernText = analysis.concerns && analysis.concerns !== 'None' ? analysis.concerns : 'No major concerns observed.';
+        analysis.summary = `${ageText}Assessed stage: ${analysis.healingStage}. Progress score: ${analysis.progressScore}/100. ${concernText}`;
+      }
+      
     } catch (e) {
       console.error('Failed to parse AI response:', analysisText);
       // Fallback response if parsing fails
       analysis = {
         healingStage: 'Unknown',
         progressScore: 50,
+        summary: 'Unable to analyze image automatically. Please consult with a professional.',
+        tattooAgeDays: tattooAge || null,
+        visualAssessment: {},
         recommendations: ['Upload a clearer photo', 'Consult with your tattoo artist'],
+        riskFactors: [],
+        productRecommendations: [],
         concerns: 'Unable to analyze image automatically. Please consult with a professional.'
       };
     }
