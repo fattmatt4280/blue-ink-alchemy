@@ -8,11 +8,9 @@ import "./index.css";
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
-    </QueryClientProvider>
-  </StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
+  </QueryClientProvider>
 );
