@@ -23,8 +23,8 @@ interface AnalysisResult {
     overall?: string;
   };
   recommendations: string[];
-  riskFactors: string[];
-  productRecommendations: string[];
+  riskFactors?: string[];
+  productRecommendations?: string[];
   summary: string;
 }
 
@@ -347,29 +347,31 @@ const HealingTracker = () => {
                 )}
 
                 {/* Product Recommendations */}
-                <Card className="neon-border">
-                  <CardHeader>
-                    <CardTitle>Recommended Products</CardTitle>
-                    <CardDescription>Blue Dream Budder products for your healing stage</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {analysis.productRecommendations.map((product, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">🌿</span>
-                          <span className="text-sm">{product}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => navigate('/shop')}
-                      className="w-full mt-4"
-                      variant="outline"
-                    >
-                      Shop Products
-                    </Button>
-                  </CardContent>
-                </Card>
+                {analysis.productRecommendations && analysis.productRecommendations.length > 0 && (
+                  <Card className="neon-border">
+                    <CardHeader>
+                      <CardTitle>Recommended Products</CardTitle>
+                      <CardDescription>Blue Dream Budder products for your healing stage</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {analysis.productRecommendations.map((product, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-primary mt-1">🌿</span>
+                            <span className="text-sm">{product}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button
+                        onClick={() => navigate('/shop')}
+                        className="w-full mt-4"
+                        variant="outline"
+                      >
+                        Shop Products
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
               </>
             ) : (
               <Card className="neon-border">
