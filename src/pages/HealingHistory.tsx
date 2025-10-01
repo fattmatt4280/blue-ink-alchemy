@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Download, TrendingUp, Calendar, Award } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Download, TrendingUp, Calendar, Award, AlertCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useHealingHistory } from "@/hooks/useHealingHistory";
 import { HealingHistoryCard } from "@/components/HealingHistoryCard";
 import { HealingProgressChart } from "@/components/HealingProgressChart";
@@ -9,9 +9,13 @@ import { HealingPhotoTimeline } from "@/components/HealingPhotoTimeline";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HealingHistory = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const { data: entries, isLoading } = useHealingHistory();
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
 
@@ -24,7 +28,39 @@ const HealingHistory = () => {
       : 0
   } : null;
 
-  if (isLoading) {
+  // Show auth check before loading state
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle>Authentication Required</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>Please sign in to view your healing history</span>
+                    <Button 
+                      onClick={() => navigate('/auth')} 
+                      size="sm"
+                      className="ml-4"
+                    >
+                      Sign In
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 py-20">
         <div className="container mx-auto px-4">
