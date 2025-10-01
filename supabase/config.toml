@@ -50,3 +50,7 @@ verify_jwt = false
 [[functions]]
 name = "send-admin-notification"
 verify_jwt = false
+
+[[functions]]
+name = "analyze-healing-progress"
+verify_jwt = false

@@ -1,6 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { useNavigate } from "react-router-dom";
+import { Activity } from "lucide-react";
 
 interface HeroContentProps {
   onShopNowClick: () => void;
@@ -9,6 +11,7 @@ interface HeroContentProps {
 
 const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
   const { content } = useSiteContent();
+  const navigate = useNavigate();
 
   return (
     <div className="container mx-auto px-6 relative z-10 pt-24">
@@ -35,7 +38,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
             Scientifically formulated tattoo aftercare trusted by artists worldwide.
           </p>
           
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-4">
             <button 
               className="bg-cyan-400 text-black font-semibold px-8 py-4 rounded-lg text-lg hover:bg-cyan-300 transition-all duration-300 shadow-lg hover:shadow-cyan-400/25"
               onClick={onShopNowClick}
@@ -47,6 +50,13 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
               onClick={onDiscountClick}
             >
               View Benefits
+            </button>
+            <button 
+              className="border-2 border-cyan-400 text-cyan-400 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-cyan-400 hover:text-black transition-all duration-300 bg-transparent flex items-center gap-2"
+              onClick={() => navigate('/healing-tracker')}
+            >
+              <Activity className="h-5 w-5" />
+              Track Healing
             </button>
           </div>
         </div>

@@ -28,7 +28,8 @@ const HeroHeader = () => {
     { id: 'faq', label: 'FAQ', type: 'scroll' },
     { id: 'newsletter', label: 'Newsletter', type: 'scroll' },
     { id: '/blog', label: 'Blog', type: 'link' },
-    { id: '/shop', label: 'Shop', type: 'link' }
+    { id: '/shop', label: 'Shop', type: 'link' },
+    { id: '/healing-tracker', label: 'Healing Tracker', type: 'link' }
   ];
 
   return (
@@ -55,6 +56,9 @@ const HeroHeader = () => {
           >
             View Benefits
           </button>
+          <Link to="/healing-tracker" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
+            Healing Tracker
+          </Link>
           {isAdmin && (
             <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
               Admin

@@ -335,6 +335,39 @@ export type Database = {
         }
         Relationships: []
       }
+      healing_progress: {
+        Row: {
+          analysis_result: Json
+          created_at: string
+          healing_stage: string
+          id: string
+          photo_url: string
+          progress_score: number | null
+          recommendations: string[]
+          user_id: string | null
+        }
+        Insert: {
+          analysis_result: Json
+          created_at?: string
+          healing_stage: string
+          id?: string
+          photo_url: string
+          progress_score?: number | null
+          recommendations?: string[]
+          user_id?: string | null
+        }
+        Update: {
+          analysis_result?: Json
+          created_at?: string
+          healing_stage?: string
+          id?: string
+          photo_url?: string
+          progress_score?: number | null
+          recommendations?: string[]
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       newsletter_signups: {
         Row: {
           active: boolean

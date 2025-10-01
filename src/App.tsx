@@ -23,6 +23,7 @@ import Contact from "./pages/Contact";
 import SizeGuide from "./pages/SizeGuide";
 import Tracking from "./pages/Tracking";
 import TattooAftercare from "./pages/TattooAftercare";
+import HealingTracker from "./pages/HealingTracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const App = () => (
                <Route path="/size-guide" element={<SizeGuide />} />
                <Route path="/tracking" element={<Tracking />} />
                <Route path="/tattoo-aftercare" element={<TattooAftercare />} />
+               <Route path="/healing-tracker" element={<HealingTracker />} />
                <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
