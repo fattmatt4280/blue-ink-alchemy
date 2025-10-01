@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from 'zod';
+
+const emailSchema = z.object({
+  email: z.string().trim().email('Invalid email address').max(255, 'Email must be less than 255 characters')
+});
 
 interface NewsletterFormProps {
   onSubscribed: () => void;
@@ -22,13 +27,16 @@ const NewsletterForm = ({ onSubscribed, onDebugMessage, onShowDebugDialog }: New
     onShowDebugDialog(); // Show the debug dialog immediately
 
     try {
-      onDebugMessage('🚀 Starting newsletter signup for: ' + email);
+      // Validate email input
+      const { email: validatedEmail } = emailSchema.parse({ email });
+      
+      onDebugMessage('🚀 Starting newsletter signup for: ' + validatedEmail);
       
       // First, save the email to the database
       onDebugMessage('💾 Attempting to save email to database...');
       const { error: dbError } = await supabase
         .from('newsletter_signups')
-        .insert([{ email }]);
+        .insert([{ email: validatedEmail }]);
 
       if (dbError) {
         if (dbError.code === '23505') { // Unique constraint violation (email already exists)
@@ -61,7 +69,7 @@ const NewsletterForm = ({ onSubscribed, onDebugMessage, onShowDebugDialog }: New
         
         // Send welcome email with discount code - using correct format for supabase.functions.invoke
         const { data: emailData, error: emailError } = await supabase.functions.invoke('send-welcome-email', {
-          body: { email },
+          body: { email: validatedEmail },
           headers: {
             'Content-Type': 'application/json',
           }
@@ -107,14 +115,23 @@ const NewsletterForm = ({ onSubscribed, onDebugMessage, onShowDebugDialog }: New
       onSubscribed();
       setEmail("");
     } catch (error) {
-      onDebugMessage('💥 Newsletter signup error: ' + JSON.stringify(error));
-      onDebugMessage('💥 Error name: ' + (error as Error)?.name);
-      onDebugMessage('💥 Error message: ' + (error as Error)?.message);
-      toast({
-        title: "Signup failed",
-        description: "Please try again later or contact support. Your discount code is WELCOME10 if you need it.",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        onDebugMessage('❌ Validation error: ' + error.errors[0].message);
+        toast({
+          title: "Invalid email",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        onDebugMessage('💥 Newsletter signup error: ' + JSON.stringify(error));
+        onDebugMessage('💥 Error name: ' + (error as Error)?.name);
+        onDebugMessage('💥 Error message: ' + (error as Error)?.message);
+        toast({
+          title: "Signup failed",
+          description: "Please try again later or contact support. Your discount code is WELCOME10 if you need it.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -127,6 +144,7 @@ const NewsletterForm = ({ onSubscribed, onDebugMessage, onShowDebugDialog }: New
         placeholder="Enter your email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        maxLength={255}
         required
         disabled={isSubmitting}
         className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/70 focus:bg-white/20"

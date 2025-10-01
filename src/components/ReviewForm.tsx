@@ -7,6 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const reviewSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  email: z.string().trim().email('Invalid email address').max(255, 'Email must be less than 255 characters'),
+  title: z.string().trim().max(200, 'Title must be less than 200 characters').optional().or(z.literal('')),
+  content: z.string().trim().min(10, 'Review must be at least 10 characters').max(2000, 'Review must be less than 2000 characters'),
+  rating: z.number().int().min(1).max(5)
+});
 
 interface ReviewFormProps {
   onClose: () => void;
@@ -28,9 +37,18 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
     setSubmitting(true);
 
     try {
+      // Validate input data
+      const validatedData = reviewSchema.parse(formData);
+
       const { error } = await supabase
         .from('customer_reviews')
-        .insert([formData]);
+        .insert([{
+          name: validatedData.name,
+          email: validatedData.email,
+          title: validatedData.title || null,
+          content: validatedData.content,
+          rating: validatedData.rating
+        }]);
 
       if (error) throw error;
 
@@ -41,11 +59,19 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
 
       onClose();
     } catch (error: any) {
-      toast({
-        title: "Error submitting review",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error submitting review",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -64,6 +90,7 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                maxLength={100}
                 required
               />
             </div>
@@ -73,6 +100,7 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                maxLength={255}
                 required
               />
             </div>
@@ -99,6 +127,7 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="Brief summary of your experience"
+              maxLength={200}
             />
           </div>
 
@@ -109,8 +138,12 @@ const ReviewForm = ({ onClose }: ReviewFormProps) => {
               onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
               placeholder="Tell us about your experience with Blue Dream Budder..."
               rows={4}
+              maxLength={2000}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              {formData.content.length}/2000 characters
+            </p>
           </div>
 
           <div className="flex gap-2 pt-4">

@@ -29,6 +29,7 @@ const EmailSignupForm = ({
           placeholder="Enter your email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          maxLength={255}
           required
           disabled={isSubmitting}
           className="w-full"
