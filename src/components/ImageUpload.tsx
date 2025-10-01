@@ -53,6 +53,17 @@ const ImageUpload = ({ onImageUploaded, currentImage, currentOpacity = 100, titl
       // Get current user for healing-photos bucket
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Safety check: prevent uploads to healing-photos if not authenticated
+      if (bucket === 'healing-photos' && !user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to upload healing photos.",
+          variant: "destructive",
+        });
+        setUploading(false);
+        return;
+      }
+      
       // For healing-photos, organize by user ID; otherwise use uploads folder
       const filePath = bucket === 'healing-photos' && user
         ? `${user.id}/${fileName}`

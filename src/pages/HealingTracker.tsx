@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "@/components/ImageUpload";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AnalysisResult {
   healingStage: string;
@@ -30,6 +31,7 @@ interface AnalysisResult {
 const HealingTracker = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading } = useAuth();
   const [uploadedImage, setUploadedImage] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -159,13 +161,29 @@ const HealingTracker = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ImageUpload
-                  onImageUploaded={handleImageUploaded}
-                  currentImage={uploadedImage}
-                  title="Tattoo Photo"
-                  description="Upload a clear photo showing the entire tattoo"
-                  bucket="healing-photos"
-                />
+                {!loading && !user ? (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="flex items-center justify-between">
+                      <span>Please sign in to upload and track your healing progress</span>
+                      <Button 
+                        onClick={() => navigate('/auth')} 
+                        size="sm"
+                        className="ml-4"
+                      >
+                        Sign In
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <ImageUpload
+                    onImageUploaded={handleImageUploaded}
+                    currentImage={uploadedImage}
+                    title="Tattoo Photo"
+                    description="Upload a clear photo showing the entire tattoo"
+                    bucket="healing-photos"
+                  />
+                )}
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
@@ -182,7 +200,7 @@ const HealingTracker = () => {
 
                 <Button
                   onClick={analyzeProgress}
-                  disabled={!uploadedImage || isAnalyzing}
+                  disabled={!uploadedImage || isAnalyzing || !user}
                   className="w-full"
                   size="lg"
                 >
