@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const faqs = [
   {
@@ -38,6 +39,32 @@ const FAQ = () => {
 
   return (
     <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What should I put on a fresh tattoo?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Use a thin layer of fragrance-free, vegan aftercare like Blue Dream Budder to keep the tattoo moisturized and protected."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is CBD safe for tattoo aftercare?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. CBD has soothing and anti-inflammatory properties, making it safe for most tattoos when applied in a clean, topical balm."
+                }
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4">
