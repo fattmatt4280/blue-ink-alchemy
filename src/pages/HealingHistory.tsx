@@ -163,62 +163,116 @@ const HealingHistory = () => {
           </DialogHeader>
           {selectedEntry && (
             <div className="space-y-6">
-              <img
-                src={selectedEntry.photo_url}
-                alt="Full analysis"
-                className="w-full rounded-lg"
-              />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium mb-2">Healing Stage</p>
-                  <Badge className="text-base">{selectedEntry.healing_stage}</Badge>
-                </div>
-                <div>
-                  <p className="text-sm font-medium mb-2">Progress Score</p>
-                  <p className="text-3xl font-bold text-primary">{selectedEntry.progress_score}/100</p>
-                </div>
+              <div className="relative aspect-square overflow-hidden rounded-lg border">
+                <img
+                  src={selectedEntry.photo_url}
+                  alt="Healing progress"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
-              {selectedEntry.analysis_result && (
-                <>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Summary</p>
-                    <p className="text-muted-foreground">{selectedEntry.analysis_result.summary}</p>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <Badge className="text-base px-4 py-2">
+                    {selectedEntry.healing_stage}
+                  </Badge>
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-primary">
+                      {selectedEntry.progress_score}/100
+                    </div>
+                    <div className="text-sm text-muted-foreground">Healing Progress</div>
                   </div>
+                </div>
 
-                  <div>
-                    <p className="text-sm font-medium mb-2">Recommendations</p>
-                    <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      {selectedEntry.recommendations.map((rec: string, idx: number) => (
-                        <li key={idx}>{rec}</li>
-                      ))}
-                    </ul>
-                  </div>
+                {selectedEntry.analysis_result?.summary && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Analysis Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.summary}</p>
+                    </CardContent>
+                  </Card>
+                )}
 
-                  {selectedEntry.analysis_result.risk_factors && selectedEntry.analysis_result.risk_factors.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium mb-2 text-red-600">Risk Factors</p>
-                      <ul className="list-disc list-inside space-y-1 text-red-600">
-                        {selectedEntry.analysis_result.risk_factors.map((risk: string, idx: number) => (
-                          <li key={idx}>{risk}</li>
+                {selectedEntry.recommendations && selectedEntry.recommendations.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Recommendations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="list-disc list-inside space-y-2">
+                        {selectedEntry.recommendations.map((rec: string, idx: number) => (
+                          <li key={idx} className="text-sm leading-relaxed">{rec}</li>
                         ))}
                       </ul>
-                    </div>
-                  )}
+                    </CardContent>
+                  </Card>
+                )}
 
-                  {selectedEntry.analysis_result.product_recommendations && (
-                    <div>
-                      <p className="text-sm font-medium mb-2">Recommended Products</p>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                {selectedEntry.analysis_result?.risk_factors && (
+                  <Card className="border-destructive/50 bg-destructive/5">
+                    <CardHeader>
+                      <CardTitle className="text-destructive flex items-center gap-2">
+                        <span>⚠️</span> Risk Factors
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.risk_factors}</p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {selectedEntry.analysis_result?.visual_assessment && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Visual Assessment</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {selectedEntry.analysis_result.visual_assessment.color_assessment && (
+                        <div>
+                          <div className="font-medium text-sm mb-1">Color Assessment</div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {selectedEntry.analysis_result.visual_assessment.color_assessment}
+                          </p>
+                        </div>
+                      )}
+                      {selectedEntry.analysis_result.visual_assessment.texture_assessment && (
+                        <div>
+                          <div className="font-medium text-sm mb-1">Texture Assessment</div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {selectedEntry.analysis_result.visual_assessment.texture_assessment}
+                          </p>
+                        </div>
+                      )}
+                      {selectedEntry.analysis_result.visual_assessment.overall_condition && (
+                        <div>
+                          <div className="font-medium text-sm mb-1">Overall Condition</div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {selectedEntry.analysis_result.visual_assessment.overall_condition}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {selectedEntry.analysis_result?.product_recommendations && 
+                 selectedEntry.analysis_result.product_recommendations.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Product Recommendations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="list-disc list-inside space-y-2">
                         {selectedEntry.analysis_result.product_recommendations.map((product: string, idx: number) => (
-                          <li key={idx}>{product}</li>
+                          <li key={idx} className="text-sm leading-relaxed">{product}</li>
                         ))}
                       </ul>
-                    </div>
-                  )}
-                </>
-              )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>

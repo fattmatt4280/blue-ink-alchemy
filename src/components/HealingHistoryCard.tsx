@@ -51,17 +51,22 @@ export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) 
           <img
             src={entry.photo_url}
             alt="Tattoo progress"
-            className="w-24 h-24 object-cover rounded-lg"
+            className="w-24 h-24 object-cover rounded-lg border"
           />
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
               <span className="text-sm font-medium">Progress Score:</span>
               <span className={`text-2xl font-bold ${getScoreColor(entry.progress_score)}`}>
                 {entry.progress_score}/100
               </span>
             </div>
-            <div className="text-sm text-muted-foreground">
+            {entry.analysis_result?.summary && (
+              <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                {entry.analysis_result.summary}
+              </p>
+            )}
+            <div className="text-xs text-muted-foreground">
               {entry.recommendations.length} recommendation{entry.recommendations.length !== 1 ? 's' : ''}
             </div>
           </div>
