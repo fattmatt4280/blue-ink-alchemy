@@ -38,8 +38,12 @@ const HealingTracker = () => {
   const [tattooAge, setTattooAge] = useState<string>("");
 
   const handleImageUploaded = (url: string) => {
-    setUploadedImage(url);
-    setAnalysis(null);
+    try {
+      setUploadedImage(url);
+      setAnalysis(null);
+    } catch (error) {
+      console.error('Error updating image state:', error);
+    }
   };
 
   const analyzeProgress = async () => {
@@ -52,9 +56,11 @@ const HealingTracker = () => {
       return;
     }
 
-    setIsAnalyzing(true);
+    if (isAnalyzing) return; // Prevent double-clicking
 
     try {
+      setIsAnalyzing(true);
+      
       const { data, error } = await supabase.functions.invoke('analyze-healing-progress', {
         body: {
           imageUrl: uploadedImage,
@@ -65,21 +71,29 @@ const HealingTracker = () => {
       if (error) throw error;
 
       if (data.success && data.analysis) {
+        // Update analysis state first
         setAnalysis(data.analysis);
 
-        // Save to database
-        const { error: dbError } = await supabase
-          .from('healing_progress')
-          .insert({
-            photo_url: uploadedImage,
-            analysis_result: data.analysis,
-            healing_stage: data.analysis.healingStage,
-            recommendations: data.analysis.recommendations,
-            progress_score: data.analysis.progressScore,
-            user_id: (await supabase.auth.getUser()).data.user?.id || null,
-          });
-
-        if (dbError) console.error('Failed to save analysis:', dbError);
+        // Then save to database (don't block on this)
+        try {
+          const { data: userData } = await supabase.auth.getUser();
+          
+          if (userData.user) {
+            await supabase
+              .from('healing_progress')
+              .insert({
+                photo_url: uploadedImage,
+                analysis_result: data.analysis,
+                healing_stage: data.analysis.healingStage,
+                recommendations: data.analysis.recommendations,
+                progress_score: data.analysis.progressScore,
+                user_id: userData.user.id,
+              });
+          }
+        } catch (dbError) {
+          console.error('Failed to save analysis:', dbError);
+          // Don't fail the whole operation if DB save fails
+        }
 
         toast({
           title: "Analysis Complete!",
@@ -90,6 +104,7 @@ const HealingTracker = () => {
       }
     } catch (error) {
       console.error('Analysis error:', error);
+      setAnalysis(null);
       toast({
         title: "Analysis Failed",
         description: "Unable to analyze the image. Please try again.",

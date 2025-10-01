@@ -37,45 +37,76 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
   const addToCart = (product: { id: string; name: string; price: number; image_url: string | null }) => {
-    setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
+    try {
+      setItems(prevItems => {
+        try {
+          const existingItem = prevItems.find(item => item.id === product.id);
+          if (existingItem) {
+            return prevItems.map(item =>
+              item.id === product.id 
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+            );
+          }
+          return [...prevItems, { ...product, quantity: 1 }];
+        } catch (error) {
+          console.error('Error in addToCart state update:', error);
+          return prevItems;
+        }
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
   };
 
   const removeFromCart = (id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    try {
+      setItems(prevItems => prevItems.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Error removing from cart:', error);
+    }
   };
 
   const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(id);
-      return;
+    try {
+      if (quantity <= 0) {
+        removeFromCart(id);
+        return;
+      }
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+    } catch (error) {
+      console.error('Error updating quantity:', error);
     }
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
   };
 
   const clearCart = () => {
-    setItems([]);
+    try {
+      setItems([]);
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+    }
   };
 
   const getTotalItems = () => {
-    return items.reduce((total, item) => total + item.quantity, 0);
+    try {
+      return items.reduce((total, item) => total + item.quantity, 0);
+    } catch (error) {
+      console.error('Error calculating total items:', error);
+      return 0;
+    }
   };
 
   const getTotalPrice = () => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    try {
+      return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    } catch (error) {
+      console.error('Error calculating total price:', error);
+      return 0;
+    }
   };
 
   return (
