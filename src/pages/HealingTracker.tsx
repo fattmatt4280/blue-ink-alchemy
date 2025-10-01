@@ -164,6 +164,7 @@ const HealingTracker = () => {
                   currentImage={uploadedImage}
                   title="Tattoo Photo"
                   description="Upload a clear photo showing the entire tattoo"
+                  bucket="healing-photos"
                 />
 
                 <div className="space-y-2">

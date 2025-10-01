@@ -15,9 +15,10 @@ interface ImageUploadProps {
   currentOpacity?: number;
   title: string;
   description: string;
+  bucket?: string;
 }
 
-const ImageUpload = ({ onImageUploaded, currentImage, currentOpacity = 100, title, description }: ImageUploadProps) => {
+const ImageUpload = ({ onImageUploaded, currentImage, currentOpacity = 100, title, description, bucket = 'site-images' }: ImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [opacity, setOpacity] = useState(currentOpacity);
@@ -48,12 +49,19 @@ const ImageUpload = ({ onImageUploaded, currentImage, currentOpacity = 100, titl
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `uploads/${fileName}`;
+      
+      // Get current user for healing-photos bucket
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // For healing-photos, organize by user ID; otherwise use uploads folder
+      const filePath = bucket === 'healing-photos' && user
+        ? `${user.id}/${fileName}`
+        : `uploads/${fileName}`;
 
-      console.log('Uploading file:', fileName);
+      console.log('Uploading file to bucket:', bucket, 'path:', filePath);
 
       const { error: uploadError } = await supabase.storage
-        .from('site-images')
+        .from(bucket)
         .upload(filePath, file);
 
       if (uploadError) {
@@ -62,7 +70,7 @@ const ImageUpload = ({ onImageUploaded, currentImage, currentOpacity = 100, titl
       }
 
       const { data } = supabase.storage
-        .from('site-images')
+        .from(bucket)
         .getPublicUrl(filePath);
 
       console.log('Upload successful, public URL:', data.publicUrl);
