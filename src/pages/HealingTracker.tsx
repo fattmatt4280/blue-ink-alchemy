@@ -67,7 +67,33 @@ const HealingTracker = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Function invocation error:', error);
+        throw error;
+      }
+
+      // Handle specific error cases from the edge function
+      if (!data.success) {
+        if (data.error === 'insufficient_credits') {
+          toast({
+            title: "Service Temporarily Unavailable",
+            description: data.userMessage || "The AI analysis service needs to be recharged. Please try again later.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (data.error === 'rate_limit_exceeded') {
+          toast({
+            title: "Please Wait",
+            description: data.userMessage || "Too many requests. Please wait a few minutes and try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        throw new Error(data.message || 'Analysis failed');
+      }
 
       if (data.success && data.analysis) {
         // Update analysis state first

@@ -179,6 +179,39 @@ Provide your assessment following the expert guidance provided in the system pro
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI gateway error:', response.status, errorText);
+      
+      // Handle specific error cases with user-friendly messages
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: 'insufficient_credits',
+            message: 'AI analysis service is temporarily unavailable due to insufficient credits. Please try again later or contact support.',
+            userMessage: 'The AI analysis service needs to be topped up. Please contact support or try again later.'
+          }),
+          { 
+            status: 402,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: 'rate_limit_exceeded',
+            message: 'Too many requests. Please wait a moment before trying again.',
+            userMessage: 'Our AI service is experiencing high demand. Please wait a few minutes and try again.'
+          }),
+          { 
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      // Generic error for other status codes
       throw new Error(`AI analysis failed: ${response.status}`);
     }
 
