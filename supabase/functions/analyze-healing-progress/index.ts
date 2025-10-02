@@ -21,9 +21,9 @@ serve(async (req) => {
     
     console.log('Analyzing healing progress:', { imageUrl, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0 });
     
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    const openRouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
+    if (!openRouterApiKey) {
+      throw new Error('OPENROUTER_API_KEY is not configured');
     }
 
     // Fetch custom AI instructions
@@ -154,12 +154,14 @@ Respond with valid JSON only, no markdown formatting:
 
 Provide your assessment following the expert guidance provided in the system prompt.`;
 
-    // Call Lovable AI for analysis
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call OpenRouter for analysis (temporary - using OpenRouter credits)
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
+        'Authorization': `Bearer ${openRouterApiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://dreamtattoocompany.com',
+        'X-Title': 'Dream Tattoo Company - Healing Tracker',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
