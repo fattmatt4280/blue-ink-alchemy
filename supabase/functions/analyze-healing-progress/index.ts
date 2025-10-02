@@ -190,7 +190,7 @@ Provide your assessment following the expert guidance provided in the system pro
             userMessage: 'The AI analysis service needs to be topped up. Please contact support or try again later.'
           }),
           { 
-            status: 402,
+            status: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
           }
         );
@@ -205,14 +205,25 @@ Provide your assessment following the expert guidance provided in the system pro
             userMessage: 'Our AI service is experiencing high demand. Please wait a few minutes and try again.'
           }),
           { 
-            status: 429,
+            status: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
           }
         );
       }
       
-      // Generic error for other status codes
-      throw new Error(`AI analysis failed: ${response.status}`);
+      // Generic error for other status codes -> normalize to 200 so client can show friendly message
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'ai_gateway_error',
+          message: `AI analysis failed with status ${response.status}`,
+          userMessage: 'The AI service had a temporary issue. Please try again shortly.'
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     const aiData = await response.json();

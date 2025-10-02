@@ -69,6 +69,25 @@ const HealingTracker = () => {
 
       if (error) {
         console.error('Function invocation error:', error);
+        // Gracefully handle normalized HTTP errors
+        // @ts-ignore - supabase error may include status
+        const status = (error as any)?.status;
+        if (status === 402) {
+          toast({
+            title: "Service Temporarily Unavailable",
+            description: "The AI analysis service needs to be topped up. Please try again later.",
+            variant: "destructive",
+          });
+          return;
+        }
+        if (status === 429) {
+          toast({
+            title: "Please Wait",
+            description: "Too many requests. Please wait a few minutes and try again.",
+            variant: "destructive",
+          });
+          return;
+        }
         throw error;
       }
 
@@ -87,6 +106,15 @@ const HealingTracker = () => {
           toast({
             title: "Please Wait",
             description: data.userMessage || "Too many requests. Please wait a few minutes and try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (data.error === 'ai_gateway_error') {
+          toast({
+            title: "AI Service Issue",
+            description: data.userMessage || "The AI service had a temporary issue. Please try again shortly.",
             variant: "destructive",
           });
           return;
