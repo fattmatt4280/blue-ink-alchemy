@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle, History } from "lucide-react";
+import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle, History, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -11,6 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "@/components/ImageUpload";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProductGrid } from "@/hooks/useProductGrid";
+import ProductCard from "@/components/ProductCard";
+import CartDialog from "@/components/CartDialog";
 
 interface AnalysisResult {
   healingStage: string;
@@ -30,6 +33,7 @@ const HealingTracker = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading } = useAuth();
+  const { products, loading: productsLoading, cartDialogOpen, selectedProductName, setCartDialogOpen, handleAddToCart, handleProductView } = useProductGrid();
   const [uploadedImage, setUploadedImage] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -420,24 +424,33 @@ const HealingTracker = () => {
                 {analysis.productRecommendations && analysis.productRecommendations.length > 0 && (
                   <Card className="neon-border">
                     <CardHeader>
-                      <CardTitle>Recommended Products</CardTitle>
-                      <CardDescription>Blue Dream Budder products for your healing stage</CardDescription>
+                      <CardTitle className="flex items-center gap-2">
+                        <ShoppingBag className="h-5 w-5" />
+                        Recommended Products
+                      </CardTitle>
+                      <CardDescription>
+                        Our Blue Dream Budder products to help your healing
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {analysis.productRecommendations.map((product, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-primary mt-1">🌿</span>
-                            <span className="text-sm">{product}</span>
-                          </li>
-                        ))}
-                      </ul>
+                    <CardContent className="space-y-4">
+                      {!productsLoading && products.length > 0 && (
+                        <div className="grid grid-cols-1 gap-4">
+                          {products.slice(0, 2).map((product) => (
+                            <ProductCard
+                              key={product.id}
+                              product={product}
+                              onAddToCart={handleAddToCart}
+                              onProductView={handleProductView}
+                            />
+                          ))}
+                        </div>
+                      )}
                       <Button
                         onClick={() => navigate('/shop')}
-                        className="w-full mt-4"
+                        className="w-full"
                         variant="outline"
                       >
-                        Shop Products
+                        View All Products
                       </Button>
                     </CardContent>
                   </Card>
@@ -454,6 +467,12 @@ const HealingTracker = () => {
           </div>
         </div>
       </div>
+
+      <CartDialog 
+        open={cartDialogOpen}
+        onOpenChange={setCartDialogOpen}
+        productName={selectedProductName}
+      />
     </div>
   );
 };
