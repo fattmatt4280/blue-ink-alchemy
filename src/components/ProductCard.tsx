@@ -71,7 +71,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
           </p>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="cyber-text text-2xl font-bold text-gray-900">
               ${product.price.toFixed(2)}
@@ -88,7 +88,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
               e.stopPropagation();
               onAddToCart(product);
             }}
-            className="neon-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            className="neon-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
           >
             Add to Cart
           </Button>
