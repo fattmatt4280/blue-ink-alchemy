@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Loader2, BookOpen } from 'lucide-react';
+import { Plus, Trash2, Loader2, BookOpen, Upload, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -24,6 +24,7 @@ interface KnowledgeEntry {
   severity_level: string;
   times_referenced: number;
   created_at: string;
+  reference_images?: string[];
 }
 
 export const ExpertKnowledgeEditor = () => {
@@ -44,6 +45,8 @@ export const ExpertKnowledgeEditor = () => {
   const [productRecommendations, setProductRecommendations] = useState('');
   const [timelineExpectations, setTimelineExpectations] = useState('');
   const [severityLevel, setSeverityLevel] = useState('normal');
+  const [referenceImages, setReferenceImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchEntries();
@@ -79,6 +82,7 @@ export const ExpertKnowledgeEditor = () => {
     setProductRecommendations(entry.product_recommendations?.join('\n') || '');
     setTimelineExpectations(entry.timeline_expectations || '');
     setSeverityLevel(entry.severity_level || 'normal');
+    setReferenceImages(entry.reference_images || []);
     setIsCreating(false);
   };
 
@@ -93,6 +97,7 @@ export const ExpertKnowledgeEditor = () => {
     setProductRecommendations('');
     setTimelineExpectations('');
     setSeverityLevel('normal');
+    setReferenceImages([]);
     setIsCreating(true);
   };
 
@@ -121,6 +126,7 @@ export const ExpertKnowledgeEditor = () => {
       product_recommendations: productRecommendations.split('\n').filter(p => p.trim()),
       timeline_expectations: timelineExpectations,
       severity_level: severityLevel,
+      reference_images: referenceImages,
       created_by: user.id,
     };
 
@@ -373,7 +379,132 @@ export const ExpertKnowledgeEditor = () => {
                   />
                 </div>
 
-                <div className="flex gap-2">
+                {/* Reference Images Section */}
+                <div className="space-y-4 pt-4 border-t">
+                  <div>
+                    <Label className="text-base font-semibold">Reference Images (Visual Examples)</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Upload up to 5 reference photos showing what this condition looks like. 
+                      The AI will use these images for visual comparison.
+                    </p>
+                  </div>
+
+                  {/* Image Grid */}
+                  {referenceImages.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {referenceImages.map((imageUrl, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={imageUrl} 
+                            alt={`Reference ${index + 1}`}
+                            className="w-full h-40 object-cover rounded-lg border-2 border-border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReferenceImages(referenceImages.filter((_, i) => i !== index));
+                            }}
+                            className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                          <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                            Image {index + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Upload Button */}
+                  {referenceImages.length < 5 && (
+                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast({
+                              title: "File too large",
+                              description: "Image must be less than 10MB",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          if (!conditionName) {
+                            toast({
+                              title: "Enter condition name first",
+                              description: "Please enter a condition name before uploading images",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          setUploading(true);
+                          try {
+                            const fileExt = file.name.split('.').pop();
+                            const slug = conditionName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                            const fileName = `expert-knowledge/${slug}/${Date.now()}.${fileExt}`;
+                            
+                            const { data, error } = await supabase.storage
+                              .from('healing-photos')
+                              .upload(fileName, file);
+
+                            if (error) throw error;
+
+                            const { data: { publicUrl } } = supabase.storage
+                              .from('healing-photos')
+                              .getPublicUrl(fileName);
+
+                            setReferenceImages([...referenceImages, publicUrl]);
+                            toast({
+                              title: "Image uploaded!",
+                              description: "Reference image added successfully",
+                            });
+                          } catch (error) {
+                            console.error('Upload error:', error);
+                            toast({
+                              title: "Upload failed",
+                              description: "Failed to upload image. Please try again.",
+                              variant: "destructive",
+                            });
+                          } finally {
+                            setUploading(false);
+                            // Reset the input
+                            e.target.value = '';
+                          }
+                        }}
+                        className="hidden"
+                        id="reference-image-upload"
+                        disabled={uploading}
+                      />
+                      <label 
+                        htmlFor="reference-image-upload"
+                        className="cursor-pointer block"
+                      >
+                        <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-sm font-medium mb-1">
+                          {uploading ? 'Uploading...' : 'Click to upload or drag and drop'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          PNG, JPG, WEBP up to 10MB ({5 - referenceImages.length} remaining)
+                        </p>
+                      </label>
+                    </div>
+                  )}
+
+                  {referenceImages.length >= 5 && (
+                    <p className="text-sm text-muted-foreground text-center py-2">
+                      Maximum of 5 reference images reached
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-2 pt-4">
                   <Button
                     onClick={saveEntry}
                     disabled={saving}

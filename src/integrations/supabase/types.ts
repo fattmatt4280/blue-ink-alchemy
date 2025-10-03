@@ -483,6 +483,7 @@ export type Database = {
           last_used: string | null
           product_recommendations: string[] | null
           recommended_actions: string[]
+          reference_images: string[] | null
           severity_level: string | null
           timeline_expectations: string | null
           times_referenced: number | null
@@ -500,6 +501,7 @@ export type Database = {
           last_used?: string | null
           product_recommendations?: string[] | null
           recommended_actions?: string[]
+          reference_images?: string[] | null
           severity_level?: string | null
           timeline_expectations?: string | null
           times_referenced?: number | null
@@ -517,6 +519,7 @@ export type Database = {
           last_used?: string | null
           product_recommendations?: string[] | null
           recommended_actions?: string[]
+          reference_images?: string[] | null
           severity_level?: string | null
           timeline_expectations?: string | null
           times_referenced?: number | null

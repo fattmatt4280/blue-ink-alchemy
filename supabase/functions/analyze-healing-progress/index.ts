@@ -33,7 +33,7 @@ serve(async (req) => {
       .eq('active', true)
       .order('priority', { ascending: false });
 
-    // Fetch expert knowledge from database to enhance AI analysis
+    // Fetch expert knowledge with reference images from database to enhance AI analysis
     const { data: expertKnowledge } = await supabase
       .from('expert_knowledge_base')
       .select('*')
@@ -51,6 +51,7 @@ serve(async (req) => {
     if (expertKnowledge && expertKnowledge.length > 0) {
       expertContext = '\n\nEXPERT KNOWLEDGE FROM 25-YEAR TATTOO ARTIST:\n';
       expertKnowledge.forEach((entry: any) => {
+        const hasReferenceImages = entry.reference_images && entry.reference_images.length > 0;
         expertContext += `\n- ${entry.condition_name} (${entry.severity_level}):\n`;
         expertContext += `  Description: ${entry.condition_description}\n`;
         if (entry.visual_indicators?.length) {
@@ -61,6 +62,9 @@ serve(async (req) => {
         }
         if (entry.product_recommendations?.length) {
           expertContext += `  Product Recommendations: ${entry.product_recommendations.join(', ')}\n`;
+        }
+        if (hasReferenceImages) {
+          expertContext += `  ⚠️ REFERENCE IMAGES AVAILABLE: ${entry.reference_images.length} visual examples of this condition exist for comparison\n`;
         }
       });
     }
@@ -122,9 +126,13 @@ ${expertContext}
 
 ANALYSIS PRIORITY:
 1. First, scan for infection/complication signs
-2. Determine tattoo age compatibility with visible stage
-3. Assess healing stage based on timeline above
-4. Provide clear, actionable recommendations
+2. Compare visually with expert reference images if available in the knowledge base above
+3. Determine tattoo age compatibility with visible stage
+4. Assess healing stage based on timeline above
+5. Provide clear, actionable recommendations
+
+VISUAL COMPARISON INSTRUCTIONS:
+When the Expert Knowledge Base mentions "REFERENCE IMAGES AVAILABLE", you should visually compare the user's tattoo photo with what those documented conditions look like. Use these visual references to improve diagnostic accuracy for infections, allergic reactions, and healing complications.
 
 Respond with valid JSON only, no markdown formatting:
 {
