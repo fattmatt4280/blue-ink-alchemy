@@ -108,7 +108,7 @@ const Footer = () => {
             </div>
             
             <div className="text-sm text-gray-400">
-              © 2024 Blue Dream Budder. All rights reserved.
+              © 2025 Dream Tattoo Company LLC. All rights reserved.
             </div>
           </div>
         </div>
