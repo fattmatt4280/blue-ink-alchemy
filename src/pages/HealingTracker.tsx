@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle, History, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle, History, ShoppingBag, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -435,7 +435,7 @@ const HealingTracker = () => {
                     <CardContent className="space-y-4">
                       {!productsLoading && products.length > 0 && (
                         <div className="grid grid-cols-1 gap-4">
-                          {products.slice(0, 2).map((product) => (
+                      {products.slice(0, 2).map((product) => (
                             <ProductCard
                               key={product.id}
                               product={product}
@@ -445,9 +445,54 @@ const HealingTracker = () => {
                           ))}
                         </div>
                       )}
+                      
+                      {/* Emergency Care Products */}
+                      <div className="mt-6 pt-6 border-t">
+                        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-destructive" />
+                          Emergency Care Products
+                        </h4>
+                        <p className="text-xs text-muted-foreground mb-4">
+                          For infections or allergic reactions - seek medical advice if symptoms persist
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <Card className="border-2 border-muted">
+                            <CardContent className="p-4 space-y-2">
+                              <h5 className="font-medium text-sm">Dial Antibacterial Soap</h5>
+                              <p className="text-xs text-muted-foreground">For infection prevention & cleaning</p>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => window.open('https://www.amazon.com/s?k=dial+antibacterial+soap', '_blank')}
+                              >
+                                View on Amazon
+                                <ExternalLink className="ml-2 h-3 w-3" />
+                              </Button>
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="border-2 border-muted">
+                            <CardContent className="p-4 space-y-2">
+                              <h5 className="font-medium text-sm">Benadryl Topical Spray</h5>
+                              <p className="text-xs text-muted-foreground">For allergic reactions & itching</p>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => window.open('https://www.amazon.com/s?k=benadryl+topical+spray', '_blank')}
+                              >
+                                View on Amazon
+                                <ExternalLink className="ml-2 h-3 w-3" />
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </div>
+                      
                       <Button
                         onClick={() => navigate('/shop')}
-                        className="w-full"
+                        className="w-full mt-4"
                         variant="outline"
                       >
                         View All Products
