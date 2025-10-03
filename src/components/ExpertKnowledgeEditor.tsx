@@ -216,7 +216,7 @@ export const ExpertKnowledgeEditor = () => {
         <CardHeader>
           <CardTitle>Knowledge Base</CardTitle>
           <CardDescription>{entries.length} conditions documented</CardDescription>
-          <Button onClick={createNew} className="w-full">
+          <Button type="button" onClick={createNew} className="w-full">
             <Plus className="h-4 w-4 mr-2" />
             Add New Condition
           </Button>
