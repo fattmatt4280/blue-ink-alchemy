@@ -34,14 +34,12 @@ const PublicReviews = () => {
   }, []);
 
   const fetchPublicReviews = async () => {
-    // Query from secure view that excludes email addresses
+    // Use secure function that excludes email addresses and only returns approved reviews
     const { data, error } = await supabase
-      .from('approved_customer_reviews')
-      .select('*')
-      .limit(20);
+      .rpc('get_approved_reviews');
 
     if (!error && data) {
-      setReviews(data);
+      setReviews(data.slice(0, 20));
     }
     setLoading(false);
   };

@@ -1132,6 +1132,17 @@ export type Database = {
       }
     }
     Functions: {
+      get_approved_reviews: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          name: string
+          rating: number
+          title: string
+        }[]
+      }
       increment_daily_metric: {
         Args: { metric_date: string; metric_name: string }
         Returns: undefined

@@ -38,15 +38,12 @@ const Testimonials = () => {
   }, []);
 
   const fetchCustomerReviews = async () => {
+    // Use secure function that excludes email addresses and only returns approved reviews
     const { data, error } = await supabase
-      .from('customer_reviews')
-      .select(PUBLIC_REVIEW_COLUMNS)
-      .eq('approved', true)
-      .order('created_at', { ascending: false })
-      .limit(4);
+      .rpc('get_approved_reviews');
 
     if (!error && data) {
-      setCustomerReviews(data);
+      setCustomerReviews(data.slice(0, 4));
     }
   };
 
