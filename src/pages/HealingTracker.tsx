@@ -434,14 +434,31 @@ const HealingTracker = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {!productsLoading && products.length > 0 && (
-                        <div className="grid grid-cols-1 gap-4">
-                      {products.slice(0, 2).map((product) => (
-                            <ProductCard
-                              key={product.id}
-                              product={product}
-                              onAddToCart={handleAddToCart}
-                              onProductView={handleProductView}
-                            />
+                        <div className="flex justify-center">
+                          {products.slice(0, 1).map((product) => (
+                            <Card key={product.id} className="max-w-xs border-2 border-muted hover:border-primary/50 transition-colors">
+                              <CardContent className="p-4 space-y-3">
+                                <div className="aspect-square relative overflow-hidden rounded-lg">
+                                  <img 
+                                    src={product.image_url || '/placeholder.svg'} 
+                                    alt={product.name}
+                                    className="object-cover w-full h-full"
+                                  />
+                                </div>
+                                <div>
+                                  <h5 className="font-semibold text-base">{product.name}</h5>
+                                  <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
+                                  <p className="text-lg font-bold text-primary mt-2">${product.price}</p>
+                                </div>
+                                <Button
+                                  onClick={() => handleAddToCart(product)}
+                                  className="w-full"
+                                  size="sm"
+                                >
+                                  Add to Cart
+                                </Button>
+                              </CardContent>
+                            </Card>
                           ))}
                         </div>
                       )}
@@ -455,7 +472,7 @@ const HealingTracker = () => {
                         <p className="text-xs text-muted-foreground mb-4">
                           For infections or allergic reactions - seek medical advice if symptoms persist
                         </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <Card className="border-2 border-muted">
                             <CardContent className="p-4 space-y-2">
                               <h5 className="font-medium text-sm">Dial Antibacterial Soap</h5>
@@ -464,7 +481,7 @@ const HealingTracker = () => {
                                 size="sm"
                                 variant="outline"
                                 className="w-full"
-                                onClick={() => window.open('https://www.amazon.com/s?k=dial+antibacterial+soap', '_blank')}
+                                onClick={() => window.open('https://amzn.to/3Krva3p', '_blank')}
                               >
                                 View on Amazon
                                 <ExternalLink className="ml-2 h-3 w-3" />
@@ -480,7 +497,23 @@ const HealingTracker = () => {
                                 size="sm"
                                 variant="outline"
                                 className="w-full"
-                                onClick={() => window.open('https://www.amazon.com/s?k=benadryl+topical+spray', '_blank')}
+                                onClick={() => window.open('https://amzn.to/4nwJR3v', '_blank')}
+                              >
+                                View on Amazon
+                                <ExternalLink className="ml-2 h-3 w-3" />
+                              </Button>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="border-2 border-muted">
+                            <CardContent className="p-4 space-y-2">
+                              <h5 className="font-medium text-sm">Hustle Bubbles</h5>
+                              <p className="text-xs text-muted-foreground">Gentle tattoo cleanser</p>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => window.open('https://amzn.to/48f5e4L', '_blank')}
                               >
                                 View on Amazon
                                 <ExternalLink className="ml-2 h-3 w-3" />
