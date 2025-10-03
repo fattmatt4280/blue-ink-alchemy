@@ -14,7 +14,6 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface AnalysisResult {
   healingStage: string;
-  progressScore: number;
   visualAssessment: {
     colorAssessment?: string;
     textureAssessment?: string;
@@ -139,7 +138,7 @@ const HealingTracker = () => {
                 analysis_result: data.analysis,
                 healing_stage: data.analysis.healingStage,
                 recommendations: data.analysis.recommendations,
-                progress_score: data.analysis.progressScore,
+                progress_score: 0,
                 user_id: userData.user.id,
               });
           }
@@ -176,13 +175,6 @@ const HealingTracker = () => {
       case 'healed': return 'bg-green-500';
       default: return 'bg-gray-500';
     }
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-500';
-    if (score >= 60) return 'text-yellow-500';
-    if (score >= 40) return 'text-orange-500';
-    return 'text-red-500';
   };
 
   return (
@@ -343,32 +335,21 @@ const HealingTracker = () => {
           <div className="space-y-6">
             {analysis ? (
               <>
-                {/* Progress Score */}
+                {/* Healing Stage */}
                 <Card className="neon-border">
                   <CardHeader>
                     <CardTitle>Healing Progress Assessment</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="text-center">
-                      <div className={`text-6xl font-bold ${getScoreColor(analysis.progressScore)}`}>
-                        {analysis.progressScore}/100
-                      </div>
-                      <p className="text-muted-foreground mt-2">Overall Progress Score</p>
+                      <Badge className={`${getStageColor(analysis.healingStage)} text-lg px-4 py-2`}>
+                        {analysis.healingStage}
+                      </Badge>
                       {tattooAge && (
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground mt-3">
                           Tattoo Age: {tattooAge} days
                         </p>
                       )}
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Healing Stage</span>
-                        <Badge className={getStageColor(analysis.healingStage)}>
-                          {analysis.healingStage}
-                        </Badge>
-                      </div>
-                      <Progress value={analysis.progressScore} className="h-2" />
                     </div>
 
                     {analysis.summary && (

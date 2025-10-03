@@ -22,14 +22,6 @@ export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) 
     return colors[stage] || "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 dark:text-green-400";
-    if (score >= 60) return "text-blue-600 dark:text-blue-400";
-    if (score >= 40) return "text-yellow-600 dark:text-yellow-400";
-    if (score >= 20) return "text-orange-600 dark:text-orange-400";
-    return "text-red-600 dark:text-red-400";
-  };
-
   return (
     <Card 
       className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
@@ -54,13 +46,6 @@ export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) 
             className="w-24 h-24 object-cover rounded-lg border"
           />
           <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Progress Score:</span>
-              <span className={`text-2xl font-bold ${getScoreColor(entry.progress_score)}`}>
-                {entry.progress_score}/100
-              </span>
-            </div>
             {entry.analysis_result?.summary && (
               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                 {entry.analysis_result.summary}

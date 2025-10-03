@@ -4,7 +4,6 @@ import { ArrowLeft, Download, TrendingUp, Calendar, Award, AlertCircle } from "l
 import { Link, useNavigate } from "react-router-dom";
 import { useHealingHistory } from "@/hooks/useHealingHistory";
 import { HealingHistoryCard } from "@/components/HealingHistoryCard";
-import { HealingProgressChart } from "@/components/HealingProgressChart";
 import { HealingPhotoTimeline } from "@/components/HealingPhotoTimeline";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,11 +20,7 @@ const HealingHistory = () => {
 
   const stats = entries ? {
     totalAnalyses: entries.length,
-    averageScore: Math.round(entries.reduce((acc, e) => acc + e.progress_score, 0) / entries.length),
     latestStage: entries[0]?.healing_stage || "N/A",
-    improvement: entries.length >= 2 
-      ? entries[0].progress_score - entries[entries.length - 1].progress_score 
-      : 0
   } : null;
 
   // Show auth check before loading state
@@ -109,7 +104,7 @@ const HealingHistory = () => {
           ) : (
             <div className="space-y-6">
               {/* Stats Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -125,18 +120,6 @@ const HealingHistory = () => {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Average Score
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-primary">{stats?.averageScore}/100</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <Award className="w-4 h-4" />
                       Current Stage
                     </CardTitle>
@@ -145,24 +128,7 @@ const HealingHistory = () => {
                     <Badge className="text-sm">{stats?.latestStage}</Badge>
                   </CardContent>
                 </Card>
-
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Improvement
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className={`text-3xl font-bold ${stats && stats.improvement >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {stats && stats.improvement >= 0 ? '+' : ''}{stats?.improvement}
-                    </p>
-                  </CardContent>
-                </Card>
               </div>
-
-              {/* Progress Chart */}
-              {entries.length > 1 && <HealingProgressChart entries={entries} />}
 
               {/* Photo Timeline */}
               <HealingPhotoTimeline entries={entries} />
@@ -208,16 +174,10 @@ const HealingHistory = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div>
                   <Badge className="text-base px-4 py-2">
                     {selectedEntry.healing_stage}
                   </Badge>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-primary">
-                      {selectedEntry.progress_score}/100
-                    </div>
-                    <div className="text-sm text-muted-foreground">Healing Progress</div>
-                  </div>
                 </div>
 
                 {selectedEntry.analysis_result?.summary && (
@@ -243,7 +203,7 @@ const HealingHistory = () => {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm leading-relaxed">
-                        Assessed stage: {selectedEntry.healing_stage}. Progress score: {selectedEntry.progress_score}/100. 
+                        Assessed stage: {selectedEntry.healing_stage}. 
                         {selectedEntry.analysis_result?.concerns && selectedEntry.analysis_result.concerns !== 'None' 
                           ? ` ${selectedEntry.analysis_result.concerns}` 
                           : ' No major concerns observed.'}

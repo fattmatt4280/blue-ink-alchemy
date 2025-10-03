@@ -109,18 +109,12 @@ CRITICAL INFECTION SIGNS (flag immediately as "High Risk"):
 - Skin that feels hot compared to surrounding areas
 
 HEALING TIMELINE (be strict about age):
-- Days 0-2: Fresh/Open Wound - Red, slightly swollen, oozing plasma. Score: 5-15
-- Days 3-4: Early Healing - Still red, forming scabs, some swelling normal. Score: 15-25
-- Days 5-7: Scabbing Phase - Darker scabs forming, itching starts. Score: 25-40
-- Days 8-14: Peeling Phase - Scabs flaking off, skin looks dull/silvery. Score: 40-65
-- Days 15-30: Late Healing - Most peeling done, color returning. Score: 65-85
-- Days 30+: Settled - Fully healed, vibrant colors, no flaking. Score: 85-100
-
-SCORING RULES:
-- Subtract 30-50 points if ANY infection signs present
-- A 3-day-old tattoo should NEVER score above 25
-- Fresh tattoos (0-4 days) with complications: 0-10
-- If unsure between stages, choose the EARLIER stage
+- Days 0-2: Fresh/Open Wound - Red, slightly swollen, oozing plasma
+- Days 3-4: Early Healing - Still red, forming scabs, some swelling normal
+- Days 5-7: Scabbing Phase - Darker scabs forming, itching starts
+- Days 8-14: Peeling Phase - Scabs flaking off, skin looks dull/silvery
+- Days 15-30: Late Healing - Most peeling done, color returning
+- Days 30+: Settled - Fully healed, vibrant colors, no flaking
 
 ${previousAnalysesContext}
 ${customInstructionsContext}
@@ -130,13 +124,11 @@ ANALYSIS PRIORITY:
 1. First, scan for infection/complication signs
 2. Determine tattoo age compatibility with visible stage
 3. Assess healing stage based on timeline above
-4. Calculate score based on both stage AND any concerns
-5. Provide clear, actionable recommendations
+4. Provide clear, actionable recommendations
 
 Respond with valid JSON only, no markdown formatting:
 {
   "healingStage": "stage name",
-  "progressScore": number (0-100),
   "summary": "Brief summary mentioning tattoo age and overall assessment",
   "tattooAgeDays": number or null,
   "visualAssessment": {
@@ -244,7 +236,6 @@ Provide your assessment following the expert guidance provided in the system pro
       
       // Normalize keys and ensure required fields
       analysis.healingStage = analysis.healingStage || analysis.healing_stage || 'Unknown';
-      analysis.progressScore = analysis.progressScore || analysis.progress_score || 50;
       analysis.recommendations = analysis.recommendations || [];
       analysis.riskFactors = analysis.riskFactors || analysis.risk_factors || [];
       analysis.productRecommendations = analysis.productRecommendations || analysis.product_recommendations || [];
@@ -259,16 +250,11 @@ Provide your assessment following the expert guidance provided in the system pro
         };
       }
       
-      // Ensure progressScore is 0-100 scale
-      if (analysis.progressScore > 0 && analysis.progressScore <= 10) {
-        analysis.progressScore = analysis.progressScore * 10;
-      }
-      
       // Generate summary if missing
       if (!analysis.summary) {
         const ageText = analysis.tattooAgeDays ? `Tattoo age: ${analysis.tattooAgeDays} days. ` : '';
         const concernText = analysis.concerns && analysis.concerns !== 'None' ? analysis.concerns : 'No major concerns observed.';
-        analysis.summary = `${ageText}Assessed stage: ${analysis.healingStage}. Progress score: ${analysis.progressScore}/100. ${concernText}`;
+        analysis.summary = `${ageText}Assessed stage: ${analysis.healingStage}. ${concernText}`;
       }
       
     } catch (e) {
@@ -276,7 +262,6 @@ Provide your assessment following the expert guidance provided in the system pro
       // Fallback response if parsing fails
       analysis = {
         healingStage: 'Unknown',
-        progressScore: 50,
         summary: 'Unable to analyze image automatically. Please consult with a professional.',
         tattooAgeDays: tattooAge || null,
         visualAssessment: {},
