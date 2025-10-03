@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProductGrid } from "@/hooks/useProductGrid";
 import ProductCard from "@/components/ProductCard";
 import CartDialog from "@/components/CartDialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AnalysisResult {
   healingStage: string;
@@ -38,11 +39,13 @@ const HealingTracker = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [tattooAge, setTattooAge] = useState<string>("");
+  const [tosAccepted, setTosAccepted] = useState<boolean>(false);
 
   const handleImageUploaded = (url: string) => {
     try {
       setUploadedImage(url);
       setAnalysis(null);
+      setTosAccepted(false);
     } catch (error) {
       console.error('Error updating image state:', error);
     }
@@ -62,6 +65,15 @@ const HealingTracker = () => {
       toast({
         title: "Tattoo age required",
         description: "Please enter how many days old your tattoo is.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!tosAccepted) {
+      toast({
+        title: "Terms of Service Required",
+        description: "Please accept the Terms of Service to continue.",
         variant: "destructive",
       });
       return;
@@ -285,9 +297,32 @@ const HealingTracker = () => {
                   />
                 </div>
 
+                <div className="flex items-start gap-2 p-3 border border-border rounded-md bg-muted/50">
+                  <Checkbox 
+                    id="tos-acceptance"
+                    checked={tosAccepted}
+                    onCheckedChange={(checked) => setTosAccepted(checked === true)}
+                  />
+                  <label 
+                    htmlFor="tos-acceptance" 
+                    className="text-sm leading-tight cursor-pointer"
+                  >
+                    I agree to the{" "}
+                    <Link 
+                      to="/terms-of-service" 
+                      className="text-primary hover:underline"
+                      target="_blank"
+                    >
+                      Terms of Service
+                    </Link>
+                    {" "}and understand that the AI Healing Tracker is for informational 
+                    purposes only and does not replace medical advice.
+                  </label>
+                </div>
+
                 <Button
                   onClick={analyzeProgress}
-                  disabled={!uploadedImage || isAnalyzing || !user || !tattooAge}
+                  disabled={!uploadedImage || isAnalyzing || !user || !tattooAge || !tosAccepted}
                   className="w-full"
                   size="lg"
                 >
