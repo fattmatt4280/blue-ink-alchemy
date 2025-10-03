@@ -58,6 +58,15 @@ const HealingTracker = () => {
       return;
     }
 
+    if (!tattooAge) {
+      toast({
+        title: "Tattoo age required",
+        description: "Please enter how many days old your tattoo is.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (isAnalyzing) return; // Prevent double-clicking
 
     try {
@@ -262,7 +271,7 @@ const HealingTracker = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Tattoo Age (Optional)
+                    Tattoo Age (Required) <span className="text-destructive">*</span>
                   </label>
                   <input
                     type="number"
@@ -270,12 +279,15 @@ const HealingTracker = () => {
                     value={tattooAge}
                     onChange={(e) => setTattooAge(e.target.value)}
                     className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                    min="0"
+                    max="365"
+                    required
                   />
                 </div>
 
                 <Button
                   onClick={analyzeProgress}
-                  disabled={!uploadedImage || isAnalyzing || !user}
+                  disabled={!uploadedImage || isAnalyzing || !user || !tattooAge}
                   className="w-full"
                   size="lg"
                 >
