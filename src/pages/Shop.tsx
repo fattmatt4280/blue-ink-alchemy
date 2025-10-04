@@ -1,4 +1,5 @@
 import ProductGrid from "@/components/ProductGrid";
+import Footer from "@/components/Footer";
 
 const Shop = () => {
   return (
@@ -43,6 +44,8 @@ const Shop = () => {
 
         <ProductGrid />
       </div>
+      
+      <Footer />
     </div>
   );
 };

@@ -15,6 +15,7 @@ import { useProductGrid } from "@/hooks/useProductGrid";
 import ProductCard from "@/components/ProductCard";
 import CartDialog from "@/components/CartDialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import Footer from "@/components/Footer";
 
 interface AnalysisResult {
   healingStage: string;
@@ -610,6 +611,8 @@ const HealingTracker = () => {
         onOpenChange={setCartDialogOpen}
         productName={selectedProductName}
       />
+      
+      <Footer />
     </div>
   );
 };

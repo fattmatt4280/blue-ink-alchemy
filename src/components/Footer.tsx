@@ -107,8 +107,14 @@ const Footer = () => {
               <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
             </div>
             
-            <div className="text-sm text-gray-400">
-              © 2025 Dream Tattoo Company LLC. All rights reserved.
+            <div className="text-sm text-gray-400 text-center md:text-right">
+              <p className="mb-1">© 2025 Dream Tattoo Company LLC. All rights reserved.</p>
+              <p className="text-xs">
+                Blue Dream Budder™ and Dream Healing Tracker™ are trademarks of Dream Tattoo Company LLC.
+              </p>
+              <p className="text-xs">
+                All product names, logos, and brands are property of their respective owners.
+              </p>
             </div>
           </div>
         </div>

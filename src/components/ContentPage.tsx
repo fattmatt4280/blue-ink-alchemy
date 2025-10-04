@@ -25,6 +25,15 @@ const ContentPage = ({ title, children }: ContentPageProps) => {
           
           <div className="bg-white rounded-lg shadow-sm p-8">
             {children}
+            
+            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+              <p className="text-xs text-gray-500 mb-1">
+                © 2025 Dream Tattoo Company LLC. All rights reserved.
+              </p>
+              <p className="text-xs text-gray-400">
+                Blue Dream Budder™ and Dream Healing Tracker™ are trademarks of Dream Tattoo Company LLC.
+              </p>
+            </div>
           </div>
         </div>
       </div>
