@@ -17,9 +17,13 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses } = await req.json();
+    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses } = await req.json();
     
-    console.log('Analyzing healing progress:', { imageUrl, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0 });
+    // Support both single image (legacy) and multiple images
+    const images = imageUrls || [primaryImageUrl];
+    const mainImage = primaryImageUrl || images[0];
+    
+    console.log('Analyzing healing progress:', { imageCount: images.length, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0 });
     
     const openRouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
     if (!openRouterApiKey) {
@@ -150,7 +154,8 @@ Respond with valid JSON only, no markdown formatting:
   "concerns": "any concerns or 'None'"
 }`;
 
-    const userPrompt = `Analyze this tattoo healing progress photo.
+    const userPrompt = `Analyze this tattoo healing progress from ${images.length} photo${images.length > 1 ? 's' : ''}.
+${images.length > 1 ? 'Multiple angles have been provided for comprehensive analysis.' : ''}
 
 Tattoo Age: ${tattooAge ? `${tattooAge} days` : 'Not specified'}
 
@@ -191,7 +196,10 @@ Provide your assessment following the expert guidance provided in the system pro
             role: 'user', 
             content: [
               { type: 'text', text: userPrompt },
-              { type: 'image_url', image_url: { url: imageUrl } }
+              ...images.map((url: string) => ({ 
+                type: 'image_url', 
+                image_url: { url } 
+              }))
             ]
           }
         ],

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export interface HealingHistoryEntry {
   id: string;
   photo_url: string;
+  photo_urls?: string[];
   healing_stage: string;
   progress_score: number;
   recommendations: string[];

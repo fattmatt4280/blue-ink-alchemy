@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import ImageUpload from "@/components/ImageUpload";
+import MultipleImageUpload from "@/components/MultipleImageUpload";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProductGrid } from "@/hooks/useProductGrid";
@@ -36,7 +36,7 @@ const HealingTracker = () => {
   const { toast } = useToast();
   const { user, loading } = useAuth();
   const { products, loading: productsLoading, cartDialogOpen, selectedProductName, setCartDialogOpen, handleAddToCart, handleProductView } = useProductGrid();
-  const [uploadedImage, setUploadedImage] = useState<string>("");
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [tattooAge, setTattooAge] = useState<string>("");
@@ -46,21 +46,21 @@ const HealingTracker = () => {
   const [allergies, setAllergies] = useState<string>("");
   const [tosAccepted, setTosAccepted] = useState<boolean>(false);
 
-  const handleImageUploaded = (url: string) => {
+  const handleImagesUploaded = (urls: string[]) => {
     try {
-      setUploadedImage(url);
+      setUploadedImages(urls);
       setAnalysis(null);
       setTosAccepted(false);
     } catch (error) {
-      console.error('Error updating image state:', error);
+      console.error('Error updating images state:', error);
     }
   };
 
   const analyzeProgress = async () => {
-    if (!uploadedImage) {
+    if (uploadedImages.length === 0) {
       toast({
-        title: "No image uploaded",
-        description: "Please upload a photo of your tattoo first.",
+        title: "No images uploaded",
+        description: "Please upload at least one photo of your tattoo first.",
         variant: "destructive",
       });
       return;
@@ -91,7 +91,8 @@ const HealingTracker = () => {
       
       const { data, error } = await supabase.functions.invoke('analyze-healing-progress', {
         body: {
-          imageUrl: uploadedImage,
+          imageUrls: uploadedImages,
+          primaryImageUrl: uploadedImages[0],
           tattooAge: tattooAge ? parseInt(tattooAge) : null,
           cleanedWithAlcohol,
           coveringType,
@@ -168,7 +169,8 @@ const HealingTracker = () => {
             await supabase
               .from('healing_progress')
               .insert({
-                photo_url: uploadedImage,
+                photo_url: uploadedImages[0],
+                photo_urls: uploadedImages,
                 analysis_result: data.analysis,
                 healing_stage: data.analysis.healingStage,
                 recommendations: data.analysis.recommendations,
@@ -262,7 +264,7 @@ const HealingTracker = () => {
                   Upload Tattoo Photo
                 </CardTitle>
                 <CardDescription>
-                  Take a clear, well-lit photo of your tattoo for AI analysis
+                  Take clear, well-lit photos of your tattoo for AI analysis
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -281,12 +283,13 @@ const HealingTracker = () => {
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <ImageUpload
-                    onImageUploaded={handleImageUploaded}
-                    currentImage={uploadedImage}
-                    title="Tattoo Photo"
-                    description="Upload a clear photo showing the entire tattoo"
+                  <MultipleImageUpload
+                    onImagesUploaded={handleImagesUploaded}
+                    currentImages={uploadedImages}
+                    title="Tattoo Photos"
+                    description="Upload multiple photos from different angles (up to 10 images)"
                     bucket="healing-photos"
+                    maxImages={10}
                   />
                 )}
 
@@ -395,7 +398,7 @@ const HealingTracker = () => {
 
                 <Button
                   onClick={analyzeProgress}
-                  disabled={!uploadedImage || isAnalyzing || !user || !tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies || !tosAccepted}
+                  disabled={uploadedImages.length === 0 || isAnalyzing || !user || !tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies || !tosAccepted}
                   className="w-full"
                   size="lg"
                 >
@@ -583,7 +586,6 @@ const HealingTracker = () => {
                         </div>
                       )}
                       
-                      {/* Emergency Care Products */}
                       <div className="mt-6 pt-6 border-t">
                         <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                           <AlertCircle className="h-4 w-4 text-destructive" />
@@ -670,7 +672,7 @@ const HealingTracker = () => {
               <Card className="neon-border">
                 <CardContent className="py-12 text-center text-muted-foreground">
                   <Upload className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Upload a photo and click "Analyze" to see your healing progress assessment</p>
+                  <p>Upload photos and click "Analyze" to see your healing progress assessment</p>
                 </CardContent>
               </Card>
             )}

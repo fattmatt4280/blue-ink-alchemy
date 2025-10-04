@@ -580,6 +580,7 @@ export type Database = {
           healing_stage: string
           id: string
           photo_url: string
+          photo_urls: string[] | null
           progress_score: number | null
           recommendations: string[]
           user_id: string | null
@@ -590,6 +591,7 @@ export type Database = {
           healing_stage: string
           id?: string
           photo_url: string
+          photo_urls?: string[] | null
           progress_score?: number | null
           recommendations?: string[]
           user_id?: string | null
@@ -600,6 +602,7 @@ export type Database = {
           healing_stage?: string
           id?: string
           photo_url?: string
+          photo_urls?: string[] | null
           progress_score?: number | null
           recommendations?: string[]
           user_id?: string | null
