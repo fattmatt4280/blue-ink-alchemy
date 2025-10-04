@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_products: {
+        Row: {
+          active: boolean | null
+          affiliate_link: string
+          amazon_asin: string
+          category: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          priority: number | null
+          product_name: string
+          recommended_for: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          affiliate_link: string
+          amazon_asin: string
+          category: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          priority?: number | null
+          product_name: string
+          recommended_for?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          affiliate_link?: string
+          amazon_asin?: string
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          priority?: number | null
+          product_name?: string
+          recommended_for?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ai_assessment_ratings: {
         Row: {
           created_at: string | null

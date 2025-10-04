@@ -9,6 +9,7 @@ import AdminHeader from '@/components/AdminHeader';
 import TextContentEditor from '@/components/TextContentEditor';
 import ProductManager from '@/components/ProductManager';
 import ProductReorderTool from '@/components/ProductReorderTool';
+import AffiliateProductManager from '@/components/AffiliateProductManager';
 import IngredientsEditor from '@/components/IngredientsEditor';
 import TestimonialsEditor from '@/components/TestimonialsEditor';
 import FooterLinksEditor from '@/components/FooterLinksEditor';
@@ -229,6 +230,9 @@ const AdminDashboard = () => {
 
             {/* Product Reorder Tool */}
             <ProductReorderTool />
+
+            {/* Affiliate Products Management */}
+            <AffiliateProductManager />
           </TabsContent>
 
           <TabsContent value="blog" className="space-y-6">
