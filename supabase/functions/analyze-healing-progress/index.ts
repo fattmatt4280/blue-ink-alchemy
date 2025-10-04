@@ -17,7 +17,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, tattooAge, previousAnalyses } = await req.json();
+    const { imageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses } = await req.json();
     
     console.log('Analyzing healing progress:', { imageUrl, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0 });
     
@@ -150,9 +150,29 @@ Respond with valid JSON only, no markdown formatting:
   "concerns": "any concerns or 'None'"
 }`;
 
-    const userPrompt = `Analyze this tattoo healing progress photo. ${tattooAge ? `The tattoo is ${tattooAge} days old.` : ''}
+    const userPrompt = `Analyze this tattoo healing progress photo.
 
-Provide your assessment following the expert guidance provided in the system prompt.`;
+Tattoo Age: ${tattooAge ? `${tattooAge} days` : 'Not specified'}
+
+Artist Post-Tattoo Care:
+- Cleaned with alcohol afterward: ${cleanedWithAlcohol || 'Not specified'}
+- Initial covering used: ${coveringType || 'Not specified'}
+
+Client Aftercare Routine:
+- Products and routine: ${aftercareProducts || 'Not specified'}
+
+Allergies: ${allergies || 'None reported'}
+
+${previousAnalyses && previousAnalyses.length > 0 ? `
+Previous Assessments:
+${previousAnalyses.map((a: any, i: number) => `
+${i + 1}. Date: ${new Date(a.date).toLocaleDateString()}
+   Stage: ${a.stage}
+   Progress Score: ${a.score}/10
+`).join('\n')}
+` : 'This is the first assessment for this tattoo.'}
+
+Provide your assessment following the expert guidance provided in the system prompt. Take into account the initial covering method, aftercare products being used, and any allergies when making recommendations.`;
 
     // Call OpenRouter for analysis (temporary - using OpenRouter credits)
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {

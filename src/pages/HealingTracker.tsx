@@ -40,6 +40,10 @@ const HealingTracker = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [tattooAge, setTattooAge] = useState<string>("");
+  const [cleanedWithAlcohol, setCleanedWithAlcohol] = useState<string>("");
+  const [coveringType, setCoveringType] = useState<string>("");
+  const [aftercareProducts, setAftercareProducts] = useState<string>("");
+  const [allergies, setAllergies] = useState<string>("");
   const [tosAccepted, setTosAccepted] = useState<boolean>(false);
 
   const handleImageUploaded = (url: string) => {
@@ -62,10 +66,10 @@ const HealingTracker = () => {
       return;
     }
 
-    if (!tattooAge) {
+    if (!tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies) {
       toast({
-        title: "Tattoo age required",
-        description: "Please enter how many days old your tattoo is.",
+        title: "Missing Information",
+        description: "Please fill in all required fields including tattoo age, aftercare details, and allergy information.",
         variant: "destructive",
       });
       return;
@@ -89,6 +93,10 @@ const HealingTracker = () => {
         body: {
           imageUrl: uploadedImage,
           tattooAge: tattooAge ? parseInt(tattooAge) : null,
+          cleanedWithAlcohol,
+          coveringType,
+          aftercareProducts,
+          allergies,
         }
       });
 
@@ -282,20 +290,84 @@ const HealingTracker = () => {
                   />
                 )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Tattoo Age (Required) <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="How many days old is your tattoo?"
-                    value={tattooAge}
-                    onChange={(e) => setTattooAge(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md"
-                    min="0"
-                    max="365"
-                    required
-                  />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Tattoo Age (Required) <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="How many days old is your tattoo?"
+                      value={tattooAge}
+                      onChange={(e) => setTattooAge(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                      min="0"
+                      max="365"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Did the artist clean with alcohol afterward? <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      value={cleanedWithAlcohol}
+                      onChange={(e) => setCleanedWithAlcohol(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                      required
+                    >
+                      <option value="">Select an option</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                      <option value="unknown">I don't know</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      What was the tattoo covered with? <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      value={coveringType}
+                      onChange={(e) => setCoveringType(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                      required
+                    >
+                      <option value="">Select an option</option>
+                      <option value="dermal-covering">Dermal covering (2nd skin plastic - Tegaderm, Saniderm, etc.)</option>
+                      <option value="plastic-wrap">Plastic wrap</option>
+                      <option value="paper-towel">Paper towel</option>
+                      <option value="nothing">Nothing</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      How have you been taking care of it? What products are you using? <span className="text-destructive">*</span>
+                    </label>
+                    <textarea
+                      placeholder="e.g., Aquaphor twice daily, washing with antibacterial soap, using Blue Dream Budder, etc."
+                      value={aftercareProducts}
+                      onChange={(e) => setAftercareProducts(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-md min-h-[80px]"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Do you have any allergies? <span className="text-destructive">*</span>
+                    </label>
+                    <textarea
+                      placeholder="List any allergies (medications, topical products, environmental, etc.) or write 'None'"
+                      value={allergies}
+                      onChange={(e) => setAllergies(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-md min-h-[60px]"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-start gap-2 p-3 border border-border rounded-md bg-muted/50">
@@ -323,7 +395,7 @@ const HealingTracker = () => {
 
                 <Button
                   onClick={analyzeProgress}
-                  disabled={!uploadedImage || isAnalyzing || !user || !tattooAge || !tosAccepted}
+                  disabled={!uploadedImage || isAnalyzing || !user || !tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies || !tosAccepted}
                   className="w-full"
                   size="lg"
                 >
