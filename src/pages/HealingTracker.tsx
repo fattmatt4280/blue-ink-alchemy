@@ -580,6 +580,18 @@ const HealingTracker = () => {
                     </CardContent>
                   </Card>
                 )}
+
+                {/* Branding Footer */}
+                <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-lg bg-muted/50 border border-border">
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground">
+                      AI Analysis Powered by
+                    </p>
+                    <p className="text-sm font-semibold gradient-text">
+                      Dream Healing Tracker™
+                    </p>
+                  </div>
+                </div>
               </>
             ) : (
               <Card className="neon-border">
