@@ -18,6 +18,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Footer from "@/components/Footer";
 
 interface AnalysisResult {
+  personalGreeting?: string;
+  tattooDescription?: string;
   healingStage: string;
   visualAssessment: {
     colorAssessment?: string;
@@ -89,6 +91,37 @@ const HealingTracker = () => {
     try {
       setIsAnalyzing(true);
       
+      // Fetch user's previous healing progress entries for historical context
+      let previousAnalyses = [];
+      let userName = 'there';
+      
+      if (user) {
+        // Get user's name from email or metadata
+        userName = user.user_metadata?.first_name || 
+                   user.email?.split('@')[0]?.split('.')[0] || 
+                   'there';
+        
+        // Fetch last 5 healing progress entries
+        const { data: previousEntries } = await supabase
+          .from('healing_progress')
+          .select('created_at, healing_stage, progress_score, analysis_result')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        // Format for AI context
+        if (previousEntries && previousEntries.length > 0) {
+          previousAnalyses = previousEntries.map(entry => ({
+            date: entry.created_at,
+            stage: entry.healing_stage,
+            score: entry.progress_score,
+            summary: typeof entry.analysis_result === 'object' && entry.analysis_result !== null 
+              ? (entry.analysis_result as any)?.summary || '' 
+              : ''
+          }));
+        }
+      }
+      
       const { data, error } = await supabase.functions.invoke('analyze-healing-progress', {
         body: {
           imageUrls: uploadedImages,
@@ -98,6 +131,9 @@ const HealingTracker = () => {
           coveringType,
           aftercareProducts,
           allergies,
+          previousAnalyses,
+          userName,
+          userId: user?.id || null,
         }
       });
 
@@ -462,22 +498,32 @@ const HealingTracker = () => {
           <div className="space-y-6">
             {analysis ? (
               <>
-                {/* Healing Stage */}
+                {/* Personalized Greeting & Tattoo Description */}
                 <Card className="neon-border">
                   <CardHeader>
-                    <CardTitle>Healing Progress Assessment</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="text-center">
-                      <Badge className={`${getStageColor(analysis.healingStage)} text-lg px-4 py-2`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-2xl mb-2">
+                          {analysis.personalGreeting || 'Healing Progress Assessment'}
+                        </CardTitle>
+                        {analysis.tattooDescription && (
+                          <CardDescription className="text-base">
+                            {analysis.tattooDescription}
+                          </CardDescription>
+                        )}
+                      </div>
+                      <Badge className={`${getStageColor(analysis.healingStage)} text-lg px-4 py-2 ml-4`}>
                         {analysis.healingStage}
                       </Badge>
-                      {tattooAge && (
-                        <p className="text-sm text-muted-foreground mt-3">
-                          Tattoo Age: {tattooAge} days
-                        </p>
-                      )}
                     </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {tattooAge && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" />
+                        <span>Tattoo Age: {tattooAge} days</span>
+                      </div>
+                    )}
 
                     {analysis.summary && (
                       <div>

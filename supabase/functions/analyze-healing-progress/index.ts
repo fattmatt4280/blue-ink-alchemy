@@ -17,13 +17,15 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses } = await req.json();
+    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses, userName, userId } = await req.json();
     
     // Support both single image (legacy) and multiple images
     const images = imageUrls || [primaryImageUrl];
     const mainImage = primaryImageUrl || images[0];
     
-    console.log('Analyzing healing progress:', { imageCount: images.length, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0 });
+    const clientName = userName || 'there';
+    
+    console.log('Analyzing healing progress:', { imageCount: images.length, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0, userName: clientName });
     
     const openRouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
     if (!openRouterApiKey) {
@@ -89,10 +91,18 @@ serve(async (req) => {
     // Build previous analyses context
     let previousAnalysesContext = '';
     if (previousAnalyses && previousAnalyses.length > 0) {
-      previousAnalysesContext = '\nPrevious analyses for this tattoo:\n';
-      previousAnalyses.forEach((prev: any, idx: number) => {
-        previousAnalysesContext += `Analysis ${idx + 1}: Stage=${prev.healingStage}, Score=${prev.progressScore}\n`;
-      });
+      previousAnalysesContext = `\n\nCLIENT'S HEALING HISTORY:
+${clientName} has ${previousAnalyses.length} previous check-in(s) with us:
+${previousAnalyses.map((prev: any, idx: number) => `
+  ${idx + 1}. ${new Date(prev.date).toLocaleDateString()}
+     - Healing Stage: ${prev.stage}
+     - Progress Score: ${prev.score || 'N/A'}/10
+     - Key Notes: ${prev.summary || 'None'}
+`).join('\n')}
+
+Based on this history, provide continuity of care and reference any improvements or concerns compared to their previous visits.`;
+    } else {
+      previousAnalysesContext = `\n\nThis is ${clientName}'s first check-in with our healing tracker. Welcome them warmly and establish a baseline for future comparisons.`;
     }
 
     // Build custom instructions context
@@ -105,7 +115,21 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `You are a professional tattoo aftercare specialist with 25 years of experience. Your PRIMARY responsibility is to identify potential infections and complications early.
+    const systemPrompt = `You are Matt from Dream Tattoo Company, a professional tattoo aftercare specialist with 25 years of experience. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
+
+PERSONALIZATION REQUIREMENTS:
+1. Address the client by their first name (${clientName}) warmly and professionally
+2. Describe the tattoo design and style you observe in the photos (subject matter, artistic style, color palette, notable elements)
+3. Reference their previous check-ins if available - note improvements, consistency, or new concerns
+4. Use warm, conversational yet professional language - make them feel cared for
+5. Show genuine empathy and encouragement for their healing journey
+6. Make this feel like a personal consultation from Matt, not a robotic analysis
+
+TATTOO DESCRIPTION (Required in response):
+- Identify the subject matter (e.g., "your floral sleeve," "portrait piece," "geometric design")
+- Note the artistic style (realism, traditional, watercolor, blackwork, neo-traditional, etc.)
+- Comment on color palette if applicable (black & grey, vibrant colors, etc.)
+- Mention notable artistic elements (shading quality, linework, detail level)
 
 CRITICAL INFECTION SIGNS (flag immediately as "High Risk"):
 - Excessive redness spreading beyond tattoo borders
@@ -133,15 +157,17 @@ ANALYSIS PRIORITY:
 2. Compare visually with expert reference images if available in the knowledge base above
 3. Determine tattoo age compatibility with visible stage
 4. Assess healing stage based on timeline above
-5. Provide clear, actionable recommendations
+5. Provide clear, actionable recommendations with continuity of care
 
 VISUAL COMPARISON INSTRUCTIONS:
 When the Expert Knowledge Base mentions "REFERENCE IMAGES AVAILABLE", you should visually compare the user's tattoo photo with what those documented conditions look like. Use these visual references to improve diagnostic accuracy for infections, allergic reactions, and healing complications.
 
-Respond with valid JSON only, no markdown formatting:
+RESPONSE FORMAT - Add these new fields at the top:
 {
+  "personalGreeting": "Warm, personalized opening addressing ${clientName} by name (e.g., 'Hi ${clientName}! Great to see you...')",
+  "tattooDescription": "Description of the tattoo design and artistic style visible in the photos",
   "healingStage": "stage name",
-  "summary": "Brief summary mentioning tattoo age and overall assessment",
+  "summary": "Personalized summary that references their history if available and shows continuity of care",
   "tattooAgeDays": number or null,
   "visualAssessment": {
     "colorAssessment": "description",
@@ -154,8 +180,12 @@ Respond with valid JSON only, no markdown formatting:
   "concerns": "any concerns or 'None'"
 }`;
 
-    const userPrompt = `Analyze this tattoo healing progress from ${images.length} photo${images.length > 1 ? 's' : ''}.
+    const userPrompt = `Analyze ${clientName}'s tattoo healing progress from ${images.length} photo${images.length > 1 ? 's' : ''}.
 ${images.length > 1 ? 'Multiple angles have been provided for comprehensive analysis.' : ''}
+
+CLIENT INFORMATION:
+- Name: ${clientName}
+- This is their personal healing journey with Dream Tattoo Company
 
 Tattoo Age: ${tattooAge ? `${tattooAge} days` : 'Not specified'}
 
@@ -174,8 +204,15 @@ ${previousAnalyses.map((a: any, i: number) => `
 ${i + 1}. Date: ${new Date(a.date).toLocaleDateString()}
    Stage: ${a.stage}
    Progress Score: ${a.score}/10
+   Summary: ${a.summary || 'No summary'}
 `).join('\n')}
 ` : 'This is the first assessment for this tattoo.'}
+
+Remember to:
+- Address ${clientName} personally and warmly in your personalGreeting
+- Describe their tattoo design and style in tattooDescription
+- Reference their previous visits if this isn't their first check-in
+- Provide continuity of care and personalized guidance
 
 Provide your assessment following the expert guidance provided in the system prompt. Take into account the initial covering method, aftercare products being used, and any allergies when making recommendations.`;
 
