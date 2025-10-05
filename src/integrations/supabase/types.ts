@@ -609,6 +609,47 @@ export type Database = {
         }
         Relationships: []
       }
+      healing_qa_interactions: {
+        Row: {
+          analysis_context: Json
+          answer_text: string
+          created_at: string
+          healing_progress_id: string | null
+          id: string
+          question_category: string | null
+          question_text: string
+          user_id: string | null
+        }
+        Insert: {
+          analysis_context: Json
+          answer_text: string
+          created_at?: string
+          healing_progress_id?: string | null
+          id?: string
+          question_category?: string | null
+          question_text: string
+          user_id?: string | null
+        }
+        Update: {
+          analysis_context?: Json
+          answer_text?: string
+          created_at?: string
+          healing_progress_id?: string | null
+          id?: string
+          question_category?: string | null
+          question_text?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healing_qa_interactions_healing_progress_id_fkey"
+            columns: ["healing_progress_id"]
+            isOneToOne: false
+            referencedRelation: "healing_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_signups: {
         Row: {
           active: boolean

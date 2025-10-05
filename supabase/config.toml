@@ -54,3 +54,7 @@ verify_jwt = false
 [[functions]]
 name = "analyze-healing-progress"
 verify_jwt = false
+
+[[functions]]
+name = "healing-followup-qa"
+verify_jwt = false

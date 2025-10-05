@@ -16,6 +16,16 @@ import ProductCard from "@/components/ProductCard";
 import CartDialog from "@/components/CartDialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import Footer from "@/components/Footer";
+import HealingQADialog from "@/components/HealingQADialog";
+import { MessageCircle } from "lucide-react";
+
+interface Question {
+  id: string;
+  question: string;
+  category: string;
+  icon: string;
+  context?: string;
+}
 
 interface AnalysisResult {
   personalGreeting?: string;
@@ -31,6 +41,7 @@ interface AnalysisResult {
   productRecommendations?: string[];
   summary: string;
   tattooAgeDays?: number | null;
+  suggestedQuestions?: Question[];
 }
 
 const HealingTracker = () => {
@@ -47,6 +58,8 @@ const HealingTracker = () => {
   const [aftercareProducts, setAftercareProducts] = useState<string>("");
   const [allergies, setAllergies] = useState<string>("");
   const [tosAccepted, setTosAccepted] = useState<boolean>(false);
+  const [qaDialogOpen, setQaDialogOpen] = useState(false);
+  const [savedHealingProgressId, setSavedHealingProgressId] = useState<string | null>(null);
 
   const handleImagesUploaded = (urls: string[]) => {
     try {
@@ -202,7 +215,7 @@ const HealingTracker = () => {
           const { data: userData } = await supabase.auth.getUser();
           
           if (userData.user) {
-            await supabase
+            const { data: progressData } = await supabase
               .from('healing_progress')
               .insert({
                 photo_url: uploadedImages[0],
@@ -212,7 +225,13 @@ const HealingTracker = () => {
                 recommendations: data.analysis.recommendations,
                 progress_score: 0,
                 user_id: userData.user.id,
-              });
+              })
+              .select()
+              .single();
+            
+            if (progressData) {
+              setSavedHealingProgressId(progressData.id);
+            }
           }
         } catch (dbError) {
           console.error('Failed to save analysis:', dbError);
@@ -589,6 +608,19 @@ const HealingTracker = () => {
                   </Card>
                 )}
 
+                {/* Follow-Up Questions Button */}
+                {analysis.suggestedQuestions && analysis.suggestedQuestions.length > 0 && (
+                  <Button
+                    onClick={() => setQaDialogOpen(true)}
+                    className="w-full"
+                    size="lg"
+                    variant="outline"
+                  >
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Ask Follow-Up Questions
+                  </Button>
+                )}
+
                 {/* Product Recommendations */}
                 {analysis.productRecommendations && analysis.productRecommendations.length > 0 && (
                   <Card className="neon-border">
@@ -726,12 +758,24 @@ const HealingTracker = () => {
         </div>
       </div>
 
-      <CartDialog 
+      <CartDialog
         open={cartDialogOpen}
         onOpenChange={setCartDialogOpen}
         productName={selectedProductName}
       />
-      
+
+      {analysis && analysis.suggestedQuestions && (
+        <HealingQADialog
+          open={qaDialogOpen}
+          onOpenChange={setQaDialogOpen}
+          analysisContext={analysis}
+          userName={user?.user_metadata?.first_name || user?.email?.split('@')[0]?.split('.')[0] || 'there'}
+          userId={user?.id}
+          healingProgressId={savedHealingProgressId || undefined}
+          initialQuestions={analysis.suggestedQuestions}
+        />
+      )}
+
       <Footer />
     </div>
   );

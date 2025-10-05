@@ -177,8 +177,31 @@ RESPONSE FORMAT - Add these new fields at the top:
   "recommendations": ["rec1", "rec2"],
   "riskFactors": ["any concerns or empty array"],
   "productRecommendations": ["product suggestions based on healing stage"],
-  "concerns": "any concerns or 'None'"
-}`;
+  "concerns": "any concerns or 'None'",
+  "suggestedQuestions": [
+    {
+      "id": "unique-id-based-on-category",
+      "question": "Specific question based on THEIR analysis results",
+      "category": "healing_stage|products|concerns|aftercare",
+      "icon": "Activity|Package|AlertCircle|Heart",
+      "context": "Why this question is relevant to their specific situation"
+    }
+  ]
+}
+
+SUGGESTED QUESTIONS INSTRUCTIONS:
+Generate 3-5 contextual follow-up questions that are:
+1. Specific to THIS client's analysis (their healing stage, risk factors, recommendations)
+2. Genuinely helpful and actionable
+3. Strictly within scope (healing, products, aftercare only)
+4. Natural conversation starters that feel personal
+
+Example patterns:
+- If they have peeling: "What should I do if the peeling increases in the next few days?"
+- If using specific product: "Can I switch from [product] to [alternative] at this stage?"
+- If at risk: "What specific signs should I watch for in my [area] over the next 48 hours?"
+- Based on their history: "How does my current progress compare to my last check-in?"
+`;
 
     const userPrompt = `Analyze ${clientName}'s tattoo healing progress from ${images.length} photo${images.length > 1 ? 's' : ''}.
 ${images.length > 1 ? 'Multiple angles have been provided for comprehensive analysis.' : ''}
