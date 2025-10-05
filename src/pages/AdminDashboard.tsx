@@ -21,6 +21,7 @@ import { PushNotificationManager } from '@/components/PushNotificationManager';
 import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { HealingAssessmentReviewer } from '@/components/HealingAssessmentReviewer';
 import { ExpertKnowledgeEditor } from '@/components/ExpertKnowledgeEditor';
 import { AITrainingAnalytics } from '@/components/AITrainingAnalytics';
@@ -168,6 +169,14 @@ const AdminDashboard = () => {
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-6">
+            <div className="mb-4">
+              <Button 
+                onClick={() => window.location.href = '/admin/activation-codes'}
+                variant="outline"
+              >
+                Manage Healyn Activation Codes
+              </Button>
+            </div>
             <PushNotificationManager />
             <AnalyticsDashboard />
             <AdminAnalyticsManager />

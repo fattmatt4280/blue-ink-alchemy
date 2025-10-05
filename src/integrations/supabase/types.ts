@@ -650,6 +650,142 @@ export type Database = {
           },
         ]
       }
+      healyn_activation_codes: {
+        Row: {
+          activated_by: string | null
+          activation_date: string | null
+          code: string
+          created_at: string | null
+          email: string | null
+          expiration_date: string | null
+          id: string
+          redeemed: boolean | null
+          tier: string | null
+          updated_at: string | null
+          upgraded: boolean | null
+        }
+        Insert: {
+          activated_by?: string | null
+          activation_date?: string | null
+          code: string
+          created_at?: string | null
+          email?: string | null
+          expiration_date?: string | null
+          id?: string
+          redeemed?: boolean | null
+          tier?: string | null
+          updated_at?: string | null
+          upgraded?: boolean | null
+        }
+        Update: {
+          activated_by?: string | null
+          activation_date?: string | null
+          code?: string
+          created_at?: string | null
+          email?: string | null
+          expiration_date?: string | null
+          id?: string
+          redeemed?: boolean | null
+          tier?: string | null
+          updated_at?: string | null
+          upgraded?: boolean | null
+        }
+        Relationships: []
+      }
+      healyn_subscriptions: {
+        Row: {
+          activation_code: string | null
+          created_at: string | null
+          email: string
+          expiration_date: string
+          id: string
+          is_active: boolean | null
+          start_date: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activation_code?: string | null
+          created_at?: string | null
+          email: string
+          expiration_date: string
+          id?: string
+          is_active?: boolean | null
+          start_date?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activation_code?: string | null
+          created_at?: string | null
+          email?: string
+          expiration_date?: string
+          id?: string
+          is_active?: boolean | null
+          start_date?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healyn_subscriptions_activation_code_fkey"
+            columns: ["activation_code"]
+            isOneToOne: false
+            referencedRelation: "healyn_activation_codes"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      healyn_upgrade_history: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          id: string
+          new_tier: string
+          old_tier: string | null
+          stripe_payment_id: string | null
+          subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          new_tier: string
+          old_tier?: string | null
+          stripe_payment_id?: string | null
+          subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          new_tier?: string
+          old_tier?: string | null
+          stripe_payment_id?: string | null
+          subscription_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healyn_upgrade_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "healyn_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_signups: {
         Row: {
           active: boolean
@@ -1231,6 +1367,10 @@ export type Database = {
           rating: number
           title: string
         }[]
+      }
+      has_active_healyn_subscription: {
+        Args: { user_id_param: string }
+        Returns: boolean
       }
       increment_daily_metric: {
         Args: { metric_date: string; metric_name: string }

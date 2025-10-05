@@ -58,3 +58,15 @@ verify_jwt = false
 [[functions]]
 name = "healing-followup-qa"
 verify_jwt = false
+
+[[functions]]
+name = "activate-healyn"
+verify_jwt = false
+
+[[functions]]
+name = "create-healyn-upgrade"
+verify_jwt = true
+
+[[functions]]
+name = "generate-activation-codes"
+verify_jwt = true

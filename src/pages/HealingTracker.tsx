@@ -17,6 +17,7 @@ import CartDialog from "@/components/CartDialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import Footer from "@/components/Footer";
 import HealingQADialog from "@/components/HealingQADialog";
+import { HealynSubscriptionStatus } from "@/components/HealynSubscriptionStatus";
 import { MessageCircle } from "lucide-react";
 
 interface Question {
@@ -312,6 +313,7 @@ const HealingTracker = () => {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Upload Section */}
           <div className="space-y-6">
+            <HealynSubscriptionStatus />
             <Card className="neon-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

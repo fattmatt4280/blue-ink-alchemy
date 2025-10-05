@@ -24,6 +24,9 @@ import Tracking from "./pages/Tracking";
 import TattooAftercare from "./pages/TattooAftercare";
 import HealingTracker from "./pages/HealingTracker";
 import HealingHistory from "./pages/HealingHistory";
+import Activate from "./pages/Activate";
+import Dashboard from "./pages/Dashboard";
+import AdminActivationCodes from "./pages/AdminActivationCodes";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -53,6 +56,9 @@ const App = () => (
                <Route path="/tattoo-aftercare" element={<TattooAftercare />} />
                <Route path="/healing-tracker" element={<HealingTracker />} />
                <Route path="/healing-history" element={<HealingHistory />} />
+               <Route path="/activate" element={<Activate />} />
+               <Route path="/dashboard" element={<Dashboard />} />
+               <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
                <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
