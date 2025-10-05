@@ -284,10 +284,10 @@ const HealingTracker = () => {
             </Button>
             <div>
               <h1 className="text-4xl font-bold gradient-text mb-2">
-                Tattoo Healing Tracker
+                Healyn
               </h1>
               <p className="text-muted-foreground">
-                AI-powered healing progress assessment for your tattoo aftercare journey
+                Your AI tattoo healing assistant by Blue Dream Budder
               </p>
             </div>
           </div>
@@ -446,7 +446,7 @@ const HealingTracker = () => {
                     >
                       Terms of Service
                     </Link>
-                    {" "}and understand that the AI Healing Tracker is for informational 
+                    {" "}and understand that Healyn is for informational 
                     purposes only and does not replace medical advice.
                   </label>
                 </div>
@@ -741,7 +741,7 @@ const HealingTracker = () => {
                       AI Analysis Powered by
                     </p>
                     <p className="text-sm font-semibold gradient-text">
-                      Dream Healing Tracker™
+                      Healyn™ by Blue Dream Budder
                     </p>
                   </div>
                 </div>

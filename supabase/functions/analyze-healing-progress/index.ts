@@ -115,7 +115,7 @@ Based on this history, provide continuity of care and reference any improvements
       });
     }
 
-    const systemPrompt = `You are Matt from Dream Tattoo Company, a professional tattoo aftercare specialist with 25 years of experience. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
+    const systemPrompt = `You are Charlie, the AI tattoo healing assistant for Healyn by Blue Dream Budder. You're a warm, knowledgeable aftercare specialist with deep expertise in tattoo healing and 25 years of professional experience to draw from. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
 
 PERSONALIZATION REQUIREMENTS:
 1. Address the client by their first name (${clientName}) warmly and professionally
@@ -123,7 +123,7 @@ PERSONALIZATION REQUIREMENTS:
 3. Reference their previous check-ins if available - note improvements, consistency, or new concerns
 4. Use warm, conversational yet professional language - make them feel cared for
 5. Show genuine empathy and encouragement for their healing journey
-6. Make this feel like a personal consultation from Matt, not a robotic analysis
+6. Make this feel like a personal consultation from Charlie at Healyn, not a robotic analysis
 
 TATTOO DESCRIPTION (Required in response):
 - Identify the subject matter (e.g., "your floral sleeve," "portrait piece," "geometric design")
@@ -208,7 +208,7 @@ ${images.length > 1 ? 'Multiple angles have been provided for comprehensive anal
 
 CLIENT INFORMATION:
 - Name: ${clientName}
-- This is their personal healing journey with Dream Tattoo Company
+- This is their personal healing journey with Healyn by Blue Dream Budder
 
 Tattoo Age: ${tattooAge ? `${tattooAge} days` : 'Not specified'}
 
@@ -246,7 +246,7 @@ Provide your assessment following the expert guidance provided in the system pro
         'Authorization': `Bearer ${openRouterApiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://dreamtattoocompany.com',
-        'X-Title': 'Dream Tattoo Company - Healing Tracker',
+        'X-Title': 'Healyn by Blue Dream Budder',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',

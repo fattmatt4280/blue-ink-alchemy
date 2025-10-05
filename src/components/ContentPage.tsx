@@ -31,7 +31,7 @@ const ContentPage = ({ title, children }: ContentPageProps) => {
                 © 2025 Dream Tattoo Company LLC. All rights reserved.
               </p>
               <p className="text-xs text-gray-400">
-                Blue Dream Budder™ and Dream Healing Tracker™ are trademarks of Dream Tattoo Company LLC.
+                Blue Dream Budder™ and Healyn™ are trademarks of Dream Tattoo Company LLC.
               </p>
             </div>
           </div>

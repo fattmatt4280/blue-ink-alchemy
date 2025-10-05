@@ -27,7 +27,7 @@ const PrivacyPolicy = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">1. Introduction</h2>
               <p>
-                This Privacy Policy explains how Dream Tattoo Company LLC / Blue Dream Budder ("we," "our," or "us") collects, uses, and safeguards personal information when you use our website, online store, and services, including the AI Tattoo Healing Tracker (the "Services"). By using the Services, you consent to the practices described in this Privacy Policy.
+                This Privacy Policy explains how Dream Tattoo Company LLC / Blue Dream Budder ("we," "our," or "us") collects, uses, and safeguards personal information when you use our website, online store, and services, including Healyn (AI Tattoo Healing Assistant) (the "Services"). By using the Services, you consent to the practices described in this Privacy Policy.
               </p>
             </section>
 
@@ -36,7 +36,7 @@ const PrivacyPolicy = () => {
               <p>We collect the following categories of information:</p>
               <ul className="list-disc ml-6 mt-2 space-y-1">
                 <li><strong>Personal Information You Provide:</strong> Name, email, billing and shipping address, payment details, and other information you submit when making purchases or creating an account.</li>
-                <li><strong>Uploaded Images:</strong> Tattoo photos and any related details you provide when using the Tattoo Healing Tracker.</li>
+                <li><strong>Uploaded Images:</strong> Tattoo photos and any related details you provide when using Healyn.</li>
                 <li><strong>Generated Reports:</strong> AI-generated summaries and recommendations derived from your uploaded images.</li>
                 <li><strong>Device & Usage Data:</strong> IP address, browser type, operating system, referral source, interactions with our site, cookies, and analytics data.</li>
                 <li><strong>Communications:</strong> Information you provide when contacting us, subscribing to newsletters, or engaging with customer service.</li>
@@ -63,7 +63,7 @@ const PrivacyPolicy = () => {
               <ul className="list-disc ml-6 space-y-1">
                 <li>Uploaded tattoo images may contain health-related information (skin conditions, healing progress, allergic reactions).</li>
                 <li>These images are used only for generating AI-based educational reports and are not shared publicly.</li>
-                <li>The AI Tattoo Healing Tracker is not a medical device and is not regulated as one.</li>
+                <li>Healyn is not a medical device and is not regulated as one.</li>
                 <li>We are not a HIPAA-covered entity, and the Services are not designed for transmission or storage of Protected Health Information (PHI).</li>
               </ul>
             </section>

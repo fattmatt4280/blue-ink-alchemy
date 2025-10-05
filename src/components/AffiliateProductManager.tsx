@@ -64,7 +64,7 @@ const AffiliateProductManager = () => {
         <div className="flex justify-between items-center">
           <div>
             <CardTitle>Amazon Affiliate Product Management</CardTitle>
-            <CardDescription>Manage products for AI healing tracker recommendations</CardDescription>
+            <CardDescription>Manage products for Healyn recommendations</CardDescription>
           </div>
           <Button 
             onClick={() => setShowAddForm(true)} 
