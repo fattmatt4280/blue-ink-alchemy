@@ -56,7 +56,7 @@ const Dashboard = () => {
       setDaysRemaining(diffDays);
 
       if (diffDays <= 0 && data.is_active) {
-        toast.error("Your Healyn access has expired");
+        toast.error("Your Heal-AId access has expired");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -111,7 +111,7 @@ const Dashboard = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Healyn Dashboard</h1>
+          <h1 className="text-4xl font-bold mb-2">Heal-AId Dashboard</h1>
           <p className="text-muted-foreground">powered by Blue Dream Budder</p>
         </div>
 
@@ -146,7 +146,7 @@ const Dashboard = () => {
                 {daysRemaining <= 2 && subscription.tier === 'free_trial' && (
                   <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                     <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                      Your trial is ending soon! Upgrade now to continue using Healyn.
+                      Your trial is ending soon! Upgrade now to continue using Heal-AId.
                     </p>
                   </div>
                 )}
@@ -154,7 +154,7 @@ const Dashboard = () => {
             ) : (
               <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <p className="text-sm font-medium text-destructive">
-                  Your access has expired. Please upgrade to continue using Healyn.
+                  Your access has expired. Please upgrade to continue using Heal-AId.
                 </p>
               </div>
             )}
@@ -248,7 +248,7 @@ const Dashboard = () => {
               variant="outline"
               onClick={() => navigate("/healing-tracker")}
             >
-              Open Healyn Tracker
+              Open Heal-AId Tracker
               <ArrowRight className="w-4 h-4" />
             </Button>
             <Button

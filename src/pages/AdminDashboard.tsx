@@ -174,7 +174,7 @@ const AdminDashboard = () => {
                 onClick={() => window.location.href = '/admin/activation-codes'}
                 variant="outline"
               >
-                Manage Healyn Activation Codes
+                Manage Heal-AId Activation Codes
               </Button>
             </div>
             <PushNotificationManager />

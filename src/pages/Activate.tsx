@@ -49,7 +49,7 @@ const Activate = () => {
         return;
       }
 
-      toast.success(data.message || "Healyn activated successfully!");
+      toast.success(data.message || "Heal-AId activated successfully!");
       
       // Redirect to healing tracker
       setTimeout(() => {
@@ -70,7 +70,7 @@ const Activate = () => {
           <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
             <Sparkles className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Activate Healyn AI</CardTitle>
+          <CardTitle className="text-2xl">Activate Heal-AId AI</CardTitle>
           <CardDescription>
             powered by Blue Dream Budder
           </CardDescription>

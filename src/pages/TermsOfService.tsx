@@ -27,14 +27,14 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">1) Agreement to Terms</h2>
               <p>
-                These Terms of Service ("Terms") constitute a legally binding agreement between Dream Tattoo Company LLC ("Company," "we," "us," or "our") and you ("you," "user") governing your access to and use of BlueDreamBudder.com, our online store, and all related tools, features, and services, including Healyn (AI Tattoo Healing Assistant) (collectively, the "Services"). By accessing or using the Services, you agree to be bound by these Terms and our Privacy Policy. If you do not agree, do not use the Services.
+                These Terms of Service ("Terms") constitute a legally binding agreement between Dream Tattoo Company LLC ("Company," "we," "us," or "our") and you ("you," "user") governing your access to and use of BlueDreamBudder.com, our online store, and all related tools, features, and services, including Heal-AId (AI Tattoo Healing Assistant) (collectively, the "Services"). By accessing or using the Services, you agree to be bound by these Terms and our Privacy Policy. If you do not agree, do not use the Services.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold mb-3">2) Eligibility</h2>
               <p>
-                You must be at least 18 years old (or the age of majority where you live) to use Healyn and to purchase products. By using the Services, you represent that you meet this requirement and are legally able to enter into these Terms.
+                You must be at least 18 years old (or the age of majority where you live) to use Heal-AId and to purchase products. By using the Services, you represent that you meet this requirement and are legally able to enter into these Terms.
               </p>
             </section>
 
@@ -42,7 +42,7 @@ const TermsOfService = () => {
               <h2 className="text-xl font-semibold mb-3">3) The Services</h2>
               <ul className="list-disc pl-6 space-y-1">
                 <li><strong>Website & Store.</strong> We sell aftercare and skincare products and provide informational content.</li>
-                <li><strong>Healyn.</strong> Users may upload tattoo images for automated analysis and a generated report with observations and general self-care suggestions.</li>
+                <li><strong>Heal-AId.</strong> Users may upload tattoo images for automated analysis and a generated report with observations and general self-care suggestions.</li>
               </ul>
               <p className="mt-3">
                 We may add, modify, suspend, or discontinue any part of the Services at any time with or without notice. Certain features may be labeled beta or experimental and are provided as-is.
@@ -52,7 +52,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">4) No Medical Advice; Not a Medical Device</h2>
               <p className="font-semibold text-red-600 mb-2">
-                The Services (including Healyn) are for informational and educational purposes only and are not medical advice, diagnosis, or treatment.
+                The Services (including Heal-AId) are for informational and educational purposes only and are not medical advice, diagnosis, or treatment.
               </p>
               <ul className="list-disc pl-6 space-y-1">
                 <li>The AI output is generated programmatically from images and inputs you provide and may be incomplete, inaccurate, or inapplicable to your situation.</li>
@@ -124,7 +124,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">11) Privacy</h2>
               <p>
-                Your use of the Services is subject to our Privacy Policy (incorporated by reference). By using Healyn, you consent to the processing of your uploaded images and related data as described in the Privacy Policy. Do not upload sensitive personal data you do not wish to share.
+                Your use of the Services is subject to our Privacy Policy (incorporated by reference). By using Heal-AId, you consent to the processing of your uploaded images and related data as described in the Privacy Policy. Do not upload sensitive personal data you do not wish to share.
               </p>
             </section>
 

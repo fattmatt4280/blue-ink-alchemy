@@ -29,7 +29,7 @@ const HeroHeader = () => {
     { id: 'newsletter', label: 'Newsletter', type: 'scroll' },
     { id: '/blog', label: 'Blog', type: 'link' },
     { id: '/shop', label: 'Shop', type: 'link' },
-    { id: '/healing-tracker', label: 'Healyn', type: 'link' }
+    { id: '/healing-tracker', label: 'Heal-AId', type: 'link' }
   ];
 
   return (
@@ -57,7 +57,7 @@ const HeroHeader = () => {
             View Benefits
           </button>
           <Link to="/healing-tracker" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
-            Healyn
+            Heal-AId
           </Link>
           {isAdmin && (
             <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">

@@ -121,7 +121,7 @@ const AdminActivationCodes = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "healyn-activation-codes.csv";
+    a.download = "heal-aid-activation-codes.csv";
     a.click();
   };
 
@@ -150,7 +150,7 @@ const AdminActivationCodes = () => {
       
       <div className="container mx-auto p-4 md:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Healyn Activation Codes</h1>
+          <h1 className="text-3xl font-bold mb-2">Heal-AId Activation Codes</h1>
           <p className="text-muted-foreground">Generate and manage activation codes</p>
         </div>
 
@@ -159,7 +159,7 @@ const AdminActivationCodes = () => {
           <Card>
             <CardHeader>
               <CardTitle>Generate New Codes</CardTitle>
-              <CardDescription>Create activation codes for Healyn</CardDescription>
+              <CardDescription>Create activation codes for Heal-AId</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
