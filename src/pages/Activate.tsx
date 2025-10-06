@@ -49,12 +49,31 @@ const Activate = () => {
         return;
       }
 
-      toast.success(data.message || "Heal-AId activated successfully!");
+      // Show tier-specific success message
+      const tierMessages = {
+        free_trial: "Your 3-day free trial is now active!",
+        '7_day': "Your 7-day access is now active!",
+        '30_day': "Your 30-day access is now active!",
+      };
+
+      const successMessage = data.tier && tierMessages[data.tier] 
+        ? tierMessages[data.tier] 
+        : data.message || "Heal-AId activated successfully!";
+
+      toast.success(successMessage);
+
+      // Show expiration info
+      if (data.expiration_date) {
+        const expiryDate = new Date(data.expiration_date);
+        setTimeout(() => {
+          toast.info(`Access expires on ${expiryDate.toLocaleDateString()}`);
+        }, 1000);
+      }
       
       // Redirect to healing tracker
       setTimeout(() => {
         navigate("/healing-tracker");
-      }, 1500);
+      }, 2500);
     } catch (error: any) {
       console.error("Activation error:", error);
       toast.error(error.message || "Failed to activate code");
@@ -111,20 +130,22 @@ const Activate = () => {
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
-              <p>Get 3 days of free access to Charlie,</p>
-              <p>your AI tattoo healing assistant</p>
+              <p className="mb-1">💡 Enter your activation code to unlock</p>
+              <p className="font-medium text-foreground">Charlie - Your AI Tattoo Healing Assistant</p>
+            </div>
+
+            <div className="mt-4 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground text-center">
+              ⏰ Activation codes must be used within 90 days of purchase
             </div>
           </form>
 
           <div className="mt-6 pt-6 border-t">
             <p className="text-sm text-center text-muted-foreground mb-3">
-              After activation, you can extend your access:
+              Need to extend your access? Choose from:
             </p>
             <div className="space-y-2 text-sm text-center">
-              <p>7 Days - $0.99</p>
-              <p>30 Days - $2.99</p>
-              <p>90 Days (Pro) - $7.99</p>
-              <p>Studio Unlimited - $39.99/month</p>
+              <p className="text-muted-foreground">7 Days - <span className="font-semibold text-foreground">$0.99</span></p>
+              <p className="text-muted-foreground">30 Days - <span className="font-semibold text-foreground">$3.99</span></p>
             </div>
           </div>
         </CardContent>

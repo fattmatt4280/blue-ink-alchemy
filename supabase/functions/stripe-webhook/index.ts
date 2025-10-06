@@ -82,6 +82,23 @@ serve(async (req) => {
       });
     }
 
+    // Helper function to generate activation codes
+    const generateActivationCode = (): string => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'HLN-';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    };
+
+    // Heal-AId product price IDs
+    const HEALYN_PRICE_IDS = {
+      'price_1SF1DzDiBqghYX9iIMBbMSvu': 'free_trial',  // 3-day free
+      'price_1SF1FqDiBqghYX9ixP0Ah8Dq': '7_day',       // 7-day $0.99
+      'price_1SFEBWDiBqghYX9iLOPkqaBn': '30_day',      // 30-day $3.99
+    };
+
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed':
@@ -138,6 +155,96 @@ serve(async (req) => {
                   newStatus: 'paid',
                   updatedOrder: updatedOrder?.[0] 
                 });
+
+                // Check for Heal-AId subscription products
+                const stripeInstance = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
+                const sessionDetails = await stripeInstance.checkout.sessions.retrieve(session.id, {
+                  expand: ['line_items']
+                });
+
+                let healynTier: string | null = null;
+                
+                if (sessionDetails.line_items?.data) {
+                  for (const item of sessionDetails.line_items.data) {
+                    const priceId = item.price?.id;
+                    if (priceId && HEALYN_PRICE_IDS[priceId]) {
+                      healynTier = HEALYN_PRICE_IDS[priceId];
+                      logStep("Heal-AId product detected", { priceId, tier: healynTier });
+                      break;
+                    }
+                  }
+                }
+
+                // Generate activation code if Heal-AId product purchased
+                if (healynTier) {
+                  try {
+                    let activationCode = generateActivationCode();
+                    
+                    // Ensure uniqueness
+                    let { data: existingCode } = await supabaseClient
+                      .from('healyn_activation_codes')
+                      .select('code')
+                      .eq('code', activationCode)
+                      .single();
+
+                    while (existingCode) {
+                      activationCode = generateActivationCode();
+                      const result = await supabaseClient
+                        .from('healyn_activation_codes')
+                        .select('code')
+                        .eq('code', activationCode)
+                        .single();
+                      existingCode = result.data;
+                    }
+
+                    // Set code expiration to 90 days from now
+                    const codeExpirationDate = new Date();
+                    codeExpirationDate.setDate(codeExpirationDate.getDate() + 90);
+
+                    // Insert activation code
+                    const { error: codeInsertError } = await supabaseClient
+                      .from('healyn_activation_codes')
+                      .insert({
+                        code: activationCode,
+                        email: session.customer_email,
+                        tier: healynTier,
+                        code_expiration_date: codeExpirationDate.toISOString(),
+                        redeemed: false,
+                      });
+
+                    if (codeInsertError) {
+                      logStep("ERROR: Failed to create activation code", { error: codeInsertError.message });
+                    } else {
+                      logStep("Activation code created", { code: activationCode, tier: healynTier });
+
+                      // Send activation code email
+                      setTimeout(async () => {
+                        try {
+                          await fetch(`${supabaseUrl}/functions/v1/send-activation-code-email`, {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${supabaseServiceKey}`,
+                            },
+                            body: JSON.stringify({
+                              email: session.customer_email,
+                              code: activationCode,
+                              tier: healynTier,
+                              customerName: session.customer_details?.name,
+                            }),
+                          });
+                          logStep("Activation code email sent", { code: activationCode });
+                        } catch (emailError) {
+                          const errorMessage = emailError instanceof Error ? emailError.message : String(emailError);
+                          logStep("ERROR: Activation code email failed", { error: errorMessage });
+                        }
+                      }, 500);
+                    }
+                  } catch (codeError) {
+                    const errorMessage = codeError instanceof Error ? codeError.message : String(codeError);
+                    logStep("ERROR: Activation code generation failed", { error: errorMessage });
+                  }
+                }
 
                 // Trigger automated post-sale workflow
                 logStep("Triggering post-sale automation", { orderId: existingOrder.id });

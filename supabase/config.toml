@@ -70,3 +70,7 @@ verify_jwt = true
 [[functions]]
 name = "generate-activation-codes"
 verify_jwt = true
+
+[[functions]]
+name = "send-activation-code-email"
+verify_jwt = false

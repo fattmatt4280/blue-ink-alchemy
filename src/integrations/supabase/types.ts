@@ -655,6 +655,7 @@ export type Database = {
           activated_by: string | null
           activation_date: string | null
           code: string
+          code_expiration_date: string | null
           created_at: string | null
           email: string | null
           expiration_date: string | null
@@ -668,6 +669,7 @@ export type Database = {
           activated_by?: string | null
           activation_date?: string | null
           code: string
+          code_expiration_date?: string | null
           created_at?: string | null
           email?: string | null
           expiration_date?: string | null
@@ -681,6 +683,7 @@ export type Database = {
           activated_by?: string | null
           activation_date?: string | null
           code?: string
+          code_expiration_date?: string | null
           created_at?: string | null
           email?: string | null
           expiration_date?: string | null

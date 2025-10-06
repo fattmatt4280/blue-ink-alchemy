@@ -56,6 +56,19 @@ serve(async (req) => {
       );
     }
 
+    // Check if code has expired (must be activated within 90 days)
+    const now = new Date();
+    const codeExpiration = new Date(activationCode.code_expiration_date);
+    
+    if (now > codeExpiration) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'This activation code has expired. Codes must be activated within 90 days of purchase.' 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Check if user already has an active subscription from the last month
     if (userId) {
       const { data: existingSubscription } = await supabase
@@ -74,10 +87,18 @@ serve(async (req) => {
       }
     }
 
-    // Activate the code (3-day free trial)
+    // Calculate subscription duration based on tier
+    const tierHours = {
+      'free_trial': 72,   // 3 days
+      '7_day': 168,       // 7 days
+      '30_day': 720,      // 30 days
+    };
+
+    const hours = tierHours[activationCode.tier] || 72; // Default to 72 hours
+    
     const activationDate = new Date();
     const expirationDate = new Date(activationDate);
-    expirationDate.setDate(expirationDate.getDate() + 3);
+    expirationDate.setHours(expirationDate.getHours() + hours);
 
     // Update activation code
     const { error: updateError } = await supabase
@@ -132,10 +153,20 @@ serve(async (req) => {
       }
     }
 
+    // Create friendly tier names for response
+    const tierNames = {
+      'free_trial': '3-day free trial',
+      '7_day': '7-day',
+      '30_day': '30-day',
+    };
+
+    const tierName = tierNames[activationCode.tier] || 'subscription';
+
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Healyn activated successfully! You have 3 days of free access.',
+        message: `Heal-AId ${tierName} activated successfully!`,
+        tier: activationCode.tier,
         expiration_date: expirationDate.toISOString(),
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
