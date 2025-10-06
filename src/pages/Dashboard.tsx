@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Sparkles, Clock, ArrowRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import AppHeader from "@/components/AppHeader";
 
 interface Subscription {
   tier: string;
@@ -107,7 +108,9 @@ const Dashboard = () => {
   const progressPercent = subscription ? Math.max(0, Math.min(100, (daysRemaining / 90) * 100)) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+      <AppHeader />
+      <div className="p-4 md:p-8 pt-24">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -261,6 +264,7 @@ const Dashboard = () => {
             </Button>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );

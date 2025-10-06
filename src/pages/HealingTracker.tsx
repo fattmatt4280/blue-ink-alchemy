@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Upload, TrendingUp, Calendar, AlertCircle, History, ShoppingBag, ExternalLink } from "lucide-react";
+import { Upload, TrendingUp, Calendar, AlertCircle, ShoppingBag, ExternalLink } from "lucide-react";
+import AppHeader from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -271,36 +272,8 @@ const HealingTracker = () => {
 
   return (
     <div className="min-h-screen futuristic-bg">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/')}
-              className="neon-border"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-4xl font-bold gradient-text mb-2">
-                Heal-AId
-              </h1>
-              <p className="text-muted-foreground">
-                Your AI tattoo healing assistant by Blue Dream Budder
-              </p>
-            </div>
-          </div>
-          {user && (
-            <Link to="/healing-history">
-              <Button variant="outline" className="neon-border">
-                <History className="mr-2 h-4 w-4" />
-                View History
-              </Button>
-            </Link>
-          )}
-        </div>
+      <AppHeader />
+      <div className="container mx-auto px-4 pt-24 pb-8 max-w-6xl">
 
         {/* Info Alert */}
         <Alert className="mb-6 neon-border">

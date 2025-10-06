@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Download, TrendingUp, Calendar, Award, AlertCircle } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Download, Calendar, Award, AlertCircle } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import AppHeader from "@/components/AppHeader";
 import { useHealingHistory } from "@/hooks/useHealingHistory";
 import { HealingHistoryCard } from "@/components/HealingHistoryCard";
 import { HealingPhotoTimeline } from "@/components/HealingPhotoTimeline";
@@ -72,20 +73,13 @@ const HealingHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 py-20">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950">
+      <AppHeader backUrl="/healing-tracker" />
+      <div className="container mx-auto px-4 pt-24 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <Link to="/healing-tracker">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Tracker
-                </Button>
-              </Link>
-              <h1 className="text-3xl font-bold">My Healing Journey</h1>
-            </div>
+            <h1 className="text-3xl font-bold">My Healing Journey</h1>
             <Button variant="outline" size="sm">
               <Download className="w-4 h-4 mr-2" />
               Export Report

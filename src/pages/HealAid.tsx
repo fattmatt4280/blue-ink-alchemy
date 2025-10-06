@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import AppHeader from "@/components/AppHeader";
 import { 
   Camera, 
   Brain, 
@@ -64,8 +65,9 @@ const HealAid = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
+        <AppHeader transparent />
         {/* Hero Section */}
-        <section 
+        <section
           ref={heroRef}
           className="relative min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}

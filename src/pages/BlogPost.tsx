@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, User, ArrowLeft, ExternalLink, Share2, Home } from 'lucide-react';
+import { Calendar, User, ExternalLink, Share2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
+import AppHeader from '@/components/AppHeader';
 
 interface BlogPost {
   id: string;
@@ -193,24 +194,8 @@ const BlogPost = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <article className="container max-w-4xl mx-auto px-4 py-8">
-          {/* Navigation */}
-          <div className="mb-8 flex flex-col sm:flex-row gap-4">
-            <Link
-              to="/blog"
-              className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Blog
-            </Link>
-            <Link
-              to="/"
-              className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Back to Home
-            </Link>
-          </div>
+        <AppHeader backUrl="/blog" />
+        <article className="container max-w-4xl mx-auto px-4 pt-24 pb-8">
 
           {/* Article Header */}
           <header className="mb-8">

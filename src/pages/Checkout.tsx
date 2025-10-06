@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Minus, Plus, Trash2, ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Minus, Plus, Trash2, CheckCircle, XCircle, Loader2, ArrowLeft } from "lucide-react";
+import { useSearchParams, Link } from "react-router-dom";
+import AppHeader from "@/components/AppHeader";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ShippingRateSelector from "@/components/ShippingRateSelector";
@@ -183,8 +184,9 @@ const Checkout = () => {
 
   if (success === 'true') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-        <div className="container mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <AppHeader showCart={false} />
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="max-w-2xl mx-auto text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold mb-4 text-green-800">Order Completed!</h1>
@@ -205,8 +207,9 @@ const Checkout = () => {
 
   if (cancelled === 'true') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-        <div className="container mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <AppHeader showCart={false} />
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="max-w-2xl mx-auto text-center">
             <XCircle className="w-16 h-16 text-orange-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold mb-4 text-orange-800">Order Cancelled</h1>
@@ -228,8 +231,9 @@ const Checkout = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-        <div className="container mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <AppHeader showCart={false} />
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="max-w-2xl mx-auto text-center">
             <h1 className="text-3xl font-bold mb-8">Your Cart is Empty</h1>
             <p className="text-gray-600 mb-8">Add some products to your cart to get started!</p>
@@ -246,8 +250,9 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <AppHeader showCart={false} />
+      <div className="container mx-auto px-4 pt-24 pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <Link to="/">

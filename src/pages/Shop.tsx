@@ -1,10 +1,12 @@
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
+import AppHeader from "@/components/AppHeader";
 
 const Shop = () => {
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <AppHeader />
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Shop All Products</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

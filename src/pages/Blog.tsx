@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Calendar, User, ArrowRight, Home } from 'lucide-react';
+import { Search, Calendar, User, ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { SwipeIndicator } from '@/components/SwipeIndicator';
+import AppHeader from '@/components/AppHeader';
 
 interface BlogPost {
   id: string;
@@ -150,17 +151,8 @@ const Blog = () => {
       <SwipeIndicator progress={swipeProgress} isVisible={showSwipeIndicator} />
 
       <div className="min-h-screen bg-background">
-        {/* Navigation */}
-        <div className="container max-w-7xl mx-auto px-4 pt-8">
-          <Link
-            to="/"
-            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-4"
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-        </div>
-
+        <AppHeader />
+        <div className="pt-16">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-primary/10 to-secondary/10 py-16">
           <div className="container max-w-7xl mx-auto px-4">
@@ -302,6 +294,7 @@ const Blog = () => {
             )}
           </div>
         </section>
+        </div>
       </div>
     </>
   );
