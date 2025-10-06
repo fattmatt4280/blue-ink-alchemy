@@ -23,8 +23,12 @@ export const useProductGrid = () => {
   const [loading, setLoading] = useState(true);
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
   const [selectedProductName, setSelectedProductName] = useState('');
-  const { addToCart } = useCart();
+  const { addToCart, addToCartWithFreeTrial } = useCart();
   const { toast } = useToast();
+
+  // Identify subscription products
+  const freeTrialProduct = products.find(p => p.name.includes('3-Day Free Trial'));
+  const isPhysicalProduct = (product: Product) => !product.name.includes('Heal-AId');
 
   useEffect(() => {
     fetchProducts();
@@ -53,12 +57,40 @@ export const useProductGrid = () => {
   };
 
   const handleAddToCart = async (product: Product) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image_url: product.image_url || null,
-    });
+    // Check if this is a physical product and auto-add free trial
+    if (isPhysicalProduct(product) && freeTrialProduct) {
+      addToCartWithFreeTrial(
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image_url: product.image_url || null,
+        },
+        {
+          id: freeTrialProduct.id,
+          name: freeTrialProduct.name,
+          price: freeTrialProduct.price,
+          image_url: freeTrialProduct.image_url || null,
+        }
+      );
+      
+      toast({
+        title: "Added to cart!",
+        description: `${product.name} + FREE 3-day Heal-AId trial`,
+      });
+    } else {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image_url: product.image_url || null,
+      });
+      
+      toast({
+        title: "Added to cart!",
+        description: product.name,
+      });
+    }
 
     // Track add to cart event
     await trackEvent('add_to_cart', {
@@ -68,7 +100,7 @@ export const useProductGrid = () => {
       currency: 'USD',
     });
 
-    // Show the cart dialog instead of toast
+    // Show the cart dialog
     setSelectedProductName(product.name);
     setCartDialogOpen(true);
   };

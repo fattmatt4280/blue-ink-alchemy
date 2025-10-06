@@ -12,6 +12,7 @@ interface CartItem {
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: { id: string; name: string; price: number; image_url: string | null }) => void;
+  addToCartWithFreeTrial: (product: { id: string; name: string; price: number; image_url: string | null }, freeTrialProduct?: { id: string; name: string; price: number; image_url: string | null }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -56,6 +57,21 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       });
     } catch (error) {
       console.error('Error adding to cart:', error);
+    }
+  };
+
+  const addToCartWithFreeTrial = (product: { id: string; name: string; price: number; image_url: string | null }, freeTrialProduct?: { id: string; name: string; price: number; image_url: string | null }) => {
+    try {
+      addToCart(product);
+      
+      // Auto-add free trial if a free trial product is provided and not already in cart
+      if (freeTrialProduct && !items.some(item => item.id === freeTrialProduct.id)) {
+        setTimeout(() => {
+          addToCart(freeTrialProduct);
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error adding to cart with free trial:', error);
     }
   };
 
@@ -113,6 +129,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     <CartContext.Provider value={{
       items,
       addToCart,
+      addToCartWithFreeTrial,
       removeFromCart,
       updateQuantity,
       clearCart,
