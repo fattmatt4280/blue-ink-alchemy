@@ -28,6 +28,7 @@ import Activate from "./pages/Activate";
 import Dashboard from "./pages/Dashboard";
 import AdminActivationCodes from "./pages/AdminActivationCodes";
 import NotFound from "./pages/NotFound";
+import HealAid from "./pages/HealAid";
 
 const App = () => (
   <TooltipProvider>
@@ -59,6 +60,7 @@ const App = () => (
                <Route path="/activate" element={<Activate />} />
                <Route path="/dashboard" element={<Dashboard />} />
                <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
+               <Route path="/heal-aid" element={<HealAid />} />
                <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

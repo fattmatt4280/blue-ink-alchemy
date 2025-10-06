@@ -37,6 +37,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
 
   return (
     <div 
+      id={isFreeTrialProduct ? 'free-trial-product' : undefined}
       className={`group neon-card rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer ${isDisabled ? 'opacity-60' : ''}`}
       onClick={() => onProductView(product)}
     >
