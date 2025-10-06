@@ -79,7 +79,7 @@ const HealAid = () => {
               </Badge>
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">
-                Heal-AId™
+                <span className="font-rajdhani">Heal-AId™</span>
               </h1>
               
               <p className="text-2xl md:text-3xl font-semibold mb-4">
@@ -167,7 +167,7 @@ const HealAid = () => {
             
             <div className="max-w-3xl mx-auto text-center">
               <p className="text-xl md:text-2xl font-semibold text-foreground">
-                Heal-AId uses advanced AI trained on thousands of tattoo healing cases to give you instant, expert-level guidance
+                <span className="font-rajdhani">Heal-AId</span> uses advanced AI trained on thousands of tattoo healing cases to give you instant, expert-level guidance
               </p>
             </div>
           </div>
@@ -478,7 +478,7 @@ const HealAid = () => {
                 AI-Powered Precision
               </h2>
               <p className="text-xl mb-12 text-gray-300">
-                Heal-AId uses advanced computer vision and machine learning trained on thousands of tattoo healing progressions. Our AI analyzes color, texture, inflammation, and healing patterns to provide expert-level assessments in seconds.
+                <span className="font-rajdhani">Heal-AId</span> uses advanced computer vision and machine learning trained on thousands of tattoo healing progressions. Our AI analyzes color, texture, inflammation, and healing patterns to provide expert-level assessments in seconds.
               </p>
               
               <div className="grid md:grid-cols-3 gap-8">
@@ -509,9 +509,9 @@ const HealAid = () => {
             <div className="max-w-3xl mx-auto">
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-left">Is Heal-AId a medical device?</AccordionTrigger>
+                  <AccordionTrigger className="text-left">Is <span className="font-rajdhani">Heal-AId</span> a medical device?</AccordionTrigger>
                   <AccordionContent>
-                    No, Heal-AId is an informational tool designed to help you track and understand your tattoo healing process. It is not a medical device and should not replace professional medical advice. If you have concerns about your tattoo, always consult with a healthcare provider.
+                    No, <span className="font-rajdhani">Heal-AId</span> is an informational tool designed to help you track and understand your tattoo healing process. It is not a medical device and should not replace professional medical advice. If you have concerns about your tattoo, always consult with a healthcare provider.
                   </AccordionContent>
                 </AccordionItem>
                 
@@ -525,7 +525,7 @@ const HealAid = () => {
                 <AccordionItem value="item-3">
                   <AccordionTrigger className="text-left">What if I need a doctor?</AccordionTrigger>
                   <AccordionContent>
-                    Heal-AId will alert you if it detects signs that warrant professional medical attention. We err on the side of caution and will always recommend seeking medical care if there are any concerning indicators of infection or complications.
+                    <span className="font-rajdhani">Heal-AId</span> will alert you if it detects signs that warrant professional medical attention. We err on the side of caution and will always recommend seeking medical care if there are any concerning indicators of infection or complications.
                   </AccordionContent>
                 </AccordionItem>
                 
@@ -568,7 +568,7 @@ const HealAid = () => {
                 Start Your Healing Journey Today
               </h2>
               <p className="text-xl mb-8 text-white/90">
-                Join thousands of tattoo owners who trust Heal-AId for expert healing guidance
+                Join thousands of tattoo owners who trust <span className="font-rajdhani">Heal-AId</span> for expert healing guidance
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -585,7 +585,7 @@ const HealAid = () => {
                   className="text-lg px-8 py-6 bg-white/10 border-white text-white hover:bg-white/20 backdrop-blur-sm"
                   onClick={handleTryNowClick}
                 >
-                  Try Heal-AId Now
+                  Try <span className="font-rajdhani">Heal-AId</span> Now
                 </Button>
               </div>
             </div>
