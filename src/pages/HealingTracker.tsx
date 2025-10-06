@@ -340,14 +340,15 @@ const HealingTracker = () => {
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <MultipleImageUpload
-                    onImagesUploaded={handleImagesUploaded}
-                    currentImages={uploadedImages}
-                    title="Tattoo Photos"
-                    description="Upload multiple photos from different angles (up to 10 images)"
-                    bucket="healing-photos"
-                    maxImages={10}
-                  />
+            <MultipleImageUpload
+              userId={user?.id}
+              onImagesUploaded={handleImagesUploaded}
+              currentImages={uploadedImages}
+              title="Tattoo Photos"
+              description="Upload multiple photos from different angles (up to 10 images)"
+              bucket="healing-photos"
+              maxImages={10}
+            />
                 )}
 
                 <div className="space-y-4">

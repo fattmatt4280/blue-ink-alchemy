@@ -13,6 +13,7 @@ interface MultipleImageUploadProps {
   description?: string;
   bucket?: string;
   maxImages?: number;
+  userId?: string;
 }
 
 const MultipleImageUpload = ({
@@ -22,6 +23,7 @@ const MultipleImageUpload = ({
   description = "Upload multiple images for analysis",
   bucket = "healing-photos",
   maxImages = 10,
+  userId,
 }: MultipleImageUploadProps) => {
   const [uploadedImages, setUploadedImages] = useState<string[]>(currentImages);
   const [uploading, setUploading] = useState(false);
@@ -52,7 +54,9 @@ const MultipleImageUpload = ({
 
     try {
       const fileExt = file.name.split('.').pop();
-      const filePath = `${crypto.randomUUID()}.${fileExt}`;
+      const filePath = userId 
+        ? `${userId}/${crypto.randomUUID()}.${fileExt}`
+        : `${crypto.randomUUID()}.${fileExt}`;
 
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
