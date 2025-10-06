@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CartItem {
   id: string;
@@ -11,6 +12,8 @@ interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
+  customerEmail: string | null;
+  setEmail: (email: string) => void;
   addToCart: (product: { id: string; name: string; price: number; image_url: string | null }) => void;
   addToCartWithFreeTrial: (product: { id: string; name: string; price: number; image_url: string | null }, freeTrialProduct?: { id: string; name: string; price: number; image_url: string | null }) => void;
   removeFromCart: (id: string) => void;
@@ -36,6 +39,21 @@ interface CartProviderProps {
 
 export const CartProvider = ({ children }: CartProviderProps) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [customerEmail, setCustomerEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getEmail = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setCustomerEmail(user.email);
+      }
+    };
+    getEmail();
+  }, []);
+
+  const setEmail = (email: string) => {
+    setCustomerEmail(email);
+  };
 
   const addToCart = (product: { id: string; name: string; price: number; image_url: string | null }) => {
     try {
@@ -128,6 +146,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   return (
     <CartContext.Provider value={{
       items,
+      customerEmail,
+      setEmail,
       addToCart,
       addToCartWithFreeTrial,
       removeFromCart,

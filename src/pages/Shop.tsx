@@ -12,7 +12,7 @@ const Shop = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="bg-card rounded-lg p-6 border">
             <h2 className="text-2xl font-semibold mb-4">Featured Products</h2>
             <p className="text-muted-foreground mb-4">
@@ -39,6 +39,22 @@ const Shop = () => {
               <li>• Recommended by professional tattoo artists</li>
               <li>• Fast, discreet shipping</li>
             </ul>
+          </div>
+
+          <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-6 border border-green-200">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              🎁 Free Heal-AId Trial Benefit
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              Every budder purchase includes a <strong>FREE 3-day Heal-AId trial</strong>! 
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Our AI-powered tattoo healing tracker analyzes your photos and 
+              provides personalized aftercare recommendations.
+            </p>
+            <p className="text-xs text-muted-foreground italic">
+              Note: Standalone free trials are limited to one per customer.
+            </p>
           </div>
         </div>
 

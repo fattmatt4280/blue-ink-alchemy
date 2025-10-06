@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/components/AnalyticsTracker';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
+import { useFreeTrialEligibility } from '@/hooks/useFreeTrialEligibility';
 
 interface Product {
   id: string;
@@ -23,8 +24,9 @@ export const useProductGrid = () => {
   const [loading, setLoading] = useState(true);
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
   const [selectedProductName, setSelectedProductName] = useState('');
-  const { addToCart, addToCartWithFreeTrial } = useCart();
+  const { addToCart, addToCartWithFreeTrial, customerEmail } = useCart();
   const { toast } = useToast();
+  const { checkEligibility } = useFreeTrialEligibility();
 
   // Identify subscription products
   const freeTrialProduct = products.find(p => p.name.includes('3-Day Free Trial'));
@@ -57,6 +59,25 @@ export const useProductGrid = () => {
   };
 
   const handleAddToCart = async (product: Product) => {
+    const isFreeTrialProduct = product.name.includes('3-Day Free Trial');
+
+    // Check eligibility for manual free trial addition
+    if (isFreeTrialProduct && customerEmail) {
+      try {
+        const result = await checkEligibility(customerEmail);
+        if (!result.eligible) {
+          toast({
+            title: "Free trial already used",
+            description: "Add a budder product to get another free trial!",
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking eligibility:', error);
+      }
+    }
+
     // Check if this is a physical product and auto-add free trial
     if (isPhysicalProduct(product) && freeTrialProduct) {
       addToCartWithFreeTrial(
@@ -76,7 +97,7 @@ export const useProductGrid = () => {
       
       toast({
         title: "Added to cart!",
-        description: `${product.name} + FREE 3-day Heal-AId trial`,
+        description: `${product.name} + FREE 3-day Heal-AId trial 🎁`,
       });
     } else {
       addToCart({
