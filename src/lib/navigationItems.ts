@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms } from "lucide-react";
+import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound } from "lucide-react";
 
 export const mainNavItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -6,6 +6,7 @@ export const mainNavItems = [
   { label: 'Heal-AId', path: '/heal-aid', icon: Heart },
   { label: 'Blog', path: '/blog', icon: BookOpen },
   { label: 'Healing Tracker', path: '/healing-tracker', icon: Package },
+  { label: 'Activate Code', path: '/activate', icon: KeyRound },
   { label: 'Reviews', path: '/reviews', icon: Star },
 ];
 

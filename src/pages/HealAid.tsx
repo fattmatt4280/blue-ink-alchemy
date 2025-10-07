@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import AppHeader from "@/components/AppHeader";
+import { ActivationDialog } from "@/components/ActivationDialog";
+import { useState } from "react";
 import { 
   Camera, 
   Brain, 
@@ -29,6 +31,7 @@ import shieldLogo from "@/assets/healaid-shield-logo.jpeg";
 
 const HealAid = () => {
   const navigate = useNavigate();
+  const [showActivationDialog, setShowActivationDialog] = useState(false);
   const { elementRef: heroRef, isIntersecting: heroVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { elementRef: problemRef, isIntersecting: problemVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { elementRef: howItWorksRef, isIntersecting: howItWorksVisible } = useIntersectionObserver({ threshold: 0.1 });
@@ -63,6 +66,11 @@ const HealAid = () => {
         <meta name="description" content="Get instant AI-powered tattoo healing analysis. Upload a photo, get expert recommendations. Free 3-day trial included with every purchase." />
         <meta name="keywords" content="tattoo healing, AI tattoo analysis, tattoo aftercare tracker, healing progress" />
       </Helmet>
+
+      <ActivationDialog 
+        open={showActivationDialog} 
+        onOpenChange={setShowActivationDialog} 
+      />
 
       <div className="min-h-screen bg-background">
         <AppHeader transparent />
@@ -107,6 +115,14 @@ const HealAid = () => {
                   onClick={scrollToHowItWorks}
                 >
                   See How It Works
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="text-lg px-8 py-6 bg-purple-500/20 border-purple-400/50 text-purple-200 hover:bg-purple-500/30 backdrop-blur-sm"
+                  onClick={() => setShowActivationDialog(true)}
+                >
+                  Already Have a Code?
                 </Button>
               </div>
               
@@ -422,6 +438,20 @@ const HealAid = () => {
                 </CardContent>
               </Card>
             </div>
+            
+            <div className="text-center mt-8">
+              <p className="text-muted-foreground mb-4">
+                Already have an activation code?
+              </p>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => setShowActivationDialog(true)}
+                className="border-primary/50 text-primary hover:bg-primary/10"
+              >
+                Activate Your Code Here
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -587,7 +617,15 @@ const HealAid = () => {
                   className="text-lg px-8 py-6 bg-white/10 border-white text-white hover:bg-white/20 backdrop-blur-sm"
                   onClick={handleTryNowClick}
                 >
-                  Try <span className="font-rajdhani">Heal-AId</span> Now
+                  Try Now
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="text-lg px-8 py-6 bg-purple-500/20 border-purple-300 text-purple-100 hover:bg-purple-500/30 backdrop-blur-sm"
+                  onClick={() => setShowActivationDialog(true)}
+                >
+                  Already Have a Code?
                 </Button>
               </div>
             </div>
