@@ -26,6 +26,8 @@ import { HealingAssessmentReviewer } from '@/components/HealingAssessmentReviewe
 import { ExpertKnowledgeEditor } from '@/components/ExpertKnowledgeEditor';
 import { AITrainingAnalytics } from '@/components/AITrainingAnalytics';
 import { AIInstructionsEditor } from '@/components/AIInstructionsEditor';
+import HealAidContentEditor from '@/components/HealAidContentEditor';
+import HealingTrackerContentEditor from '@/components/HealingTrackerContentEditor';
 
 interface SiteContent {
   id: string;
@@ -123,6 +125,8 @@ const AdminDashboard = () => {
     !item.key.startsWith('testimonial_') &&
     !item.key.startsWith('quick_link') &&
     !item.key.startsWith('support_') &&
+    !item.key.startsWith('healaid_') &&
+    !item.key.startsWith('tracker_') &&
     item.key !== 'ingredients_title' &&
     item.key !== 'ingredients_subtitle'
   );
@@ -138,6 +142,8 @@ const AdminDashboard = () => {
     item.key.startsWith('support_') ||
     item.key === 'quick_links_title'
   );
+  const healAidContent = content.filter(item => item.key.startsWith('healaid_'));
+  const trackerContent = content.filter(item => item.key.startsWith('tracker_'));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 overflow-x-hidden">
@@ -183,6 +189,22 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">
+            {/* Heal-AId Page Editor */}
+            <HealAidContentEditor
+              content={healAidContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+
+            {/* Healing Tracker Page Editor */}
+            <HealingTrackerContentEditor
+              content={trackerContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+
             {/* Customer Reviews Manager */}
             <CustomerReviewsManager />
 
