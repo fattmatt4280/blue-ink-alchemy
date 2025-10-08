@@ -21,7 +21,7 @@ const HeroHeader = () => {
   };
 
   return (
-    <header className="absolute top-0 left-0 right-0 z-50 p-6">
+    <header className="absolute top-0 left-0 right-0 z-50 p-6 bg-[#1e3a8a]/95 backdrop-blur-sm">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
