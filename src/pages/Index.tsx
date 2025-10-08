@@ -10,7 +10,7 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 
 const Index = () => {
   return (
-    <div className="min-h-screen futuristic-bg overflow-x-hidden relative">
+    <div className="min-h-screen futuristic-bg overflow-x-hidden relative text-white">
       <AnimatedBackground />
       <div id="hero" className="relative z-10">
         <Hero />

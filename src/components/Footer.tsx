@@ -62,7 +62,7 @@ const Footer = () => {
           {/* Brand with Support and Quick Links */}
           <div>
             <h3 className="text-3xl font-bold mb-4">Blue Dream Budder</h3>
-            <p className="text-gray-300 leading-relaxed mb-6">
+            <p className="text-white/90 leading-relaxed mb-6">
               Premium tattoo aftercare balm crafted with all-natural ingredients 
               for optimal healing and skin restoration.
             </p>
@@ -72,7 +72,7 @@ const Footer = () => {
               {supportLinks.length > 0 && (
                 <div>
                   <h4 className="text-lg font-bold mb-4">{content.support_title || 'Support'}</h4>
-                  <ul className="space-y-2 text-gray-300">
+                  <ul className="space-y-2 text-white/90">
                     {supportLinks.map((link, index) => (
                       <li key={index}>
                         {renderLink(link)}
@@ -85,7 +85,7 @@ const Footer = () => {
               {quickLinks.length > 0 && (
                 <div>
                   <h4 className="text-lg font-bold mb-4">{content.quick_links_title || 'Quick Links'}</h4>
-                  <ul className="space-y-2 text-gray-300">
+                  <ul className="space-y-2 text-white/90">
                     {quickLinks.map((link, index) => (
                       <li key={index}>
                         {renderLink(link)}
@@ -101,13 +101,13 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-wrap gap-6 text-sm text-gray-400">
+            <div className="flex flex-wrap gap-6 text-sm text-white/80">
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
               <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
             </div>
             
-            <div className="text-sm text-gray-400 text-center md:text-right">
+            <div className="text-sm text-white/80 text-center md:text-right">
               <p className="mb-1">© 2025 Dream Tattoo Company LLC. All rights reserved.</p>
               <p className="text-xs">
                 Blue Dream Budder™ and Heal-AId™ are trademarks of Dream Tattoo Company LLC.
