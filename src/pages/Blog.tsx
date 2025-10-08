@@ -10,6 +10,7 @@ import { Helmet } from 'react-helmet-async';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { SwipeIndicator } from '@/components/SwipeIndicator';
 import AppHeader from '@/components/AppHeader';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 interface BlogPost {
   id: string;
@@ -121,10 +122,10 @@ const Blog = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen futuristic-bg flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Loading blog posts...</p>
+          <p className="mt-4 text-gray-300">Loading blog posts...</p>
         </div>
       </div>
     );
@@ -150,35 +151,36 @@ const Blog = () => {
 
       <SwipeIndicator progress={swipeProgress} isVisible={showSwipeIndicator} />
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen futuristic-bg">
+        <AnimatedBackground />
         <AppHeader />
-        <div className="pt-16">
+        <div className="pt-16 relative z-10">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary/10 to-secondary/10 py-16">
+        <section className="bg-black/40 backdrop-blur-md py-16">
           <div className="container max-w-7xl mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
                 Tattoo Care Blog
               </h1>
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="text-lg text-gray-300 mb-8">
                 Expert advice, tips, and guides for optimal tattoo healing and aftercare
               </p>
               
               {/* Search and Filter */}
               <div className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     placeholder="Search articles..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-black/40 border-white/10 text-white placeholder:text-gray-500"
                   />
                 </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => handleCategoryChange(e.target.value)}
-                  className="px-4 py-2 rounded-md border border-input bg-background text-foreground"
+                  className="px-4 py-2 rounded-md border border-white/10 bg-black/40 text-white"
                 >
                   <option value="">All Categories</option>
                   {categories.map(category => (
@@ -197,15 +199,15 @@ const Blog = () => {
           <div className="container max-w-7xl mx-auto px-4">
             {filteredPosts.length === 0 ? (
               <div className="text-center py-16">
-                <h2 className="text-2xl font-semibold text-foreground mb-4">No posts found</h2>
-                <p className="text-muted-foreground">Try adjusting your search or filter criteria.</p>
+                <h2 className="text-2xl font-semibold text-white mb-4">No posts found</h2>
+                <p className="text-gray-400">Try adjusting your search or filter criteria.</p>
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                   {paginatedPosts.map((post) => (
                     <article key={post.id} className="group">
-                      <Card className="h-full transition-all duration-300 hover:shadow-lg border-0 bg-card">
+                      <Card className="h-full transition-all duration-300 hover:shadow-lg border-white/10 bg-black/40 backdrop-blur-md">
                         <div className="aspect-video overflow-hidden rounded-t-lg bg-muted flex items-center justify-center">
                           <img
                             src={post.featured_image}
@@ -233,17 +235,17 @@ const Blog = () => {
                               </Badge>
                             ))}
                           </div>
-                          <CardTitle className="text-xl line-clamp-2 group-hover:text-primary transition-colors">
+                          <CardTitle className="text-xl line-clamp-2 text-white group-hover:text-blue-400 transition-colors">
                             <Link to={`/blog/${post.slug}`}>
                               {post.title}
                             </Link>
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="pt-0">
-                          <CardDescription className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                          <CardDescription className="text-sm text-gray-400 line-clamp-3 mb-4">
                             {post.excerpt}
                           </CardDescription>
-                          <div className="flex items-center text-sm text-muted-foreground mb-4">
+                          <div className="flex items-center text-sm text-gray-400 mb-4">
                             <User className="w-4 h-4 mr-2" />
                             <span className="mr-4">{post.author}</span>
                             <Calendar className="w-4 h-4 mr-2" />
@@ -251,7 +253,7 @@ const Blog = () => {
                           </div>
                           <Link
                             to={`/blog/${post.slug}`}
-                            className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                            className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
                           >
                             Read more
                             <ArrowRight className="w-4 h-4 ml-1" />
