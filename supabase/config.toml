@@ -90,3 +90,7 @@ verify_jwt = false
 [[functions]]
 name = "sync-stripe-products"
 verify_jwt = true
+
+[[functions]]
+name = "send-contact-form"
+verify_jwt = false

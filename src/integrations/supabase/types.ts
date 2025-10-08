@@ -59,6 +59,50 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_audit_log: {
+        Row: {
+          action_details: Json | null
+          action_type: string
+          admin_user_id: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+        }
+        Insert: {
+          action_details?: Json | null
+          action_type: string
+          admin_user_id: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+        }
+        Update: {
+          action_details?: Json | null
+          action_type?: string
+          admin_user_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_log_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliate_products: {
         Row: {
           active: boolean | null
@@ -183,6 +227,63 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      ai_response_logs: {
+        Row: {
+          anomaly_score: number | null
+          created_at: string
+          healing_progress_id: string | null
+          healing_stage: string | null
+          id: string
+          model_used: string
+          request_hash: string
+          response_hash: string
+          response_time_ms: number | null
+          risk_level: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anomaly_score?: number | null
+          created_at?: string
+          healing_progress_id?: string | null
+          healing_stage?: string | null
+          id?: string
+          model_used: string
+          request_hash: string
+          response_hash: string
+          response_time_ms?: number | null
+          risk_level?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anomaly_score?: number | null
+          created_at?: string
+          healing_progress_id?: string | null
+          healing_stage?: string | null
+          id?: string
+          model_used?: string
+          request_hash?: string
+          response_hash?: string
+          response_time_ms?: number | null
+          risk_level?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_response_logs_healing_progress_id_fkey"
+            columns: ["healing_progress_id"]
+            isOneToOne: false
+            referencedRelation: "healing_progress"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_response_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       analytics_events: {
         Row: {
@@ -441,6 +542,56 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      contact_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          message: string
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          subject: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          message: string
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subject: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          message?: string
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          subject?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_submissions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversion_funnel: {
         Row: {
@@ -1051,6 +1202,36 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      rate_limit_violations: {
+        Row: {
+          action_type: string
+          blocked_until: string | null
+          first_violation_at: string
+          id: string
+          identifier: string
+          last_violation_at: string
+          violation_count: number
+        }
+        Insert: {
+          action_type: string
+          blocked_until?: string | null
+          first_violation_at?: string
+          id?: string
+          identifier: string
+          last_violation_at?: string
+          violation_count?: number
+        }
+        Update: {
+          action_type?: string
+          blocked_until?: string | null
+          first_violation_at?: string
+          id?: string
+          identifier?: string
+          last_violation_at?: string
+          violation_count?: number
         }
         Relationships: []
       }

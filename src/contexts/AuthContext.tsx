@@ -28,6 +28,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+
+  // Session timeout: 30 minutes of inactivity
+  const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+  const WARNING_TIME = 25 * 60 * 1000; // Show warning at 25 minutes
 
   useEffect(() => {
     let mounted = true;
@@ -175,6 +180,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     checkAdminStatus();
   }, [user]);
+
+  // Session timeout monitoring
+  useEffect(() => {
+    if (!session || !user) return;
+
+    const checkActivity = () => {
+      const now = Date.now();
+      const timeSinceLastActivity = now - lastActivity;
+
+      if (timeSinceLastActivity > SESSION_TIMEOUT) {
+        console.log('[AuthContext] Session timeout - signing out due to inactivity');
+        signOut();
+      } else if (timeSinceLastActivity > WARNING_TIME) {
+        const timeUntilTimeout = SESSION_TIMEOUT - timeSinceLastActivity;
+        const minutesRemaining = Math.ceil(timeUntilTimeout / 60000);
+        console.log(`[AuthContext] Session expiring in ${minutesRemaining} minutes`);
+      }
+    };
+
+    const interval = setInterval(checkActivity, 60000); // Check every minute
+
+    // Track user activity
+    const resetActivity = () => setLastActivity(Date.now());
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetActivity));
+
+    return () => {
+      clearInterval(interval);
+      events.forEach(event => window.removeEventListener(event, resetActivity));
+    };
+  }, [session, user, lastActivity]);
 
   const signIn = async (email: string, password: string) => {
     try {
