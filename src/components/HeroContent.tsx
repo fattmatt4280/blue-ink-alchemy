@@ -34,12 +34,12 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
             <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
               <span className="text-cyan-400">Smarter.</span>
             </h1>
-            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
-              <span className="text-cyan-400">Ink</span> <span className="text-white">Brighter</span>
-            </h1>
-            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none text-white">
-              Last Longer
-            </h1>
+          <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
+            <span className="text-white">Ink Brighter</span>
+          </h1>
+          <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
+            <span className="text-cyan-400">Last Longer</span>
+          </h1>
           </div>
           
           <p className="font-inter text-xl lg:text-2xl text-gray-300 max-w-xl leading-relaxed mb-10">
