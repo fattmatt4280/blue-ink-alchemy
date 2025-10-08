@@ -47,7 +47,7 @@ const AppHeader = ({
 
   const baseClasses = transparent 
     ? "bg-transparent" 
-    : "bg-white/90 backdrop-blur-lg border-b border-gray-200";
+    : "bg-black/90 backdrop-blur-sm border-b border-white/10";
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 ${baseClasses} ${className}`}>
@@ -60,7 +60,7 @@ const AppHeader = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleBack}
-                className="gap-2"
+                className="gap-2 text-white hover:text-cyan-400"
                 aria-label="Go back"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -68,8 +68,8 @@ const AppHeader = ({
             )}
             
             {/* Logo */}
-            <Link to="/" className="font-bold text-lg">
-              BD
+            <Link to="/" className="w-16 h-16 rounded-full border-2 border-cyan-400 flex items-center justify-center">
+              <span className="text-cyan-400 font-bold text-lg">BD</span>
             </Link>
           </div>
 
@@ -82,6 +82,7 @@ const AppHeader = ({
                 <Button 
                   variant="ghost" 
                   size="sm"
+                  className="text-white hover:text-cyan-400"
                   aria-label="Open menu"
                 >
                   <Menu className="w-5 h-5" />
