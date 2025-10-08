@@ -18,22 +18,52 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Handle OAuth callback and redirect authenticated users
+  // Handle OAuth PKCE code exchange and redirect authenticated users
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // Check if this is an OAuth callback by looking for common OAuth parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const code = urlParams.get('code');
       
-      const hasOAuthParams = urlParams.has('code') || hashParams.has('access_token') || hashParams.has('refresh_token');
-      
-      if (hasOAuthParams) {
-        console.log('Auth page: OAuth callback detected, waiting for auth state to update');
-        // Give more time for OAuth callback to be processed
+      // If we have a code parameter, exchange it for a session (PKCE flow)
+      if (code) {
+        console.log('PKCE code detected, exchanging for session...');
+        setLoading(true);
+        
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          
+          if (error) {
+            console.error('Code exchange error:', error);
+            toast({
+              title: "Authentication Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          } else {
+            console.log('Code exchange successful');
+            toast({
+              title: "Welcome!",
+              description: "You've been signed in successfully.",
+            });
+          }
+          
+          // Clean up URL by removing query parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (err) {
+          console.error('Unexpected error during code exchange:', err);
+          toast({
+            title: "Unexpected Error",
+            description: "An error occurred during sign-in.",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+        
         return;
       }
       
-      // Only redirect if we're not in the middle of processing an OAuth callback
+      // Only redirect if we're authenticated and not processing OAuth
       if (!authLoading && user) {
         if (isAdmin) {
           console.log('Admin user detected, redirecting to admin dashboard');
@@ -49,9 +79,7 @@ const Auth = () => {
       }
     };
 
-    // Add a small delay to ensure auth state has been processed
-    const timer = setTimeout(handleAuthCallback, 200);
-    return () => clearTimeout(timer);
+    handleAuthCallback();
   }, [user, isAdmin, authLoading, navigate, toast]);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -107,7 +135,7 @@ const Auth = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
