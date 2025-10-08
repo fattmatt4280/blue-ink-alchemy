@@ -32,11 +32,21 @@ const Hero = () => {
   return (
     <>
       <section 
-        className="relative min-h-screen flex items-center justify-center text-white overflow-hidden bg-cover bg-right md:bg-center bg-no-repeat"
+        className="relative min-h-screen flex items-center justify-center text-white overflow-hidden bg-no-repeat"
         style={{
-          backgroundImage: `url(${content.hero_image || "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=1920&h=1080&fit=crop&crop=center"})`
+          backgroundImage: `url(${content.hero_image || "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=1920&h=1080&fit=crop&crop=center"})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover'
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            section {
+              background-position: 70% center !important;
+              background-size: 150% auto !important;
+            }
+          }
+        `}</style>
         <div className="absolute inset-0 bg-black/60"></div>
         
         <HeroHeader />

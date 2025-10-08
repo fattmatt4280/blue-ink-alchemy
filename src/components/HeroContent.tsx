@@ -28,16 +28,16 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
         <div className="text-left max-w-4xl">
           {/* Main Headline - Multi-line with cyan highlights */}
           <div className="space-y-1 mb-8">
-            <h1 className="font-orbitron text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
+            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
               <span className="text-cyan-400">Heal</span>
             </h1>
-            <h1 className="font-orbitron text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
+            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
               <span className="text-cyan-400">Smarter.</span>
             </h1>
-            <h1 className="font-orbitron text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
+            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
               <span className="text-cyan-400">Ink</span> <span className="text-white">Brighter</span>
             </h1>
-            <h1 className="font-orbitron text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none text-white">
+            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none text-white">
               Last Longer
             </h1>
           </div>
