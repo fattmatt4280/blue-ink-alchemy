@@ -9,8 +9,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mainNavItems, userNavItems, footerNavItems } from "@/lib/navigationItems";
+import { mainNavItems, userNavItems, footerNavItems, healingTrackerNavItem } from "@/lib/navigationItems";
 import { useState } from "react";
+import { useHealynSubscription } from "@/hooks/useHealynSubscription";
+import { Badge } from "@/components/ui/badge";
 
 interface AppHeaderProps {
   showBack?: boolean;
@@ -30,6 +32,7 @@ const AppHeader = ({
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const subscription = useHealynSubscription();
 
   const handleBack = () => {
     if (backUrl) {
@@ -106,6 +109,23 @@ const AppHeader = ({
                             <span>{item.label}</span>
                           </Link>
                         ))}
+                        
+                        {/* Conditional Healing Tracker - only show if subscription is active */}
+                        {user && subscription.isActive && subscription.daysRemaining > 0 && (
+                          <Link
+                            to={healingTrackerNavItem.path}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                          >
+                            <healingTrackerNavItem.icon className="w-5 h-5" />
+                            <span className="flex items-center gap-2">
+                              {healingTrackerNavItem.label}
+                              <Badge variant="secondary" className="text-xs">
+                                {subscription.daysRemaining}d
+                              </Badge>
+                            </span>
+                          </Link>
+                        )}
                       </div>
                     </div>
 

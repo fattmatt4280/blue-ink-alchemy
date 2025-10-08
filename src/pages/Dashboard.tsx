@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Sparkles, Clock, ArrowRight } from "lucide-react";
+import { Sparkles, Clock, ArrowRight, History } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import AppHeader from "@/components/AppHeader";
+import { useHealynSubscription } from "@/hooks/useHealynSubscription";
 
 interface Subscription {
   tier: string;
@@ -17,9 +18,10 @@ interface Subscription {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const subscriptionStatus = useHealynSubscription();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [totalAnalyses, setTotalAnalyses] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [daysRemaining, setDaysRemaining] = useState(0);
 
   useEffect(() => {
     checkSubscription();
@@ -38,27 +40,27 @@ const Dashboard = () => {
         .from("healyn_subscriptions")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching subscription:", error);
-        toast.error("No active subscription found. Please activate first.");
+      }
+
+      if (!data) {
+        toast.error("No subscription found. Please activate first.");
         navigate("/activate");
         return;
       }
 
       setSubscription(data);
 
-      // Calculate days remaining
-      const now = new Date();
-      const expiry = new Date(data.expiration_date);
-      const diffTime = expiry.getTime() - now.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      setDaysRemaining(diffDays);
-
-      if (diffDays <= 0 && data.is_active) {
-        toast.error("Your Heal-AId access has expired");
-      }
+      // Fetch total analyses count
+      const { count } = await supabase
+        .from('healing_progress')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      
+      setTotalAnalyses(count || 0);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -94,7 +96,7 @@ const Dashboard = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || subscriptionStatus.loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -105,6 +107,8 @@ const Dashboard = () => {
     );
   }
 
+  const daysRemaining = subscriptionStatus.daysRemaining;
+  const isActive = subscriptionStatus.isActive;
   const progressPercent = subscription ? Math.max(0, Math.min(100, (daysRemaining / 90) * 100)) : 0;
 
   return (
@@ -240,20 +244,47 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Usage Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="w-5 h-5" />
+              Your Healing Journey
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center p-4 bg-muted rounded-lg">
+              <span className="text-sm">Total Analyses Performed</span>
+              <span className="text-2xl font-bold">{totalAnalyses}</span>
+            </div>
+            {isActive && daysRemaining > 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Your Heal-AId is active - track your healing progress now!
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Your access has expired, but you can still view your healing history and upgrade anytime.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Quick Actions */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button
-              className="w-full justify-between"
-              variant="outline"
-              onClick={() => navigate("/healing-tracker")}
-            >
-              Open Heal-AId Tracker
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            {isActive && daysRemaining > 0 && (
+              <Button
+                className="w-full justify-between"
+                variant="outline"
+                onClick={() => navigate("/healing-tracker")}
+              >
+                Open Heal-AId Tracker
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            )}
             <Button
               className="w-full justify-between"
               variant="outline"

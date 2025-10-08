@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Upload, TrendingUp, Calendar, AlertCircle, ShoppingBag, ExternalLink } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
@@ -20,6 +20,7 @@ import Footer from "@/components/Footer";
 import HealingQADialog from "@/components/HealingQADialog";
 import { HealynSubscriptionStatus } from "@/components/HealynSubscriptionStatus";
 import { MessageCircle } from "lucide-react";
+import { useHealynSubscription } from "@/hooks/useHealynSubscription";
 
 interface Question {
   id: string;
@@ -50,6 +51,7 @@ const HealingTracker = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading } = useAuth();
+  const subscription = useHealynSubscription();
   const { products, loading: productsLoading, cartDialogOpen, selectedProductName, setCartDialogOpen, handleAddToCart, handleProductView } = useProductGrid();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -62,6 +64,25 @@ const HealingTracker = () => {
   const [tosAccepted, setTosAccepted] = useState<boolean>(false);
   const [qaDialogOpen, setQaDialogOpen] = useState(false);
   const [savedHealingProgressId, setSavedHealingProgressId] = useState<string | null>(null);
+
+  // Route protection - redirect if no active subscription
+  useEffect(() => {
+    if (!loading && !subscription.loading) {
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      
+      if (!subscription.isActive || subscription.daysRemaining <= 0) {
+        toast({
+          title: "Access Expired",
+          description: "Your Heal-AId access has expired. Please activate or upgrade to continue.",
+          variant: "destructive",
+        });
+        navigate('/dashboard');
+      }
+    }
+  }, [user, loading, subscription, navigate, toast]);
 
   const handleImagesUploaded = (urls: string[]) => {
     try {

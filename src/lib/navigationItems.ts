@@ -5,10 +5,12 @@ export const mainNavItems = [
   { label: 'Shop', path: '/shop', icon: ShoppingBag },
   { label: 'Heal-AId', path: '/heal-aid', icon: Heart },
   { label: 'Blog', path: '/blog', icon: BookOpen },
-  { label: 'Healing Tracker', path: '/healing-tracker', icon: Package },
   { label: 'Activate Code', path: '/activate', icon: KeyRound },
   { label: 'Reviews', path: '/reviews', icon: Star },
 ];
+
+// Conditional nav item for Healing Tracker - shown only when user has active subscription
+export const healingTrackerNavItem = { label: 'Healing Tracker', path: '/healing-tracker', icon: Package };
 
 export const userNavItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
