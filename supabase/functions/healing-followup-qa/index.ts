@@ -25,9 +25,35 @@ serve(async (req) => {
       conversationHistory,
       healingProgressId 
     } = await req.json();
+
+    // RATE LIMITING - 20 questions/hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: hourlyCount } = await supabase
+      .from('healing_qa_interactions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', oneHourAgo);
+
+    if ((hourlyCount || 0) >= 20) {
+      return new Response(
+        JSON.stringify({ error: 'Too many questions. Please try again in an hour.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // PROMPT INJECTION DETECTION
+    const suspiciousPatterns = [/ignore\s+instructions/i, /system\s+prompt/i];
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(questionText)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid question. Please rephrase.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
     
     console.log('Processing follow-up Q&A:', { 
-      userId, 
+      userId,
       userName, 
       questionId,
       hasAnalysis: !!analysisContext,

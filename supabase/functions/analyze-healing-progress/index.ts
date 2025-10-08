@@ -16,8 +16,48 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+
   try {
     const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses, userName, userId } = await req.json();
+    
+    // RATE LIMITING - Per User (10/hour, 50/day)
+    if (userId) {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+      const { count: hourlyCount } = await supabase
+        .from('ai_response_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', oneHourAgo);
+
+      const { count: dailyCount } = await supabase
+        .from('ai_response_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', oneDayAgo);
+
+      if ((hourlyCount || 0) >= 10) {
+        await supabase.from('rate_limit_violations').insert({
+          identifier: userId,
+          action_type: 'ai_analysis',
+          violation_count: 1,
+        });
+
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again in an hour.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if ((dailyCount || 0) >= 50) {
+        return new Response(
+          JSON.stringify({ error: 'Daily analysis limit reached. Please try again tomorrow.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
     
     // Support both single image (legacy) and multiple images
     const images = imageUrls || [primaryImageUrl];
@@ -346,6 +386,44 @@ Provide your assessment following the expert guidance provided in the system pro
         };
       }
       
+      const responseTime = Date.now() - startTime;
+
+      // ANOMALY DETECTION
+      let anomalyScore = 0;
+      if (tattooAge <= 3 && !analysis.healingStage.includes('Fresh')) anomalyScore += 0.3;
+      if (analysis.riskFactors?.length > 5) anomalyScore += 0.25;
+      if (!analysis.visualAssessment) anomalyScore += 0.2;
+      if (responseTime < 1000) anomalyScore += 0.15;
+
+      // LOG AI RESPONSE
+      if (userId) {
+        await supabase.from('ai_response_logs').insert({
+          user_id: userId,
+          healing_progress_id: null,
+          request_hash: 'analyzed',
+          response_hash: 'tracked',
+          model_used: 'google/gemini-2.5-flash',
+          response_time_ms: responseTime,
+          healing_stage: analysis.healingStage,
+          risk_level: analysis.riskFactors?.length > 3 ? 'High' : 'Low',
+          anomaly_score: Math.min(anomalyScore, 1.0),
+        });
+
+        if (anomalyScore > 0.7) {
+          await supabase.functions.invoke('send-security-alert', {
+            body: {
+              alertType: 'anomaly',
+              severity: 'high',
+              details: {
+                message: `Anomalous AI response detected (score: ${anomalyScore.toFixed(2)})`,
+                context: { userId, healingStage: analysis.healingStage },
+                timestamp: new Date().toISOString()
+              }
+            }
+          });
+        }
+      }
+
       // Generate summary if missing
       if (!analysis.summary) {
         const ageText = analysis.tattooAgeDays ? `Tattoo age: ${analysis.tattooAgeDays} days. ` : '';
