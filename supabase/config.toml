@@ -86,3 +86,7 @@ verify_jwt = false
 [[functions]]
 name = "process-abandoned-carts"
 verify_jwt = false
+
+[[functions]]
+name = "sync-stripe-products"
+verify_jwt = true

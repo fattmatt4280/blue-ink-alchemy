@@ -20,6 +20,7 @@ import { AdminAnalyticsManager } from '@/components/AdminAnalyticsManager';
 import { PushNotificationManager } from '@/components/PushNotificationManager';
 import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
+import StripeProductSync from '@/components/StripeProductSync';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { HealingAssessmentReviewer } from '@/components/HealingAssessmentReviewer';
@@ -271,6 +272,9 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6">
+            {/* Stripe Product Sync */}
+            <StripeProductSync />
+
             {/* Product Management Section */}
             <ProductManager />
 
