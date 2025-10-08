@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import healaidShield from '@/assets/healaid-shield-logo.jpeg';
 
 interface Product {
   id: string;
@@ -32,6 +33,9 @@ interface ProductCardProps {
 const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) => {
   const isFreeTrialProduct = product.name.includes('3-Day Free Trial');
   const { isEligible, loading } = useFreeTrialEligibility();
+
+  const nameLower = product.name.toLowerCase();
+  const isHealAidProduct = nameLower.includes('heal-aid') || nameLower.includes('healaid');
 
   const isDisabled = isFreeTrialProduct && !isEligible;
 
@@ -60,11 +64,17 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
       <div className="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 relative overflow-hidden">
         {product.image_url ? (
           <img
-            src={product.image_url}
+            src={isHealAidProduct ? healaidShield : product.image_url}
             alt={product.name}
             className="neon-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded"
+            loading="eager"
+            decoding="sync"
+            crossOrigin="anonymous"
             onError={(e) => {
-              e.currentTarget.src = '/images/healaid-shield-logo.jpeg';
+              if (!e.currentTarget.dataset.fallbackApplied) {
+                e.currentTarget.src = healaidShield;
+                e.currentTarget.dataset.fallbackApplied = 'true';
+              }
             }}
           />
         ) : (
