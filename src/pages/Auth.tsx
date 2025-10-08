@@ -9,11 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { MFAChallenge } from '@/components/MFAChallenge';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showMFAChallenge, setShowMFAChallenge] = useState(false);
   const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -111,23 +113,83 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signIn(email, password);
-
-    if (error) {
-      toast({
-        title: "Error signing in",
-        description: error.message,
-        variant: "destructive",
+    try {
+      // Check if account is locked
+      const { data: lockCheck, error: lockError } = await supabase.rpc('is_account_locked', {
+        check_email: email
       });
-    } else {
+
+      if (lockError) throw lockError;
+
+      if (lockCheck) {
+        toast({
+          title: "Account Locked",
+          description: "Too many failed login attempts. Please try again in 15 minutes.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await signIn(email, password);
+
+      if (error) {
+        // Log failed attempt
+        await supabase.rpc('log_login_attempt', {
+          attempt_email: email,
+          attempt_ip: 'client',
+          attempt_user_agent: navigator.userAgent,
+          attempt_success: false,
+          attempt_failure_reason: error.message
+        });
+
+        toast({
+          title: "Error signing in",
+          description: error.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Log successful attempt
+      await supabase.rpc('log_login_attempt', {
+        attempt_email: email,
+        attempt_ip: 'client',
+        attempt_user_agent: navigator.userAgent,
+        attempt_success: true
+      });
+
+      // Check if user has MFA enabled
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('mfa_enabled')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (profile?.mfa_enabled) {
+          setShowMFAChallenge(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       toast({
         title: "Welcome back!",
         description: "You have been signed in successfully.",
       });
-      // Let the useEffect handle navigation based on admin status
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred during sign in",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -206,6 +268,24 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  if (showMFAChallenge) {
+    return (
+      <MFAChallenge
+        onSuccess={() => {
+          setShowMFAChallenge(false);
+          toast({
+            title: "MFA Verified",
+            description: "You have been signed in successfully.",
+          });
+        }}
+        onCancel={() => {
+          setShowMFAChallenge(false);
+          supabase.auth.signOut();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">

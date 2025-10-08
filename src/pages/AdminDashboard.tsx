@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { MFAEnforcementGate } from '@/components/MFAEnforcementGate';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Navigate } from 'react-router-dom';
@@ -149,9 +150,10 @@ const AdminDashboard = () => {
   const trackerContent = content.filter(item => item.key.startsWith('tracker_'));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 overflow-x-hidden">
-      <div className="max-w-6xl mx-auto overflow-x-hidden">
-        <AdminHeader onSignOut={handleSignOut} />
+    <MFAEnforcementGate requireMFA={true}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 overflow-x-hidden">
+        <div className="max-w-6xl mx-auto overflow-x-hidden">
+          <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 h-auto">
@@ -298,6 +300,7 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
     </div>
+    </MFAEnforcementGate>
   );
 };
 

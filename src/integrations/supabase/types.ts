@@ -997,6 +997,36 @@ export type Database = {
           },
         ]
       }
+      login_attempts: {
+        Row: {
+          created_at: string
+          email: string
+          failure_reason: string | null
+          id: string
+          ip_address: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       mfa_sessions: {
         Row: {
           challenge_code: string
@@ -1222,8 +1252,11 @@ export type Database = {
           backup_codes: Json | null
           created_at: string | null
           email: string | null
+          failed_mfa_attempts: number | null
           id: string
           mfa_enabled: boolean | null
+          mfa_enforced_at: string | null
+          mfa_locked_until: string | null
           mfa_secret: string | null
           updated_at: string | null
         }
@@ -1231,8 +1264,11 @@ export type Database = {
           backup_codes?: Json | null
           created_at?: string | null
           email?: string | null
+          failed_mfa_attempts?: number | null
           id: string
           mfa_enabled?: boolean | null
+          mfa_enforced_at?: string | null
+          mfa_locked_until?: string | null
           mfa_secret?: string | null
           updated_at?: string | null
         }
@@ -1240,8 +1276,11 @@ export type Database = {
           backup_codes?: Json | null
           created_at?: string | null
           email?: string | null
+          failed_mfa_attempts?: number | null
           id?: string
           mfa_enabled?: boolean | null
+          mfa_enforced_at?: string | null
+          mfa_locked_until?: string | null
           mfa_secret?: string | null
           updated_at?: string | null
         }
@@ -1683,9 +1722,23 @@ export type Database = {
         Args: { metric_date: string; metric_name: string }
         Returns: undefined
       }
+      is_account_locked: {
+        Args: { check_email: string }
+        Returns: boolean
+      }
       is_admin: {
         Args: { user_id?: string }
         Returns: boolean
+      }
+      log_login_attempt: {
+        Args: {
+          attempt_email: string
+          attempt_failure_reason?: string
+          attempt_ip: string
+          attempt_success: boolean
+          attempt_user_agent: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
