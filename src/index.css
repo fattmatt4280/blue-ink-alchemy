@@ -98,6 +98,7 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html, body {
@@ -105,6 +106,7 @@ All colors MUST be HSL.
     overflow-x: hidden;
     overscroll-behavior-x: none;
     touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -344,6 +346,10 @@ All colors MUST be HSL.
     0 0 40px rgba(59, 130, 246, 0.1),
     inset 0 0 20px rgba(147, 197, 253, 0.1);
   filter: blur(1px);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  contain: layout style paint;
 }
 
 .neon-orb.large {
@@ -368,6 +374,9 @@ All colors MUST be HSL.
   border-radius: 50%;
   background: rgba(59, 130, 246, 0.6);
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* Floating animations with different speeds and patterns */
@@ -464,3 +473,23 @@ All colors MUST be HSL.
 .animate-drift-4 { animation: drift-4 16s linear infinite 8s; }
 .animate-drift-5 { animation: drift-5 22s linear infinite 3s; }
 .animate-drift-6 { animation: drift-6 19s linear infinite 7s; }
+
+/* Performance optimizations */
+.animation-paused * {
+  animation-play-state: paused !important;
+}
+
+.futuristic-bg {
+  contain: layout style paint;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .neon-orb, .neon-particle, 
+  .animate-float-1, .animate-float-2, .animate-float-3, 
+  .animate-float-4, .animate-float-5, .animate-float-6,
+  .animate-drift-1, .animate-drift-2, .animate-drift-3,
+  .animate-drift-4, .animate-drift-5, .animate-drift-6 {
+    animation: none !important;
+  }
+}

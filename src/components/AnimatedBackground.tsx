@@ -1,8 +1,30 @@
+import { useEffect, useState } from 'react';
+
 const AnimatedBackground = () => {
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
+
   return (
     <>
       {/* Background layer orbs (behind everything) */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div className={`fixed inset-0 overflow-hidden pointer-events-none z-0 ${isScrolling ? 'animation-paused' : ''}`}>
         {/* Large floating orbs */}
         <div className="neon-orb large animate-float-2" style={{ top: '60%', right: '10%' }} />
         <div className="neon-orb large animate-float-3" style={{ top: '80%', left: '70%' }} />
@@ -19,7 +41,7 @@ const AnimatedBackground = () => {
       </div>
 
       {/* Mid-layer orbs (above hero background, below content) */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[5]">
+      <div className={`fixed inset-0 overflow-hidden pointer-events-none z-[5] ${isScrolling ? 'animation-paused' : ''}`}>
         {/* Large floating orbs with reduced opacity for hero area */}
         <div className="neon-orb large animate-float-1 opacity-60" style={{ top: '10%', left: '15%' }} />
         

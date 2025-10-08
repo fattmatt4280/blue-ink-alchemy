@@ -11,13 +11,14 @@ export const useIntersectionObserver = (
 ) => {
   const {
     threshold = 0.1,
-    rootMargin = '0px',
+    rootMargin = '50px',
     triggerOnce = true
   } = options;
   
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>();
 
   useEffect(() => {
     const element = elementRef.current;
@@ -27,12 +28,20 @@ export const useIntersectionObserver = (
       ([entry]) => {
         const isVisible = entry.isIntersecting;
         
-        if (isVisible && (!triggerOnce || !hasTriggered)) {
-          setIsIntersecting(true);
-          setHasTriggered(true);
-        } else if (!triggerOnce) {
-          setIsIntersecting(isVisible);
+        // Cancel any pending RAF
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
         }
+
+        // Debounce state updates using requestAnimationFrame
+        rafRef.current = requestAnimationFrame(() => {
+          if (isVisible && (!triggerOnce || !hasTriggered)) {
+            setIsIntersecting(true);
+            setHasTriggered(true);
+          } else if (!triggerOnce) {
+            setIsIntersecting(isVisible);
+          }
+        });
       },
       {
         threshold,
@@ -43,6 +52,9 @@ export const useIntersectionObserver = (
     observer.observe(element);
 
     return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
       observer.unobserve(element);
     };
   }, [threshold, rootMargin, triggerOnce, hasTriggered]);

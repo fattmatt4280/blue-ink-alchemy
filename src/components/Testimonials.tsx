@@ -1,9 +1,9 @@
-
+import { memo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Plus } from "lucide-react";
 import { useSiteContent } from '@/hooks/useSiteContent';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import ReviewForm from './ReviewForm';
 import { PublicCustomerReview, PUBLIC_REVIEW_COLUMNS } from '@/types/reviews';
@@ -11,11 +11,12 @@ const Testimonials = () => {
   const { content, loading } = useSiteContent();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [customerReviews, setCustomerReviews] = useState<PublicCustomerReview[]>([]);
+  const updateTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     fetchCustomerReviews();
     
-    // Set up real-time subscription for new approved reviews
+    // Set up real-time subscription with debouncing
     const channel = supabase
       .channel('schema-db-changes')
       .on(
@@ -27,12 +28,21 @@ const Testimonials = () => {
           filter: 'approved=eq.true'
         },
         () => {
-          fetchCustomerReviews();
+          // Debounce updates to prevent rapid re-renders during scroll
+          if (updateTimeoutRef.current) {
+            clearTimeout(updateTimeoutRef.current);
+          }
+          updateTimeoutRef.current = setTimeout(() => {
+            fetchCustomerReviews();
+          }, 500);
         }
       )
       .subscribe();
 
     return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
       supabase.removeChannel(channel);
     };
   }, []);
@@ -202,4 +212,4 @@ const Testimonials = () => {
   );
 };
 
-export default Testimonials;
+export default memo(Testimonials);

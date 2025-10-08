@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trackEvent } from '@/components/AnalyticsTracker';
@@ -67,8 +68,8 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
             src={isHealAidProduct ? healaidShield : product.image_url}
             alt={product.name}
             className="neon-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded"
-            loading="eager"
-            decoding="sync"
+            loading="lazy"
+            decoding="async"
             crossOrigin="anonymous"
             onError={(e) => {
               if (!e.currentTarget.dataset.fallbackApplied) {
@@ -156,4 +157,4 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);
