@@ -47,7 +47,7 @@ const Hero = () => {
             }
           }
         `}</style>
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-black/60"></div>
         
         <HeroHeader />
         
