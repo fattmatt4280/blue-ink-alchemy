@@ -29,6 +29,7 @@ import { AIInstructionsEditor } from '@/components/AIInstructionsEditor';
 import HealAidContentEditor from '@/components/HealAidContentEditor';
 import HealingTrackerContentEditor from '@/components/HealingTrackerContentEditor';
 import { UserBaseManager } from '@/components/UserBaseManager';
+import AbandonedCartsManager from '@/components/AbandonedCartsManager';
 
 interface SiteContent {
   id: string;
@@ -189,6 +190,7 @@ const AdminDashboard = () => {
               </Button>
             </div>
             <PushNotificationManager />
+            <AbandonedCartsManager />
             <AnalyticsDashboard />
             <AdminAnalyticsManager />
           </TabsContent>

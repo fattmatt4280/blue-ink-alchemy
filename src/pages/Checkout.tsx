@@ -18,6 +18,9 @@ const Checkout = () => {
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
   const [loading, setLoading] = useState(false);
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
@@ -57,14 +60,70 @@ const Checkout = () => {
   useEffect(() => {
     if (success === 'true') {
       toast.success("Order completed successfully!");
+      
+      // Mark abandoned cart as converted
+      const markCartConverted = async () => {
+        const email = shippingInfo.email;
+        if (email) {
+          await supabase
+            .from('abandoned_carts')
+            .update({ 
+              converted: true,
+              converted_at: new Date().toISOString(),
+              discount_code_used: discountApplied ? 'CART10' : null
+            })
+            .eq('email', email)
+            .eq('converted', false);
+
+          // Track analytics
+          await supabase.from('analytics_events').insert({
+            event_type: 'abandoned_cart_recovered',
+            event_data: {
+              email,
+              discount_used: discountApplied,
+              discount_code: discountApplied ? 'CART10' : null
+            }
+          });
+        }
+      };
+      markCartConverted();
       clearCart();
     } else if (cancelled === 'true') {
       toast.info("Order was cancelled.");
     }
   }, [success, cancelled]); // Removed clearCart from dependencies to prevent infinite loop
 
+  const applyDiscountCode = () => {
+    if (discountCode.toUpperCase() === 'CART10') {
+      const discount = subtotal * 0.1;
+      setDiscountAmount(discount);
+      setDiscountApplied(true);
+      toast.success('10% discount applied!');
+      
+      // Track discount code usage
+      supabase.from('analytics_events').insert({
+        event_type: 'discount_code_used',
+        event_data: {
+          code: 'CART10',
+          discount_amount: discount,
+          cart_value: subtotal
+        }
+      });
+    } else {
+      toast.error('Invalid discount code');
+    }
+  };
+
+  const removeDiscount = () => {
+    setDiscountCode('');
+    setDiscountAmount(0);
+    setDiscountApplied(false);
+    toast.info('Discount removed');
+  };
+
   const subtotal = getTotalPrice();
   const shipping = selectedShippingRate ? selectedShippingRate.amount : 0;
+  const total = subtotal + shipping - discountAmount;
 
   const handleCompleteOrder = async () => {
     console.log("=== STARTING CHECKOUT PROCESS ===");
@@ -465,15 +524,62 @@ const Checkout = () => {
                  </Card>
                )}
 
-              <Card>
+               <Card>
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Discount Code Section */}
+                  <div className="border-b pb-4">
+                    <label className="text-sm font-medium mb-2 block">Discount Code</label>
+                    {!discountApplied ? (
+                      <div className="flex gap-2">
+                        <Input 
+                          placeholder="Enter code (e.g., CART10)" 
+                          value={discountCode}
+                          onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                          className="uppercase"
+                        />
+                        <Button 
+                          onClick={applyDiscountCode}
+                          variant="secondary"
+                          disabled={!discountCode}
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-medium text-green-800">
+                            {discountCode} Applied (10% off)
+                          </span>
+                        </div>
+                        <Button 
+                          onClick={removeDiscount}
+                          variant="ghost"
+                          size="sm"
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
                     <span className="font-semibold">${subtotal.toFixed(2)}</span>
                   </div>
+                  
+                  {discountApplied && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount (10%):</span>
+                      <span className="font-semibold">-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  
                    <div className="flex justify-between">
                      <span>Shipping:</span>
                      <span className="font-semibold">
@@ -494,7 +600,7 @@ const Checkout = () => {
                    <div className="border-t pt-4">
                      <div className="flex justify-between text-lg font-bold">
                        <span>Total:</span>
-                       <span>${(subtotal + shipping).toFixed(2)}</span>
+                       <span>${total.toFixed(2)}</span>
                      </div>
                      <p className="text-sm text-gray-500 mt-2">
                        Final total and taxes will be calculated by Stripe

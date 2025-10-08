@@ -78,3 +78,11 @@ verify_jwt = false
 [[functions]]
 name = "check-free-trial-eligibility"
 verify_jwt = false
+
+[[functions]]
+name = "send-abandoned-cart-email"
+verify_jwt = false
+
+[[functions]]
+name = "process-abandoned-carts"
+verify_jwt = false

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_carts: {
+        Row: {
+          cart_items: Json
+          cart_value: number
+          converted: boolean | null
+          converted_at: string | null
+          created_at: string
+          discount_code_used: string | null
+          email: string
+          email_opened: boolean | null
+          email_sent_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          cart_items: Json
+          cart_value: number
+          converted?: boolean | null
+          converted_at?: string | null
+          created_at?: string
+          discount_code_used?: string | null
+          email: string
+          email_opened?: boolean | null
+          email_sent_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          cart_items?: Json
+          cart_value?: number
+          converted?: boolean | null
+          converted_at?: string | null
+          created_at?: string
+          discount_code_used?: string | null
+          email?: string
+          email_opened?: boolean | null
+          email_sent_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       affiliate_products: {
         Row: {
           active: boolean | null
