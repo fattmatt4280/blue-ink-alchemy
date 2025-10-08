@@ -17,6 +17,11 @@ export const userNavItems = [
   { label: 'Healing History', path: '/healing-history', icon: History },
 ];
 
+// Admin nav items
+export const adminNavItems = [
+  { label: 'Security Dashboard', path: '/admin/security', icon: Shield },
+];
+
 export const footerNavItems = [
   { label: 'How to Use', path: '/how-to-use', icon: Info },
   { label: 'Size Guide', path: '/size-guide', icon: Ruler },

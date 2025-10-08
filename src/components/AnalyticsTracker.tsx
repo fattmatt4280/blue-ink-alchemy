@@ -1,7 +1,7 @@
-
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { anonymizeEventData, anonymizeUserAgent, anonymizeURL } from '@/utils/piiAnonymizer';
 
 // TikTok Pixel integration
 declare global {
@@ -52,18 +52,22 @@ const AnalyticsTracker = () => {
       
       console.log('Tracking page view for:', location.pathname);
       
-      // Track in our database
+      // Anonymize event data before storing
+      const eventData = {
+        page: location.pathname,
+        title: document.title,
+        referrer: document.referrer,
+      };
+      const { anonymized } = anonymizeEventData(eventData);
+
+      // Track in our database with anonymized data
       const { error } = await supabase.from('analytics_events').insert({
         event_type: 'page_view',
-        event_data: {
-          page: location.pathname,
-          title: document.title,
-          referrer: document.referrer,
-        },
+        event_data: anonymized,
         session_id: sessionId,
-        page_url: window.location.href,
-        referrer: document.referrer,
-        user_agent: navigator.userAgent,
+        page_url: anonymizeURL(window.location.href),
+        referrer: document.referrer ? anonymizeURL(document.referrer) : null,
+        user_agent: anonymizeUserAgent(navigator.userAgent),
       });
 
       if (error) {
@@ -146,12 +150,15 @@ export const trackEvent = async (eventType: string, eventData: any) => {
     
     console.log('Tracking event:', eventType, eventData);
     
+    // Anonymize event data before storing
+    const { anonymized } = anonymizeEventData(eventData);
+    
     const { error } = await supabase.from('analytics_events').insert({
       event_type: eventType,
-      event_data: eventData,
+      event_data: anonymized,
       session_id: sessionId,
-      page_url: window.location.href,
-      user_agent: navigator.userAgent,
+      page_url: anonymizeURL(window.location.href),
+      user_agent: anonymizeUserAgent(navigator.userAgent),
     });
 
     if (error) {

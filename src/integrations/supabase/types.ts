@@ -231,39 +231,51 @@ export type Database = {
       ai_response_logs: {
         Row: {
           anomaly_score: number | null
+          baseline_deviation_score: number | null
           created_at: string
+          fallback_used: boolean | null
           healing_progress_id: string | null
           healing_stage: string | null
           id: string
           model_used: string
+          model_version: string | null
           request_hash: string
           response_hash: string
+          response_signature: string | null
           response_time_ms: number | null
           risk_level: string | null
           user_id: string | null
         }
         Insert: {
           anomaly_score?: number | null
+          baseline_deviation_score?: number | null
           created_at?: string
+          fallback_used?: boolean | null
           healing_progress_id?: string | null
           healing_stage?: string | null
           id?: string
           model_used: string
+          model_version?: string | null
           request_hash: string
           response_hash: string
+          response_signature?: string | null
           response_time_ms?: number | null
           risk_level?: string | null
           user_id?: string | null
         }
         Update: {
           anomaly_score?: number | null
+          baseline_deviation_score?: number | null
           created_at?: string
+          fallback_used?: boolean | null
           healing_progress_id?: string | null
           healing_stage?: string | null
           id?: string
           model_used?: string
+          model_version?: string | null
           request_hash?: string
           response_hash?: string
+          response_signature?: string | null
           response_time_ms?: number | null
           risk_level?: string | null
           user_id?: string | null
@@ -985,6 +997,33 @@ export type Database = {
           },
         ]
       }
+      mfa_sessions: {
+        Row: {
+          challenge_code: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          challenge_code: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          challenge_code?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       newsletter_signups: {
         Row: {
           active: boolean
@@ -1100,6 +1139,36 @@ export type Database = {
           },
         ]
       }
+      pii_access_log: {
+        Row: {
+          access_reason: string
+          accessed_user_id: string
+          admin_user_id: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          pii_type: string
+        }
+        Insert: {
+          access_reason: string
+          accessed_user_id: string
+          admin_user_id: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          pii_type: string
+        }
+        Update: {
+          access_reason?: string
+          accessed_user_id?: string
+          admin_user_id?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          pii_type?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           created_at: string
@@ -1150,21 +1219,30 @@ export type Database = {
       }
       profiles: {
         Row: {
+          backup_codes: Json | null
           created_at: string | null
           email: string | null
           id: string
+          mfa_enabled: boolean | null
+          mfa_secret: string | null
           updated_at: string | null
         }
         Insert: {
+          backup_codes?: Json | null
           created_at?: string | null
           email?: string | null
           id: string
+          mfa_enabled?: boolean | null
+          mfa_secret?: string | null
           updated_at?: string | null
         }
         Update: {
+          backup_codes?: Json | null
           created_at?: string | null
           email?: string | null
           id?: string
+          mfa_enabled?: boolean | null
+          mfa_secret?: string | null
           updated_at?: string | null
         }
         Relationships: []
