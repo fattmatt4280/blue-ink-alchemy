@@ -28,16 +28,21 @@ export const MFAEnforcementGate = ({ children, requireMFA = false }: MFAEnforcem
         return;
       }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('mfa_enabled, mfa_enforced_at')
-        .eq('id', user.id)
-        .single();
+      // Check both profile status and actual MFA factors
+      const [profileResult, factorsResult] = await Promise.all([
+        supabase.from('profiles').select('mfa_enabled, mfa_enforced_at').eq('id', user.id).single(),
+        supabase.auth.mfa.listFactors()
+      ]);
 
-      setMfaEnabled(profile?.mfa_enabled || false);
+      const profile = profileResult.data;
+      const hasVerifiedFactor = factorsResult.data?.totp?.some(f => f.status === 'verified');
+      
+      // MFA is truly enabled only if profile says so AND there's a verified factor
+      const isMFAEnabled = (profile?.mfa_enabled && hasVerifiedFactor) || false;
+      setMfaEnabled(isMFAEnabled);
 
       // If MFA is required but not enabled, show setup
-      if (requireMFA && !profile?.mfa_enabled) {
+      if (requireMFA && !isMFAEnabled) {
         // Record enforcement timestamp
         if (!profile?.mfa_enforced_at) {
           await supabase
@@ -55,8 +60,16 @@ export const MFAEnforcementGate = ({ children, requireMFA = false }: MFAEnforcem
   };
 
   const handleMFAComplete = async () => {
-    await checkMFAStatus();
-    toast.success('MFA enabled successfully! Your account is now protected.');
+    // Verify that MFA was actually set up by checking for verified factors
+    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const hasVerifiedFactor = factors?.totp?.some(f => f.status === 'verified');
+    
+    if (hasVerifiedFactor) {
+      await checkMFAStatus();
+      toast.success('MFA enabled successfully! Your account is now protected.');
+    } else {
+      toast.error('MFA setup incomplete. Please try again.');
+    }
   };
 
   if (loading) {

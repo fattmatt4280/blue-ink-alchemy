@@ -19,11 +19,47 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
   const [verificationCode, setVerificationCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [factorId, setFactorId] = useState<string>('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const resetSetup = async () => {
+    try {
+      // Unenroll any unverified factors
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      if (factors?.totp) {
+        for (const factor of factors.totp) {
+          if (factor.status === 'unverified') {
+            await supabase.auth.mfa.unenroll({ factorId: factor.id });
+          }
+        }
+      }
+      
+      setStep('generate');
+      setSecret('');
+      setQrCodeUrl('');
+      setFactorId('');
+      setVerificationCode('');
+      toast.success('Setup reset. Please try again.');
+    } catch (error: any) {
+      console.error('Reset failed:', error);
+      toast.error('Failed to reset setup');
+    }
+  };
 
   const generateMFA = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
+
+      // Check if there's already an unverified factor and clean it up
+      const { data: existingFactors } = await supabase.auth.mfa.listFactors();
+      if (existingFactors?.totp) {
+        for (const factor of existingFactors.totp) {
+          if (factor.status === 'unverified') {
+            await supabase.auth.mfa.unenroll({ factorId: factor.id });
+          }
+        }
+      }
 
       // Enroll in MFA
       const { data, error } = await supabase.auth.mfa.enroll({
@@ -32,13 +68,18 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
 
       if (error) {
         console.error('MFA enrollment error:', error);
+        if (error.message?.includes('already enrolled')) {
+          toast.error('Factor already exists. Use "Reset Setup" to start over.');
+          return;
+        }
         throw error;
       }
 
-      if (!data) {
-        throw new Error('No MFA data returned');
+      if (!data?.id || !data.totp?.secret || !data.totp?.uri) {
+        throw new Error('Incomplete MFA data returned');
       }
 
+      setFactorId(data.id);
       setSecret(data.totp.secret);
       setQrCodeUrl(data.totp.uri);
       setStep('verify');
@@ -49,31 +90,48 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
   };
 
   const verifyMFA = async () => {
+    if (isVerifying) return;
+    
+    setIsVerifying(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get the factor ID from the enrolled factors
-      const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
+      const trimmedCode = verificationCode.trim();
+      if (trimmedCode.length !== 6) {
+        throw new Error('Verification code must be 6 digits');
+      }
+
+      // Use stored factorId or fallback to listing factors
+      let currentFactorId = factorId;
       
-      if (listError) throw listError;
-      
-      const factor = factors?.totp?.[0];
-      
-      if (!factor) throw new Error('No MFA factor found. Please try enrolling again.');
+      if (!currentFactorId) {
+        const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
+        if (listError) throw listError;
+        
+        const factor = factors?.totp?.find(f => f.status === 'unverified');
+        if (!factor) {
+          throw new Error('No pending MFA factor found. Please start setup again.');
+        }
+        currentFactorId = factor.id;
+      }
 
       // Challenge and verify the code
-      const challenge = await supabase.auth.mfa.challenge({ factorId: factor.id });
-      
+      const challenge = await supabase.auth.mfa.challenge({ factorId: currentFactorId });
       if (challenge.error) throw challenge.error;
 
       const verify = await supabase.auth.mfa.verify({
-        factorId: factor.id,
+        factorId: currentFactorId,
         challengeId: challenge.data.id,
-        code: verificationCode
+        code: trimmedCode
       });
 
-      if (verify.error) throw verify.error;
+      if (verify.error) {
+        if (verify.error.message?.includes('Invalid code')) {
+          throw new Error('Invalid verification code. Please check your authenticator app and try again.');
+        }
+        throw verify.error;
+      }
 
       // Generate backup codes
       const codes = Array.from({ length: 10 }, () => 
@@ -93,6 +151,8 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
     } catch (error: any) {
       console.error('MFA verification failed:', error);
       toast.error(error?.message || 'Invalid verification code');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -125,9 +185,11 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
             <p className="text-sm text-muted-foreground">
               Multi-factor authentication (MFA) requires a second verification code from your phone when signing in.
             </p>
-            <Button onClick={generateMFA}>
-              Enable MFA
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={generateMFA}>
+                Enable MFA
+              </Button>
+            </div>
           </div>
         )}
 
@@ -146,13 +208,25 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
               <Input
                 placeholder="Enter 6-digit code"
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
                 maxLength={6}
+                disabled={isVerifying}
               />
             </div>
-            <Button onClick={verifyMFA} disabled={verificationCode.length !== 6}>
-              Verify & Enable
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={verifyMFA} 
+                disabled={verificationCode.length !== 6 || isVerifying}
+              >
+                {isVerifying ? 'Verifying...' : 'Verify & Enable'}
+              </Button>
+              <Button variant="outline" onClick={resetSetup}>
+                Reset Setup
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Make sure your phone's time is synced. If the code doesn't work, try waiting for a new code.
+            </p>
           </div>
         )}
 
