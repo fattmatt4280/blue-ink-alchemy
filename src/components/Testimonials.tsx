@@ -171,7 +171,7 @@ const Testimonials = () => {
                     className={`w-12 h-12 rounded-full object-cover ${testimonial.isPlaceholder ? 'opacity-50' : 'neon-image'}`}
                   />
                   <div>
-                    <div className={`font-medium ${testimonial.isPlaceholder ? 'text-blue-700' : 'text-gray-900'}`}>
+                    <div className={`font-medium ${testimonial.isPlaceholder ? 'text-blue-700' : 'text-white'}`}>
                       {testimonial.name}
                     </div>
                     <div className={`text-sm ${testimonial.isPlaceholder ? 'text-blue-500' : 'text-gray-600'}`}>
