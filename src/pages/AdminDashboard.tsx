@@ -28,6 +28,7 @@ import { AITrainingAnalytics } from '@/components/AITrainingAnalytics';
 import { AIInstructionsEditor } from '@/components/AIInstructionsEditor';
 import HealAidContentEditor from '@/components/HealAidContentEditor';
 import HealingTrackerContentEditor from '@/components/HealingTrackerContentEditor';
+import { UserBaseManager } from '@/components/UserBaseManager';
 
 interface SiteContent {
   id: string;
@@ -151,10 +152,14 @@ const AdminDashboard = () => {
         <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 h-auto">
+          <TabsList className="grid w-full grid-cols-6 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Users</span>
+              <span className="sm:hidden">Users</span>
             </TabsTrigger>
             <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Content Management</span>
@@ -186,6 +191,10 @@ const AdminDashboard = () => {
             <PushNotificationManager />
             <AnalyticsDashboard />
             <AdminAnalyticsManager />
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-6">
+            <UserBaseManager />
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">
