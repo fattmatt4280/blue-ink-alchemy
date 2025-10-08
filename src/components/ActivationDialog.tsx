@@ -35,7 +35,7 @@ export const ActivationDialog = ({ open, onOpenChange, prefilledCode = "" }: Act
       
       setLoading(true);
 
-      const { data, error } = await supabase.functions.invoke("activate-healyn", {
+      const { data, error } = await supabase.functions.invoke("activate-healaid", {
         body: { 
           code: validated.code,
           email: validated.email 

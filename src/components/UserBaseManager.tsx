@@ -101,7 +101,7 @@ export const UserBaseManager = () => {
 
       // Fetch subscriptions
       const { data: subscriptions, error: subsError } = await supabase
-        .from('healyn_subscriptions')
+        .from('healaid_subscriptions')
         .select('user_id, is_active');
 
       // Combine all data

@@ -67,7 +67,7 @@ serve(async (req) => {
       
       // Ensure uniqueness
       let { data: existing } = await supabase
-        .from('healyn_activation_codes')
+        .from('healaid_activation_codes')
         .select('code')
         .eq('code', code)
         .single();
@@ -75,7 +75,7 @@ serve(async (req) => {
       while (existing) {
         code = generateCode();
         const result = await supabase
-          .from('healyn_activation_codes')
+          .from('healaid_activation_codes')
           .select('code')
           .eq('code', code)
           .single();
@@ -96,7 +96,7 @@ serve(async (req) => {
 
     // Insert codes
     const { data, error: insertError } = await supabase
-      .from('healyn_activation_codes')
+      .from('healaid_activation_codes')
       .insert(codes)
       .select();
 

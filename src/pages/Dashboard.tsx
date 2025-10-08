@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Sparkles, Clock, ArrowRight, History } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import AppHeader from "@/components/AppHeader";
-import { useHealynSubscription } from "@/hooks/useHealynSubscription";
+import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 
 interface Subscription {
   tier: string;
@@ -18,7 +18,7 @@ interface Subscription {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const subscriptionStatus = useHealynSubscription();
+  const subscriptionStatus = useHealAidSubscription();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [totalAnalyses, setTotalAnalyses] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +37,7 @@ const Dashboard = () => {
       }
 
       const { data, error } = await supabase
-        .from("healyn_subscriptions")
+        .from("healaid_subscriptions")
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
@@ -78,7 +78,7 @@ const Dashboard = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('create-healyn-upgrade', {
+      const { data, error } = await supabase.functions.invoke('create-healaid-upgrade', {
         body: { tier },
         headers: {
           Authorization: `Bearer ${session.access_token}`

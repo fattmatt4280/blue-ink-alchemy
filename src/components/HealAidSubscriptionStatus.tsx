@@ -12,7 +12,7 @@ interface Subscription {
   is_active: boolean;
 }
 
-export const HealynSubscriptionStatus = () => {
+const HealAidSubscriptionStatus = () => {
   const navigate = useNavigate();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [daysRemaining, setDaysRemaining] = useState(0);
@@ -32,7 +32,7 @@ export const HealynSubscriptionStatus = () => {
       }
 
       const { data, error } = await supabase
-        .from("healyn_subscriptions")
+        .from("healaid_subscriptions")
         .select("*")
         .eq("user_id", user.id)
         .single();
@@ -136,3 +136,5 @@ export const HealynSubscriptionStatus = () => {
     </Card>
   );
 };
+
+export default HealAidSubscriptionStatus;

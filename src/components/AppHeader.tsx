@@ -11,7 +11,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { mainNavItems, userNavItems, footerNavItems, healingTrackerNavItem } from "@/lib/navigationItems";
 import { useState } from "react";
-import { useHealynSubscription } from "@/hooks/useHealynSubscription";
+import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 import { Badge } from "@/components/ui/badge";
 
 interface AppHeaderProps {
@@ -32,7 +32,7 @@ const AppHeader = ({
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const subscription = useHealynSubscription();
+  const subscription = useHealAidSubscription();
 
   const handleBack = () => {
     if (backUrl) {

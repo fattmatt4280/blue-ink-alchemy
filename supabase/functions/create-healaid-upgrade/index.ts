@@ -53,14 +53,14 @@ serve(async (req) => {
 
     // Get user's subscription
     const { data: subscription, error: subError } = await supabase
-      .from('healyn_subscriptions')
+      .from('healaid_subscriptions')
       .select('*')
       .eq('user_id', user.id)
       .single();
 
     if (subError || !subscription) {
       return new Response(
-        JSON.stringify({ error: 'No active Healyn subscription found. Please activate first.' }),
+        JSON.stringify({ error: 'No active Heal-AId subscription found. Please activate first.' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -91,7 +91,7 @@ serve(async (req) => {
       customerId = customer.id;
 
       await supabase
-        .from('healyn_subscriptions')
+        .from('healaid_subscriptions')
         .update({ stripe_customer_id: customerId })
         .eq('user_id', user.id);
     }
@@ -105,8 +105,8 @@ serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Healyn ${tierInfo.label} Access`,
-              description: `Extend your Healyn AI access for ${tierInfo.label}`,
+              name: `Heal-AId ${tierInfo.label} Access`,
+              description: `Extend your Heal-AId AI access for ${tierInfo.label}`,
             },
             unit_amount: tierInfo.amount,
             ...(tierInfo.subscription && {
@@ -135,7 +135,7 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in create-healyn-upgrade:', error);
+    console.error('Error in create-healaid-upgrade:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

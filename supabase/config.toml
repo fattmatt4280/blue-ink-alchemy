@@ -60,11 +60,11 @@ name = "healing-followup-qa"
 verify_jwt = false
 
 [[functions]]
-name = "activate-healyn"
+name = "activate-healaid"
 verify_jwt = false
 
 [[functions]]
-name = "create-healyn-upgrade"
+name = "create-healaid-upgrade"
 verify_jwt = true
 
 [[functions]]

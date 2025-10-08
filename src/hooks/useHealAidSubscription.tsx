@@ -10,7 +10,7 @@ interface SubscriptionStatus {
   loading: boolean;
 }
 
-export const useHealynSubscription = () => {
+export const useHealAidSubscription = () => {
   const { user } = useAuth();
   const [status, setStatus] = useState<SubscriptionStatus>({
     isActive: false,
@@ -35,7 +35,7 @@ export const useHealynSubscription = () => {
     const fetchSubscription = async () => {
       try {
         const { data, error } = await supabase
-          .from('healyn_subscriptions')
+          .from('healaid_subscriptions')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle();
@@ -76,7 +76,7 @@ export const useHealynSubscription = () => {
           loading: false,
         });
       } catch (err) {
-        console.error('Error in useHealynSubscription:', err);
+        console.error('Error in useHealAidSubscription:', err);
         setStatus({
           isActive: false,
           expirationDate: null,
@@ -91,13 +91,13 @@ export const useHealynSubscription = () => {
 
     // Set up real-time subscription updates
     const channel = supabase
-      .channel('healyn-subscription-changes')
+      .channel('healaid-subscription-changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'healyn_subscriptions',
+          table: 'healaid_subscriptions',
           filter: `user_id=eq.${user.id}`,
         },
         () => {

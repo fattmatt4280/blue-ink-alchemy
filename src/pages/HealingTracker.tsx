@@ -18,9 +18,9 @@ import CartDialog from "@/components/CartDialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import Footer from "@/components/Footer";
 import HealingQADialog from "@/components/HealingQADialog";
-import { HealynSubscriptionStatus } from "@/components/HealynSubscriptionStatus";
+import HealAidSubscriptionStatus from "@/components/HealAidSubscriptionStatus";
 import { MessageCircle } from "lucide-react";
-import { useHealynSubscription } from "@/hooks/useHealynSubscription";
+import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 
 interface Question {
   id: string;
@@ -51,7 +51,7 @@ const HealingTracker = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading } = useAuth();
-  const subscription = useHealynSubscription();
+  const subscription = useHealAidSubscription();
   const { products, loading: productsLoading, cartDialogOpen, selectedProductName, setCartDialogOpen, handleAddToCart, handleProductView } = useProductGrid();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -307,7 +307,7 @@ const HealingTracker = () => {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Upload Section */}
           <div className="space-y-6">
-            <HealynSubscriptionStatus />
+            <HealAidSubscriptionStatus />
             <Card className="neon-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

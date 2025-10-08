@@ -37,7 +37,7 @@ serve(async (req) => {
 
     // Check if code exists and is not redeemed
     const { data: activationCode, error: codeError } = await supabase
-      .from('healyn_activation_codes')
+      .from('healaid_activation_codes')
       .select('*')
       .eq('code', code)
       .single();
@@ -72,7 +72,7 @@ serve(async (req) => {
     // Check if user already has an active subscription from the last month
     if (userId) {
       const { data: existingSubscription } = await supabase
-        .from('healyn_subscriptions')
+        .from('healaid_subscriptions')
         .select('*')
         .eq('user_id', userId)
         .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
@@ -102,7 +102,7 @@ serve(async (req) => {
 
     // Update activation code
     const { error: updateError } = await supabase
-      .from('healyn_activation_codes')
+      .from('healaid_activation_codes')
       .update({
         redeemed: true,
         email,
@@ -123,14 +123,14 @@ serve(async (req) => {
     // Create or update subscription
     if (userId) {
       const { data: existingSub } = await supabase
-        .from('healyn_subscriptions')
+        .from('healaid_subscriptions')
         .select('*')
         .eq('user_id', userId)
         .single();
 
       if (existingSub) {
         await supabase
-          .from('healyn_subscriptions')
+          .from('healaid_subscriptions')
           .update({
             activation_code: code,
             start_date: activationDate.toISOString(),
@@ -141,7 +141,7 @@ serve(async (req) => {
           .eq('user_id', userId);
       } else {
         await supabase
-          .from('healyn_subscriptions')
+          .from('healaid_subscriptions')
           .insert({
             user_id: userId,
             email,
@@ -172,7 +172,7 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in activate-healyn:', error);
+    console.error('Error in activate-healaid:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

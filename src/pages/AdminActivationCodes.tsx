@@ -58,7 +58,7 @@ const AdminActivationCodes = () => {
   const loadCodes = async () => {
     try {
       const { data, error } = await supabase
-        .from("healyn_activation_codes")
+        .from("healaid_activation_codes")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(100);
