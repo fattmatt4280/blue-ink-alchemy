@@ -63,6 +63,9 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
             src={product.image_url}
             alt={product.name}
             className="neon-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded"
+            onError={(e) => {
+              e.currentTarget.src = '/images/healaid-shield-logo.jpeg';
+            }}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-6xl">
