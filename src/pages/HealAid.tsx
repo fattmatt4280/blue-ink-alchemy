@@ -21,16 +21,18 @@ import {
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
-import heroImage from "@/assets/healaid-ai-doctor.jpeg";
-import problemImage from "@/assets/healaid-medical-interface.jpeg";
-import howItWorksImage from "@/assets/healaid-examining-tattoo.jpeg";
-import techImage from "@/assets/healaid-doctor-tablet.jpeg";
-import featuresImage from "@/assets/healaid-tech-interface.webp";
-import ctaImage from "@/assets/healaid-medical-hand.jpeg";
-import shieldLogo from "@/assets/healaid-shield-logo.jpeg";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import heroImageFallback from "@/assets/healaid-ai-doctor.jpeg";
+import problemImageFallback from "@/assets/healaid-medical-interface.jpeg";
+import howItWorksImageFallback from "@/assets/healaid-examining-tattoo.jpeg";
+import techImageFallback from "@/assets/healaid-doctor-tablet.jpeg";
+import featuresImageFallback from "@/assets/healaid-tech-interface.webp";
+import ctaImageFallback from "@/assets/healaid-medical-hand.jpeg";
+import shieldLogoFallback from "@/assets/healaid-shield-logo.jpeg";
 
 const HealAid = () => {
   const navigate = useNavigate();
+  const { content } = useSiteContent();
   const [showActivationDialog, setShowActivationDialog] = useState(false);
   const { elementRef: heroRef, isIntersecting: heroVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { elementRef: problemRef, isIntersecting: problemVisible } = useIntersectionObserver({ threshold: 0.1 });
@@ -40,6 +42,15 @@ const HealAid = () => {
   const { elementRef: useCasesRef, isIntersecting: useCasesVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { elementRef: techRef, isIntersecting: techVisible } = useIntersectionObserver({ threshold: 0.1 });
   const { elementRef: finalCtaRef, isIntersecting: finalCtaVisible } = useIntersectionObserver({ threshold: 0.1 });
+
+  // Dynamic images with fallbacks
+  const heroImage = content.healaid_hero_image || heroImageFallback;
+  const problemImage = content.healaid_problem_image || problemImageFallback;
+  const howItWorksImage = content.healaid_how_image || howItWorksImageFallback;
+  const featuresImage = content.healaid_features_image || featuresImageFallback;
+  const techImage = content.healaid_tech_image || techImageFallback;
+  const ctaImage = content.healaid_cta_image || ctaImageFallback;
+  const shieldLogo = content.healaid_shield_logo || shieldLogoFallback;
 
   const handleShopClick = () => {
     navigate("/shop");

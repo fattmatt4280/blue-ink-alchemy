@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Save } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import ImageUpload from '@/components/ImageUpload';
 
 interface SiteContent {
   id: string;
@@ -18,9 +19,10 @@ interface HealAidContentEditorProps {
   onContentUpdate: (content: SiteContent[]) => void;
   onSave: (id: string, value: string) => void;
   saving: boolean;
+  onImageUpload: (imageUrl: string, contentId: string) => void;
 }
 
-const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: HealAidContentEditorProps) => {
+const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving, onImageUpload }: HealAidContentEditorProps) => {
   const handleInputChange = (id: string, value: string) => {
     onContentUpdate(
       content.map(c => 
@@ -59,6 +61,13 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
           <AccordionItem value="hero">
             <AccordionTrigger>Hero Section</AccordionTrigger>
             <AccordionContent className="space-y-4 pt-4">
+              <ImageUpload
+                title="Hero Background Image"
+                description="Upload the main hero section background image"
+                currentImage={getContentValue('healaid_hero_image')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_hero_image'))}
+                bucket="site-images"
+              />
               <div className="space-y-2">
                 <Label>Title</Label>
                 <Input
@@ -94,7 +103,7 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
                   onChange={(e) => handleInputChange(getContentId('healaid_hero_cta_secondary'), e.target.value)}
                 />
               </div>
-              <Button onClick={() => saveSection(['healaid_hero_title', 'healaid_hero_subtitle', 'healaid_hero_description', 'healaid_hero_cta_primary', 'healaid_hero_cta_secondary'])} disabled={saving}>
+              <Button onClick={() => saveSection(['healaid_hero_title', 'healaid_hero_subtitle', 'healaid_hero_description', 'healaid_hero_cta_primary', 'healaid_hero_cta_secondary', 'healaid_hero_image'])} disabled={saving}>
                 <Save className="w-4 h-4 mr-2" />
                 Save Hero Section
               </Button>
@@ -105,6 +114,13 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
           <AccordionItem value="problem">
             <AccordionTrigger>Problem/Solution Section</AccordionTrigger>
             <AccordionContent className="space-y-4 pt-4">
+              <ImageUpload
+                title="Problem Section Image"
+                description="Upload an image for the problem/solution section"
+                currentImage={getContentValue('healaid_problem_image')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_problem_image'))}
+                bucket="site-images"
+              />
               <div className="space-y-2">
                 <Label>Section Title</Label>
                 <Input
@@ -168,6 +184,13 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
           <AccordionItem value="how">
             <AccordionTrigger>How It Works Section</AccordionTrigger>
             <AccordionContent className="space-y-4 pt-4">
+              <ImageUpload
+                title="How It Works Image"
+                description="Upload an image for the 'How It Works' section"
+                currentImage={getContentValue('healaid_how_image')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_how_image'))}
+                bucket="site-images"
+              />
               <div className="space-y-2">
                 <Label>Section Title</Label>
                 <Input
@@ -209,6 +232,13 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
           <AccordionItem value="features">
             <AccordionTrigger>Features Section</AccordionTrigger>
             <AccordionContent className="space-y-4 pt-4">
+              <ImageUpload
+                title="Features Section Image"
+                description="Upload an image for the features section"
+                currentImage={getContentValue('healaid_features_image')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_features_image'))}
+                bucket="site-images"
+              />
               <div className="space-y-2">
                 <Label>Section Title</Label>
                 <Input
@@ -342,6 +372,13 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
           <AccordionItem value="technology">
             <AccordionTrigger>Technology Section</AccordionTrigger>
             <AccordionContent className="space-y-4 pt-4">
+              <ImageUpload
+                title="Technology Section Image"
+                description="Upload an image for the technology showcase"
+                currentImage={getContentValue('healaid_tech_image')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_tech_image'))}
+                bucket="site-images"
+              />
               <div className="space-y-2">
                 <Label>Section Title</Label>
                 <Input
@@ -383,6 +420,20 @@ const HealAidContentEditor = ({ content, onContentUpdate, onSave, saving }: Heal
           <AccordionItem value="cta">
             <AccordionTrigger>Final CTA Section</AccordionTrigger>
             <AccordionContent className="space-y-4 pt-4">
+              <ImageUpload
+                title="CTA Section Background"
+                description="Upload a background image for the final call-to-action"
+                currentImage={getContentValue('healaid_cta_image')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_cta_image'))}
+                bucket="site-images"
+              />
+              <ImageUpload
+                title="Shield Logo"
+                description="Upload the Heal-AId shield logo"
+                currentImage={getContentValue('healaid_shield_logo')}
+                onImageUploaded={(url) => onImageUpload(url, getContentId('healaid_shield_logo'))}
+                bucket="site-images"
+              />
               <div className="space-y-2">
                 <Label>Title</Label>
                 <Input

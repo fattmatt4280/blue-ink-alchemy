@@ -189,70 +189,74 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">
-            {/* Heal-AId Page Editor */}
-            <HealAidContentEditor
-              content={healAidContent}
-              onContentUpdate={setContent}
-              onSave={updateContent}
-              saving={saving}
-            />
+            <Tabs defaultValue="home" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="home">Home Page</TabsTrigger>
+                <TabsTrigger value="healaid">Heal-AId Page</TabsTrigger>
+                <TabsTrigger value="tracker">Healing Tracker</TabsTrigger>
+                <TabsTrigger value="sitewide">Site-Wide</TabsTrigger>
+              </TabsList>
 
-            {/* Healing Tracker Page Editor */}
-            <HealingTrackerContentEditor
-              content={trackerContent}
-              onContentUpdate={setContent}
-              onSave={updateContent}
-              saving={saving}
-            />
+              <TabsContent value="home" className="space-y-6">
+                <IngredientsEditor
+                  content={ingredientsContent}
+                  onContentUpdate={setContent}
+                  onSave={updateContent}
+                  saving={saving}
+                />
+                <TestimonialsEditor
+                  content={testimonialsContent}
+                  onContentUpdate={setContent}
+                  onSave={updateContent}
+                  saving={saving}
+                />
+                {imageContent.map((item) => (
+                  <ImageUpload
+                    key={item.id}
+                    title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
+                    currentImage={item.value}
+                    onImageUploaded={(url) => handleImageUpload(url, item.id)}
+                  />
+                ))}
+                <TextContentEditor
+                  content={textContent}
+                  onContentUpdate={setContent}
+                  onSave={updateContent}
+                  saving={saving}
+                />
+              </TabsContent>
 
-            {/* Customer Reviews Manager */}
-            <CustomerReviewsManager />
+              <TabsContent value="healaid" className="space-y-6">
+                <HealAidContentEditor
+                  content={healAidContent}
+                  onContentUpdate={setContent}
+                  onSave={updateContent}
+                  saving={saving}
+                  onImageUpload={handleImageUpload}
+                />
+              </TabsContent>
 
-            {/* Ingredients Editor */}
-            <IngredientsEditor
-              content={ingredientsContent}
-              onContentUpdate={setContent}
-              onSave={updateContent}
-              saving={saving}
-            />
+              <TabsContent value="tracker" className="space-y-6">
+                <HealingTrackerContentEditor
+                  content={trackerContent}
+                  onContentUpdate={setContent}
+                  onSave={updateContent}
+                  saving={saving}
+                />
+              </TabsContent>
 
-            {/* Testimonials Editor */}
-            <TestimonialsEditor
-              content={testimonialsContent}
-              onContentUpdate={setContent}
-              onSave={updateContent}
-              saving={saving}
-            />
-
-            {/* Footer Links Editor */}
-            <FooterLinksEditor
-              content={footerLinksContent}
-              onContentUpdate={setContent}
-              onSave={updateContent}
-              saving={saving}
-            />
-
-            {/* Social Links Editor */}
-            <SocialLinksEditor />
-
-            {/* Image Upload Section */}
-            {imageContent.map((item) => (
-              <ImageUpload
-                key={item.id}
-                title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
-                currentImage={item.value}
-                onImageUploaded={(url) => handleImageUpload(url, item.id)}
-              />
-            ))}
-
-            {/* Text Content Section */}
-            <TextContentEditor
-              content={textContent}
-              onContentUpdate={setContent}
-              onSave={updateContent}
-              saving={saving}
-            />
+              <TabsContent value="sitewide" className="space-y-6">
+                <FooterLinksEditor
+                  content={footerLinksContent}
+                  onContentUpdate={setContent}
+                  onSave={updateContent}
+                  saving={saving}
+                />
+                <SocialLinksEditor />
+                <CustomerReviewsManager />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6">
