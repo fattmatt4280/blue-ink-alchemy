@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user) {
         try {
           console.log('AuthContext: Checking admin status for user:', user.email);
-          const { data, error } = await supabase.rpc('is_admin');
+          const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
           
           if (error) {
             console.error('AuthContext: RPC error checking admin status:', error);
