@@ -32,22 +32,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
     
-    console.log('AuthContext: Initializing auth state');
+    console.log('[AuthContext] Initializing auth state');
     
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state changed:', event, session?.user?.email || 'no user');
+        console.log('[AuthContext] Auth state changed:', event, session?.user?.email || 'no user');
         
-        // Handle different auth events
+        // Handle different auth events with enhanced logging
         if (event === 'SIGNED_IN') {
-          console.log('User signed in successfully');
+          console.log('[AuthContext] ✓ User signed in successfully');
+          console.log('[AuthContext] User ID:', session?.user?.id);
+          console.log('[AuthContext] User email:', session?.user?.email);
+          console.log('[AuthContext] Auth provider:', session?.user?.app_metadata?.provider);
+          console.log('[AuthContext] Session expires at:', session?.expires_at);
         } else if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
+          console.log('[AuthContext] User signed out');
+          setIsAdmin(false);
         } else if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed');
+          console.log('[AuthContext] Token refreshed successfully');
+        } else if (event === 'USER_UPDATED') {
+          console.log('[AuthContext] User data updated');
         }
         
         setSession(session);
@@ -63,15 +70,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Get initial session AFTER setting up the listener
     const initializeAuth = async () => {
       try {
-        console.log('AuthContext: Getting initial session');
+        console.log('[AuthContext] Getting initial session');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('[AuthContext] Error getting session:', error);
+          
+          // Handle refresh token errors gracefully
+          if (error.message.includes('refresh_token_not_found') || 
+              error.message.includes('Invalid Refresh Token')) {
+            console.log('[AuthContext] Invalid session detected, clearing auth state');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+          }
         }
         
         if (mounted) {
-          console.log('AuthContext: Initial session:', session?.user?.email || 'no user');
+          console.log('[AuthContext] Initial session:', session?.user?.email || 'no user');
+          if (session) {
+            console.log('[AuthContext] Session details:', {
+              userId: session.user?.id,
+              email: session.user?.email,
+              provider: session.user?.app_metadata?.provider,
+              expiresAt: session.expires_at
+            });
+          }
           setSession(session);
           setUser(session?.user ?? null);
           
@@ -83,7 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }, 100);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('[AuthContext] Error initializing auth:', error);
         if (mounted) {
           setLoading(false);
         }
@@ -103,23 +127,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAdminStatus = async () => {
       if (user) {
         try {
-          console.log('AuthContext: Checking admin status for user:', user.email);
+          console.log('[AuthContext] Checking admin status for user:', user.email);
           const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
           
           if (error) {
-            console.error('AuthContext: RPC error checking admin status:', error);
+            console.error('[AuthContext] RPC error checking admin status:', error);
             setIsAdmin(false);
             return;
           }
           
-          console.log('AuthContext: Admin check result:', data);
+          console.log('[AuthContext] Admin check result:', data ? 'IS ADMIN' : 'NOT ADMIN');
           setIsAdmin(data || false);
+          
+          // Verify profile and role exist for this user
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          const { data: role, error: roleError } = await supabase
+            .from('user_roles')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (profileError) {
+            console.error('[AuthContext] Profile check error:', profileError);
+          } else {
+            console.log('[AuthContext] ✓ Profile exists:', !!profile);
+          }
+          
+          if (roleError) {
+            console.error('[AuthContext] Role check error:', roleError);
+          } else {
+            console.log('[AuthContext] ✓ Role assigned:', role?.role || 'none');
+          }
         } catch (error) {
-          console.error('AuthContext: Error checking admin status:', error);
+          console.error('[AuthContext] Error checking admin status:', error);
           setIsAdmin(false);
         }
       } else {
-        console.log('AuthContext: No user, setting isAdmin to false');
+        console.log('[AuthContext] No user, setting isAdmin to false');
         setIsAdmin(false);
       }
     };

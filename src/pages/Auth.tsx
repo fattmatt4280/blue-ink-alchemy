@@ -26,21 +26,46 @@ const Auth = () => {
       
       // If we have a code parameter, exchange it for a session (PKCE flow)
       if (code) {
-        console.log('PKCE code detected, exchanging for session...');
+        console.log('[Google OAuth] PKCE code detected, exchanging for session...');
         setLoading(true);
         
         try {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           
           if (error) {
-            console.error('Code exchange error:', error);
+            console.error('[Google OAuth] Code exchange error:', error);
             toast({
               title: "Authentication Error",
               description: error.message,
               variant: "destructive",
             });
           } else {
-            console.log('Code exchange successful');
+            console.log('[Google OAuth] Code exchange successful');
+            console.log('[Google OAuth] User authenticated:', data.user?.email);
+            console.log('[Google OAuth] Session established:', !!data.session);
+            
+            // Verify profile and role creation
+            setTimeout(async () => {
+              try {
+                const { data: profile } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('id', data.user?.id)
+                  .single();
+                
+                const { data: role } = await supabase
+                  .from('user_roles')
+                  .select('*')
+                  .eq('user_id', data.user?.id)
+                  .single();
+                
+                console.log('[Google OAuth] Profile created:', !!profile, profile);
+                console.log('[Google OAuth] Role assigned:', role?.role || 'none', role);
+              } catch (verifyError) {
+                console.error('[Google OAuth] Error verifying account setup:', verifyError);
+              }
+            }, 1000);
+            
             toast({
               title: "Welcome!",
               description: "You've been signed in successfully.",
@@ -50,7 +75,7 @@ const Auth = () => {
           // Clean up URL by removing query parameters
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch (err) {
-          console.error('Unexpected error during code exchange:', err);
+          console.error('[Google OAuth] Unexpected error during code exchange:', err);
           toast({
             title: "Unexpected Error",
             description: "An error occurred during sign-in.",
@@ -66,14 +91,14 @@ const Auth = () => {
       // Only redirect if we're authenticated and not processing OAuth
       if (!authLoading && user) {
         if (isAdmin) {
-          console.log('Admin user detected, redirecting to admin dashboard');
+          console.log('[Auth] Admin user detected, redirecting to admin dashboard');
           toast({
             title: "Admin access detected",
             description: "Redirecting to your dashboard...",
           });
           navigate('/admin', { replace: true });
         } else {
-          console.log('User is authenticated, redirecting to home page');
+          console.log('[Auth] User is authenticated, redirecting to home page');
           navigate('/', { replace: true });
         }
       }
@@ -129,7 +154,8 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    console.log('Starting Google OAuth flow...');
+    console.log('[Google OAuth] Initiating Google sign-in flow...');
+    console.log('[Google OAuth] Redirect URL:', `${window.location.origin}/auth`);
     
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -143,10 +169,20 @@ const Auth = () => {
         }
       });
 
-      console.log('Google OAuth response:', { data, error });
+      console.log('[Google OAuth] Response received:', { 
+        hasData: !!data, 
+        hasError: !!error,
+        provider: data?.provider,
+        url: data?.url 
+      });
 
       if (error) {
-        console.error('Google OAuth error:', error);
+        console.error('[Google OAuth] Configuration error:', error);
+        console.error('[Google OAuth] Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
         toast({
           title: "Google Sign-In Configuration Error",
           description: `${error.message}. Please check if Google provider is enabled in Supabase dashboard.`,
@@ -157,10 +193,11 @@ const Auth = () => {
       }
 
       // OAuth flow initiated successfully, user will be redirected
-      console.log('Google OAuth flow initiated successfully');
+      console.log('[Google OAuth] Flow initiated successfully, redirecting to Google...');
       
     } catch (err) {
-      console.error('Unexpected error during Google sign-in:', err);
+      console.error('[Google OAuth] Unexpected error during sign-in:', err);
+      console.error('[Google OAuth] Error type:', err instanceof Error ? err.constructor.name : typeof err);
       toast({
         title: "Unexpected Error",
         description: "An unexpected error occurred. Please try again.",
