@@ -22,6 +22,7 @@ import HealAidSubscriptionStatus from "@/components/HealAidSubscriptionStatus";
 import { MessageCircle } from "lucide-react";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 import { MedicalReferenceCard } from "@/components/MedicalReferenceCard";
+import MedicalSourcesList from "@/components/MedicalSourcesList";
 
 interface Question {
   id: string;
@@ -650,35 +651,7 @@ const HealingTracker = () => {
                     </Card>
 
                     {analysis.medicalReferencesUsed && analysis.medicalReferencesUsed.length > 0 && (
-                      <Card className="bg-muted/50 border-primary/30">
-                        <CardHeader>
-                          <CardTitle className="text-sm flex items-center gap-2">
-                            <BookOpen className="h-4 w-4" />
-                            Medical Sources Referenced ({analysis.medicalReferencesUsed.length})
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid gap-2">
-                            {analysis.medicalReferencesUsed.map((ref, i) => (
-                              <Button
-                                key={i}
-                                variant="ghost"
-                                size="sm"
-                                className="w-full justify-start text-xs h-auto py-2"
-                                onClick={() => window.open(ref.url, '_blank')}
-                              >
-                                <ExternalLink className="h-3 w-3 mr-2 flex-shrink-0" />
-                                <div className="text-left">
-                                  <div className="font-medium">{ref.source}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    Evidence: {ref.evidenceStrength.replace('_', ' ')}
-                                  </div>
-                                </div>
-                              </Button>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <MedicalSourcesList references={analysis.medicalReferencesUsed} />
                     )}
                   </div>
                 )}

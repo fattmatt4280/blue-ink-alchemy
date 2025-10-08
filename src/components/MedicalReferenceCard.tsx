@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, AlertCircle, BookOpen } from "lucide-react";
+import { ExternalLink, AlertCircle, BookOpen, Image as ImageIcon, AlertTriangle } from "lucide-react";
 
 interface MedicalReference {
   source: string;
@@ -27,6 +28,7 @@ interface MedicalReferenceCardProps {
 
 export const MedicalReferenceCard = ({ riskFactor }: MedicalReferenceCardProps) => {
   const { medicalReference } = riskFactor;
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
   if (!medicalReference) return null;
 
@@ -91,53 +93,74 @@ export const MedicalReferenceCard = ({ riskFactor }: MedicalReferenceCardProps) 
             <Button
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full gap-2"
               onClick={() => window.open(medicalReference.url, '_blank')}
             >
-              <ExternalLink className="mr-2 h-3.5 w-3.5" />
-              View Full Medical Reference
+              <ExternalLink className="h-3.5 w-3.5" />
+              Read Full Medical Article
             </Button>
           </div>
         </div>
 
         {/* Visual Examples */}
         {medicalReference.visualExamples && medicalReference.visualExamples.length > 0 && (
-          <div className="pt-3 border-t">
-            <p className="text-xs font-semibold mb-2">
-              📸 Medical Comparison Images:
+          <div className="pt-3 border-t space-y-3">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="h-4 w-4 text-primary" />
+              <p className="text-xs font-semibold">
+                Medical Reference Photos ({medicalReference.visualExamples.length})
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Compare your tattoo with these verified medical reference images. Click to enlarge.
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {medicalReference.visualExamples.map((imgUrl, i) => (
                 <div
                   key={i}
-                  className="relative group cursor-pointer"
-                  onClick={() => window.open(imgUrl, '_blank')}
+                  className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-border hover:border-primary/50 transition-all"
+                  onClick={() => setSelectedImage(imgUrl)}
                 >
                   <img
                     src={imgUrl}
-                    alt={`Medical reference ${i + 1}`}
-                    className="rounded border-2 border-border object-cover h-24 w-full group-hover:border-primary transition-colors"
+                    alt={`Medical reference ${i + 1} for ${riskFactor.concern}`}
+                    className="w-full h-32 object-cover group-hover:scale-105 transition-transform"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded flex items-center justify-center">
-                    <ExternalLink className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <ExternalLink className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Click images to view full size medical examples
-            </p>
+          </div>
+        )}
+
+        {/* Lightbox for enlarged images */}
+        {selectedImage && (
+          <div
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-pointer"
+            onClick={() => setSelectedImage(null)}
+          >
+            <img
+              src={selectedImage}
+              alt="Enlarged medical reference"
+              className="max-w-full max-h-full rounded-lg"
+            />
           </div>
         )}
 
         {/* When to Seek Care */}
-        <Alert variant={riskFactor.severity === 'urgent' ? 'destructive' : 'default'} className="mt-3">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="text-xs">
-            <strong className="block mb-1">When to Seek Medical Care:</strong>
-            {medicalReference.whenToSeekCare}
-          </AlertDescription>
-        </Alert>
+        {medicalReference.whenToSeekCare && (
+          <div className="pt-3 border-t">
+            <Alert variant={riskFactor.severity === 'urgent' ? 'destructive' : 'default'}>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="text-xs space-y-1">
+                <strong className="block font-semibold">When to Seek Professional Medical Care:</strong>
+                <p>{medicalReference.whenToSeekCare}</p>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

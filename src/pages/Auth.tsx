@@ -14,6 +14,8 @@ import { MFAChallenge } from '@/components/MFAChallenge';
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showMFAChallenge, setShowMFAChallenge] = useState(false);
   const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
@@ -196,7 +198,20 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signUp(email, password);
+    if (!firstName.trim()) {
+      toast({
+        title: "First name required",
+        description: "Please enter your first name to continue.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await signUp(email, password, {
+      firstName: firstName.trim(),
+      lastName: lastName.trim()
+    });
 
     if (error) {
       toast({
@@ -370,6 +385,29 @@ const Auth = () => {
 
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-firstname">First Name *</Label>
+                    <Input
+                      id="signup-firstname"
+                      type="text"
+                      placeholder="John"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-lastname">Last Name</Label>
+                    <Input
+                      id="signup-lastname"
+                      type="text"
+                      placeholder="Doe"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input

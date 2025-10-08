@@ -1310,7 +1310,9 @@ export type Database = {
           created_at: string | null
           email: string | null
           failed_mfa_attempts: number | null
+          first_name: string | null
           id: string
+          last_name: string | null
           mfa_enabled: boolean | null
           mfa_enforced_at: string | null
           mfa_locked_until: string | null
@@ -1322,7 +1324,9 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           failed_mfa_attempts?: number | null
+          first_name?: string | null
           id: string
+          last_name?: string | null
           mfa_enabled?: boolean | null
           mfa_enforced_at?: string | null
           mfa_locked_until?: string | null
@@ -1334,7 +1338,9 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           failed_mfa_attempts?: number | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           mfa_enabled?: boolean | null
           mfa_enforced_at?: string | null
           mfa_locked_until?: string | null

@@ -19,7 +19,7 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses, userName, userId } = await req.json();
+    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses, userId } = await req.json();
     
     // RATE LIMITING - Per User (10/hour, 50/day)
     if (userId) {
@@ -63,9 +63,23 @@ serve(async (req) => {
     const images = imageUrls || [primaryImageUrl];
     const mainImage = primaryImageUrl || images[0];
     
-    const clientName = userName || 'there';
+    // Get user's first name for personalization
+    let userFirstName = 'there';
+    if (userId) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, email')
+        .eq('id', userId)
+        .single();
+      
+      if (profile?.first_name) {
+        userFirstName = profile.first_name;
+      } else if (profile?.email) {
+        userFirstName = profile.email.split('@')[0];
+      }
+    }
     
-    console.log('Analyzing healing progress:', { imageCount: images.length, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0, userName: clientName });
+    console.log('Analyzing healing progress:', { imageCount: images.length, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0, userFirstName });
     
     const openRouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
     if (!openRouterApiKey) {
@@ -140,7 +154,7 @@ serve(async (req) => {
     let previousAnalysesContext = '';
     if (previousAnalyses && previousAnalyses.length > 0) {
       previousAnalysesContext = `\n\nCLIENT'S HEALING HISTORY:
-${clientName} has ${previousAnalyses.length} previous check-in(s) with us:
+${userFirstName} has ${previousAnalyses.length} previous check-in(s) with us:
 ${previousAnalyses.map((prev: any, idx: number) => `
   ${idx + 1}. ${new Date(prev.date).toLocaleDateString()}
      - Healing Stage: ${prev.stage}
@@ -150,7 +164,7 @@ ${previousAnalyses.map((prev: any, idx: number) => `
 
 Based on this history, provide continuity of care and reference any improvements or concerns compared to their previous visits.`;
     } else {
-      previousAnalysesContext = `\n\nThis is ${clientName}'s first check-in with our healing tracker. Welcome them warmly and establish a baseline for future comparisons.`;
+      previousAnalysesContext = `\n\nThis is ${userFirstName}'s first check-in with our healing tracker. Welcome them warmly and establish a baseline for future comparisons.`;
     }
 
     // Build custom instructions context
@@ -184,7 +198,7 @@ Based on this history, provide continuity of care and reference any improvements
     const systemPrompt = `You are Charlie, the AI tattoo healing assistant for Healyn by Blue Dream Budder. You're a warm, knowledgeable aftercare specialist with deep expertise in tattoo healing and 25 years of professional experience to draw from. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
 
 PERSONALIZATION REQUIREMENTS:
-1. Address the client by their first name (${clientName}) warmly and professionally
+1. Address the client by their first name (${userFirstName}) warmly and professionally
 2. Describe the tattoo design and style you observe in the photos (subject matter, artistic style, color palette, notable elements)
 3. Reference their previous check-ins if available - note improvements, consistency, or new concerns
 4. Use warm, conversational yet professional language - make them feel cared for
@@ -223,9 +237,12 @@ MEDICAL REFERENCE REQUIREMENTS (CRITICAL):
 When identifying HIGH RISK conditions (infections, allergic reactions, severe complications):
 1. YOU MUST cite specific medical references from the database above to back up your assessment
 2. Match observed symptoms with the "Key Symptoms" in the medical reference database
-3. Include the reference URL, key quote, and "when to seek care" guidance
-4. Provide visual comparison if reference images are available
-5. Indicate evidence strength (peer-reviewed > medical guideline > clinical observation)
+3. ALWAYS include the complete reference URL so users can verify the source themselves
+4. Include a key quote from the source that supports your finding
+5. Provide "when to seek care" guidance from the reference
+6. If visual_examples_url are available, INCLUDE 1-2 of them in your response to help users compare
+7. Indicate evidence strength (peer-reviewed > medical guideline > clinical observation)
+8. Make it clear these are clickable links for the user to verify and learn more
 
 ANALYSIS PRIORITY:
 1. First, scan for infection/complication signs
