@@ -1,28 +1,74 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Calendar, Award, AlertCircle } from "lucide-react";
+import { Download, Calendar, Award, AlertCircle, FileText, FolderArchive } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { useHealingHistory } from "@/hooks/useHealingHistory";
 import { HealingHistoryCard } from "@/components/HealingHistoryCard";
 import { HealingPhotoTimeline } from "@/components/HealingPhotoTimeline";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
+import { generateSingleEntryReport, generateCompleteReport, downloadHtmlReport } from "@/utils/healingReportExport";
+import { useToast } from "@/hooks/use-toast";
 
 const HealingHistory = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { data: entries, isLoading } = useHealingHistory();
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const stats = entries ? {
     totalAnalyses: entries.length,
     latestStage: entries[0]?.healing_stage || "N/A",
   } : null;
+
+  const handleExportSingle = () => {
+    if (!selectedEntry) return;
+    
+    try {
+      const html = generateSingleEntryReport(selectedEntry);
+      const filename = `healing-analysis-${format(new Date(selectedEntry.created_at), "yyyy-MM-dd")}.html`;
+      downloadHtmlReport(html, filename);
+      toast({
+        title: "Report Downloaded",
+        description: "Your healing analysis report has been downloaded successfully.",
+      });
+      setExportDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to generate the report. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportAll = () => {
+    if (!entries || entries.length === 0) return;
+    
+    try {
+      const html = generateCompleteReport(entries);
+      const filename = `healing-journey-complete-${format(new Date(), "yyyy-MM-dd")}.html`;
+      downloadHtmlReport(html, filename);
+      toast({
+        title: "Complete Report Downloaded",
+        description: `Successfully exported ${entries.length} healing analysis entries.`,
+      });
+      setExportDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to generate the complete report. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Show auth check before loading state
   if (!authLoading && !user) {
@@ -80,7 +126,12 @@ const HealingHistory = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold">My Healing Journey</h1>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setExportDialogOpen(true)}
+              disabled={!entries || entries.length === 0}
+            >
               <Download className="w-4 h-4 mr-2" />
               Export Report
             </Button>
@@ -148,6 +199,44 @@ const HealingHistory = () => {
           )}
         </div>
       </div>
+
+      {/* Export Options Dialog */}
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export Healing Report</DialogTitle>
+            <DialogDescription>
+              Choose what you'd like to export. Reports are downloaded as HTML files that can be viewed in your browser or saved as PDF.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {selectedEntry && (
+              <Button
+                onClick={handleExportSingle}
+                className="w-full justify-start"
+                variant="outline"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Export Current Analysis
+                <span className="ml-auto text-xs text-muted-foreground">
+                  ({format(new Date(selectedEntry.created_at), "MMM dd")})
+                </span>
+              </Button>
+            )}
+            <Button
+              onClick={handleExportAll}
+              className="w-full justify-start"
+              variant="outline"
+            >
+              <FolderArchive className="w-4 h-4 mr-2" />
+              Export Complete History
+              <span className="ml-auto text-xs text-muted-foreground">
+                ({entries?.length || 0} {entries?.length === 1 ? 'entry' : 'entries'})
+              </span>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedEntry} onOpenChange={() => setSelectedEntry(null)}>
