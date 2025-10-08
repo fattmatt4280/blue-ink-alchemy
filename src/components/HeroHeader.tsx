@@ -8,6 +8,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { mainNavItems, userNavItems, footerNavItems } from "@/lib/navigationItems";
 
 const HeroHeader = () => {
@@ -77,103 +78,105 @@ const HeroHeader = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80 bg-slate-900 border-slate-800">
-              <nav className="flex flex-col space-y-6 mt-8">
-                {/* Navigation Section */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">NAVIGATION</h3>
-                  <div className="space-y-1">
-                    {mainNavItems.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                        >
-                          <Icon className="w-5 h-5" />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Account Section */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ACCOUNT</h3>
-                  <div className="space-y-1">
-                    {user ? (
-                      <>
-                        {userNavItems.map((item) => (
+              <ScrollArea className="h-[calc(100vh-4rem)] pr-4">
+                <nav className="flex flex-col space-y-6 mt-8">
+                  {/* Navigation Section */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">NAVIGATION</h3>
+                    <div className="space-y-1">
+                      {mainNavItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
                           <Link
                             key={item.path}
                             to={item.path}
                             className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
                           >
-                            <item.icon className="w-5 h-5" />
+                            <Icon className="w-5 h-5" />
                             <span>{item.label}</span>
                           </Link>
-                        ))}
-                        <button
-                          onClick={signOut}
-                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors w-full text-left"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                          </svg>
-                          <span>Sign Out</span>
-                        </button>
-                      </>
-                    ) : (
-                      <Link
-                        to="/auth"
-                        className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                        </svg>
-                        <span>Sign In</span>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-
-                {/* Admin Section */}
-                {isAdmin && (
-                  <div>
-                    <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ADMIN</h3>
-                    <div className="space-y-1">
-                      <Link
-                        to="/admin"
-                        className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>Admin Dashboard</span>
-                      </Link>
+                        );
+                      })}
                     </div>
                   </div>
-                )}
 
-                {/* Information Section */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">INFORMATION</h3>
-                  <div className="space-y-1">
-                    {footerNavItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.label}</span>
-                      </Link>
-                    ))}
+                  {/* Account Section */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ACCOUNT</h3>
+                    <div className="space-y-1">
+                      {user ? (
+                        <>
+                          {userNavItems.map((item) => (
+                            <Link
+                              key={item.path}
+                              to={item.path}
+                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <span>{item.label}</span>
+                            </Link>
+                          ))}
+                          <button
+                            onClick={signOut}
+                            className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors w-full text-left"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span>Sign Out</span>
+                          </button>
+                        </>
+                      ) : (
+                        <Link
+                          to="/auth"
+                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                          </svg>
+                          <span>Sign In</span>
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </nav>
+
+                  {/* Admin Section */}
+                  {isAdmin && (
+                    <div>
+                      <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ADMIN</h3>
+                      <div className="space-y-1">
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Information Section */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">INFORMATION</h3>
+                    <div className="space-y-1">
+                      {footerNavItems.map((item) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </nav>
+              </ScrollArea>
             </SheetContent>
           </Sheet>
         </div>
