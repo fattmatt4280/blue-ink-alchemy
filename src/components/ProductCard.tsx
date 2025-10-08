@@ -74,7 +74,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
       <div className="p-6 relative z-10">
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2">
-            <h3 className="cyber-text text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+            <h3 className="cyber-text text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
               {product.name}
             </h3>
             {isFreeTrialProduct && (
@@ -117,7 +117,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="cyber-text text-2xl font-bold text-gray-900">
+            <span className="cyber-text text-2xl font-bold text-white">
               ${product.price.toFixed(2)}
             </span>
             {product.original_price && product.original_price > product.price && (

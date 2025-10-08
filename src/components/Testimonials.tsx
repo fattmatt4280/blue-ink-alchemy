@@ -120,7 +120,7 @@ const Testimonials = () => {
     <section className="py-20 futuristic-bg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4 cyber-text">
+          <h2 className="text-4xl lg:text-5xl font-light text-white mb-4 cyber-text">
             Trusted by Artists & Clients
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">

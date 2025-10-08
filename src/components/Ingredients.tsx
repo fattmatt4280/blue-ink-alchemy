@@ -70,7 +70,7 @@ const Ingredients = () => {
     <section className="py-20 futuristic-bg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-4 cyber-text">
+          <h2 className="text-4xl lg:text-5xl font-light text-white mb-4 cyber-text">
             {content.ingredients_title || 'Pure, Natural Ingredients'}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -89,7 +89,7 @@ const Ingredients = () => {
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
                   
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2 cyber-text">
+                  <h3 className="text-xl font-semibold text-white mb-2 cyber-text">
                     {ingredient.name}
                   </h3>
                   
