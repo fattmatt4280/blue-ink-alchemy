@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Upload, TrendingUp, Calendar, AlertCircle, ShoppingBag, ExternalLink } from "lucide-react";
+import { Upload, TrendingUp, Calendar, AlertCircle, ShoppingBag, ExternalLink, BookOpen } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import HealingQADialog from "@/components/HealingQADialog";
 import HealAidSubscriptionStatus from "@/components/HealAidSubscriptionStatus";
 import { MessageCircle } from "lucide-react";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
+import { MedicalReferenceCard } from "@/components/MedicalReferenceCard";
 
 interface Question {
   id: string;
@@ -28,6 +29,23 @@ interface Question {
   category: string;
   icon: string;
   context?: string;
+}
+
+interface MedicalReference {
+  source: string;
+  sourceType: 'medical_journal' | 'nhs' | 'mayo_clinic' | 'dermatology_org' | 'clinical_guideline';
+  url: string;
+  visualExamples?: string[];
+  keyQuote: string;
+  whenToSeekCare: string;
+  evidenceStrength: 'clinical_observation' | 'peer_reviewed' | 'medical_guideline';
+}
+
+interface RiskFactorWithEvidence {
+  concern: string;
+  symptoms: string[];
+  severity: 'normal' | 'monitor' | 'concerning' | 'urgent';
+  medicalReference?: MedicalReference;
 }
 
 interface AnalysisResult {
@@ -41,6 +59,8 @@ interface AnalysisResult {
   };
   recommendations: string[];
   riskFactors?: string[];
+  riskFactorsWithEvidence?: RiskFactorWithEvidence[];
+  medicalReferencesUsed?: MedicalReference[];
   productRecommendations?: string[];
   summary: string;
   tattooAgeDays?: number | null;
@@ -586,8 +606,85 @@ const HealingTracker = () => {
                   </CardContent>
                 </Card>
 
-                {/* Risk Factors */}
-                {analysis.riskFactors && analysis.riskFactors.length > 0 && (
+                {/* Enhanced Risk Factors with Medical Evidence */}
+                {analysis.riskFactorsWithEvidence && analysis.riskFactorsWithEvidence.length > 0 && (
+                  <div className="space-y-4">
+                    <Card className="neon-border border-red-500/50">
+                      <CardHeader>
+                        <CardTitle className="text-red-500 flex items-center gap-2">
+                          ⚠️ Points of Attention
+                          <Badge variant="outline" className="ml-auto">Evidence-Based</Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        {analysis.riskFactorsWithEvidence.map((risk, idx) => (
+                          <div key={idx}>
+                            <div className="flex items-start gap-3 mb-2">
+                              <AlertCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                                risk.severity === 'urgent' ? 'text-red-600' :
+                                risk.severity === 'concerning' ? 'text-orange-500' :
+                                risk.severity === 'monitor' ? 'text-yellow-500' :
+                                'text-blue-500'
+                              }`} />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <p className="font-semibold text-sm">{risk.concern}</p>
+                                  <Badge variant={
+                                    risk.severity === 'urgent' ? 'destructive' :
+                                    risk.severity === 'concerning' ? 'default' : 'secondary'
+                                  } className="text-xs">
+                                    {risk.severity}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                            {risk.medicalReference && (
+                              <MedicalReferenceCard riskFactor={risk} />
+                            )}
+                            {idx < analysis.riskFactorsWithEvidence.length - 1 && (
+                              <div className="border-t border-border my-6" />
+                            )}
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    {analysis.medicalReferencesUsed && analysis.medicalReferencesUsed.length > 0 && (
+                      <Card className="bg-muted/50 border-primary/30">
+                        <CardHeader>
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <BookOpen className="h-4 w-4" />
+                            Medical Sources Referenced ({analysis.medicalReferencesUsed.length})
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid gap-2">
+                            {analysis.medicalReferencesUsed.map((ref, i) => (
+                              <Button
+                                key={i}
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-xs h-auto py-2"
+                                onClick={() => window.open(ref.url, '_blank')}
+                              >
+                                <ExternalLink className="h-3 w-3 mr-2 flex-shrink-0" />
+                                <div className="text-left">
+                                  <div className="font-medium">{ref.source}</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Evidence: {ref.evidenceStrength.replace('_', ' ')}
+                                  </div>
+                                </div>
+                              </Button>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                )}
+
+                {(!analysis.riskFactorsWithEvidence || analysis.riskFactorsWithEvidence.length === 0) && 
+                 analysis.riskFactors && analysis.riskFactors.length > 0 && (
                   <Card className="neon-border border-red-500/50">
                     <CardHeader>
                       <CardTitle className="text-red-500">⚠️ Points of Attention</CardTitle>

@@ -92,6 +92,14 @@ serve(async (req) => {
       .select('*')
       .limit(5);
 
+    // Fetch medical references for evidence-based assessments
+    const { data: medicalReferences } = await supabase
+      .from('medical_references')
+      .select('*')
+      .in('condition_category', ['infection', 'allergic_reaction', 'healing_complication', 'normal_healing'])
+      .order('severity_level', { ascending: false })
+      .limit(20);
+
     // Build expert context for AI prompt
     let expertContext = '';
     if (expertKnowledge && expertKnowledge.length > 0) {
@@ -155,6 +163,24 @@ Based on this history, provide continuity of care and reference any improvements
       });
     }
 
+    // Build medical references context
+    let medicalReferencesContext = '';
+    if (medicalReferences && medicalReferences.length > 0) {
+      medicalReferencesContext = '\n\nMEDICAL REFERENCE DATABASE (Use for evidence-based assessments):\n';
+      medicalReferences.forEach((ref: any) => {
+        medicalReferencesContext += `\n[${ref.source_type.toUpperCase()}] ${ref.reference_title}\n`;
+        medicalReferencesContext += `  Condition: ${ref.condition_name} (${ref.condition_category})\n`;
+        medicalReferencesContext += `  Severity: ${ref.severity_level}\n`;
+        medicalReferencesContext += `  URL: ${ref.reference_url}\n`;
+        medicalReferencesContext += `  Key Symptoms: ${ref.key_symptoms.join(', ')}\n`;
+        medicalReferencesContext += `  When to Seek Care: ${ref.when_to_seek_care || 'Consult healthcare provider'}\n`;
+        medicalReferencesContext += `  Evidence Strength: ${ref.evidence_strength}\n`;
+        if (ref.visual_examples_url?.length) {
+          medicalReferencesContext += `  📸 Visual Examples Available: ${ref.visual_examples_url.length} medical reference images\n`;
+        }
+      });
+    }
+
     const systemPrompt = `You are Charlie, the AI tattoo healing assistant for Healyn by Blue Dream Budder. You're a warm, knowledgeable aftercare specialist with deep expertise in tattoo healing and 25 years of professional experience to draw from. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
 
 PERSONALIZATION REQUIREMENTS:
@@ -191,6 +217,15 @@ HEALING TIMELINE (be strict about age):
 ${previousAnalysesContext}
 ${customInstructionsContext}
 ${expertContext}
+${medicalReferencesContext}
+
+MEDICAL REFERENCE REQUIREMENTS (CRITICAL):
+When identifying HIGH RISK conditions (infections, allergic reactions, severe complications):
+1. YOU MUST cite specific medical references from the database above to back up your assessment
+2. Match observed symptoms with the "Key Symptoms" in the medical reference database
+3. Include the reference URL, key quote, and "when to seek care" guidance
+4. Provide visual comparison if reference images are available
+5. Indicate evidence strength (peer-reviewed > medical guideline > clinical observation)
 
 ANALYSIS PRIORITY:
 1. First, scan for infection/complication signs
@@ -202,7 +237,7 @@ ANALYSIS PRIORITY:
 VISUAL COMPARISON INSTRUCTIONS:
 When the Expert Knowledge Base mentions "REFERENCE IMAGES AVAILABLE", you should visually compare the user's tattoo photo with what those documented conditions look like. Use these visual references to improve diagnostic accuracy for infections, allergic reactions, and healing complications.
 
-RESPONSE FORMAT - Add these new fields at the top:
+RESPONSE FORMAT - Updated with medical evidence:
 {
   "personalGreeting": "Warm, personalized opening addressing ${clientName} by name (e.g., 'Hi ${clientName}! Great to see you...')",
   "tattooDescription": "Description of the tattoo design and artistic style visible in the photos",
@@ -215,7 +250,25 @@ RESPONSE FORMAT - Add these new fields at the top:
     "overallCondition": "description"
   },
   "recommendations": ["rec1", "rec2"],
-  "riskFactors": ["any concerns or empty array"],
+  "riskFactorsWithEvidence": [
+    {
+      "concern": "Specific concern observed",
+      "symptoms": ["symptom1 observed in photo", "symptom2 observed in photo"],
+      "severity": "urgent|concerning|monitor|normal",
+      "medicalReference": {
+        "source": "Exact source name from database",
+        "sourceType": "medical_journal|nhs|mayo_clinic|dermatology_org|clinical_guideline",
+        "url": "exact URL from database",
+        "visualExamples": ["url1", "url2"] if available,
+        "keyQuote": "Direct quote from medical source explaining why this matters",
+        "whenToSeekCare": "Exact guidance from database on when to seek medical attention",
+        "evidenceStrength": "peer_reviewed|medical_guideline|clinical_observation"
+      }
+    }
+  ],
+  "medicalReferencesUsed": [
+    // Array of all unique medical references cited in the analysis
+  ],
   "productRecommendations": ["product suggestions based on healing stage"],
   "concerns": "any concerns or 'None'",
   "suggestedQuestions": [
@@ -228,6 +281,8 @@ RESPONSE FORMAT - Add these new fields at the top:
     }
   ]
 }
+
+IMPORTANT: Only cite medical references when you observe symptoms that match the database. Don't force citations for normal healing.
 
 SUGGESTED QUESTIONS INSTRUCTIONS:
 Generate 3-5 contextual follow-up questions that are:
@@ -374,6 +429,8 @@ Provide your assessment following the expert guidance provided in the system pro
       analysis.healingStage = analysis.healingStage || analysis.healing_stage || 'Unknown';
       analysis.recommendations = analysis.recommendations || [];
       analysis.riskFactors = analysis.riskFactors || analysis.risk_factors || [];
+      analysis.riskFactorsWithEvidence = analysis.riskFactorsWithEvidence || analysis.risk_factors_with_evidence || [];
+      analysis.medicalReferencesUsed = analysis.medicalReferencesUsed || analysis.medical_references_used || [];
       analysis.productRecommendations = analysis.productRecommendations || analysis.product_recommendations || [];
       analysis.tattooAgeDays = tattooAge || analysis.tattooAgeDays || analysis.tattoo_age_days || null;
       

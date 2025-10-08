@@ -926,6 +926,7 @@ export type Database = {
           created_at: string
           healing_stage: string
           id: string
+          medical_references_used: Json | null
           photo_url: string
           photo_urls: string[] | null
           progress_score: number | null
@@ -937,6 +938,7 @@ export type Database = {
           created_at?: string
           healing_stage: string
           id?: string
+          medical_references_used?: Json | null
           photo_url: string
           photo_urls?: string[] | null
           progress_score?: number | null
@@ -948,6 +950,7 @@ export type Database = {
           created_at?: string
           healing_stage?: string
           id?: string
+          medical_references_used?: Json | null
           photo_url?: string
           photo_urls?: string[] | null
           progress_score?: number | null
@@ -1024,6 +1027,60 @@ export type Database = {
           ip_address?: string | null
           success?: boolean
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      medical_references: {
+        Row: {
+          condition_category: string
+          condition_name: string
+          created_at: string | null
+          created_by: string | null
+          detailed_explanation: string
+          evidence_strength: string | null
+          id: string
+          key_symptoms: string[]
+          last_verified: string | null
+          reference_title: string
+          reference_url: string
+          severity_level: string
+          source_type: string
+          visual_examples_url: string[] | null
+          when_to_seek_care: string | null
+        }
+        Insert: {
+          condition_category: string
+          condition_name: string
+          created_at?: string | null
+          created_by?: string | null
+          detailed_explanation: string
+          evidence_strength?: string | null
+          id?: string
+          key_symptoms: string[]
+          last_verified?: string | null
+          reference_title: string
+          reference_url: string
+          severity_level: string
+          source_type: string
+          visual_examples_url?: string[] | null
+          when_to_seek_care?: string | null
+        }
+        Update: {
+          condition_category?: string
+          condition_name?: string
+          created_at?: string | null
+          created_by?: string | null
+          detailed_explanation?: string
+          evidence_strength?: string | null
+          id?: string
+          key_symptoms?: string[]
+          last_verified?: string | null
+          reference_title?: string
+          reference_url?: string
+          severity_level?: string
+          source_type?: string
+          visual_examples_url?: string[] | null
+          when_to_seek_care?: string | null
         }
         Relationships: []
       }
