@@ -124,14 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // Add a small delay to ensure user state is fully set
-    if (user) {
-      setTimeout(() => {
-        checkAdminStatus();
-      }, 100);
-    } else {
-      checkAdminStatus();
-    }
+    checkAdminStatus();
   }, [user]);
 
   const signIn = async (email: string, password: string) => {
