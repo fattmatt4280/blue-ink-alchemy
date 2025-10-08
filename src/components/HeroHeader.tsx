@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Menu } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
@@ -9,10 +10,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mainNavItems, userNavItems, footerNavItems } from "@/lib/navigationItems";
+import { mainNavItems, userNavItems, footerNavItems, healingTrackerNavItem } from "@/lib/navigationItems";
+import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 
 const HeroHeader = () => {
   const { user, isAdmin, signOut } = useAuth();
+  const subscription = useHealAidSubscription();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -116,6 +119,18 @@ const HeroHeader = () => {
                               <span>{item.label}</span>
                             </Link>
                           ))}
+                          {subscription.isActive && subscription.daysRemaining > 0 && (
+                            <Link
+                              to={healingTrackerNavItem.path}
+                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                              <healingTrackerNavItem.icon className="w-5 h-5" />
+                              <span>{healingTrackerNavItem.label}</span>
+                              <Badge variant="secondary" className="ml-auto">
+                                {subscription.daysRemaining}d
+                              </Badge>
+                            </Link>
+                          )}
                           <button
                             onClick={signOut}
                             className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors w-full text-left"
