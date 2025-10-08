@@ -28,17 +28,23 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
       // Enroll in MFA
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
-        friendlyName: 'Authenticator App'
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('MFA enrollment error:', error);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('No MFA data returned');
+      }
 
       setSecret(data.totp.secret);
-      setQrCodeUrl(data.totp.qr_code);
+      setQrCodeUrl(data.totp.uri);
       setStep('verify');
-    } catch (error) {
+    } catch (error: any) {
       console.error('MFA generation failed:', error);
-      toast.error('Failed to generate MFA setup');
+      toast.error(error?.message || 'Failed to generate MFA setup. Please try again.');
     }
   };
 
@@ -48,18 +54,26 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
       if (!user) throw new Error('Not authenticated');
 
       // Get the factor ID from the enrolled factors
-      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
+      
+      if (listError) throw listError;
+      
       const factor = factors?.totp?.[0];
       
-      if (!factor) throw new Error('No MFA factor found');
+      if (!factor) throw new Error('No MFA factor found. Please try enrolling again.');
 
-      // Verify the code
-      const { error } = await supabase.auth.mfa.challengeAndVerify({
+      // Challenge and verify the code
+      const challenge = await supabase.auth.mfa.challenge({ factorId: factor.id });
+      
+      if (challenge.error) throw challenge.error;
+
+      const verify = await supabase.auth.mfa.verify({
         factorId: factor.id,
+        challengeId: challenge.data.id,
         code: verificationCode
       });
 
-      if (error) throw error;
+      if (verify.error) throw verify.error;
 
       // Generate backup codes
       const codes = Array.from({ length: 10 }, () => 
@@ -76,9 +90,9 @@ export const MFASetup = ({ onComplete }: MFASetupProps) => {
 
       setStep('backup');
       toast.success('MFA verified successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('MFA verification failed:', error);
-      toast.error('Invalid verification code');
+      toast.error(error?.message || 'Invalid verification code');
     }
   };
 
