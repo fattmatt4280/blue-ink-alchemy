@@ -1,22 +1,40 @@
 # robots.txt for bdb.com (Blue Dream Budder)
 
-# Allow all major search engines
+# Block sensitive and admin paths
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /checkout?success=
+Disallow: /checkout?cancelled=
 
-# Explicitly allow AI crawlers
+# Explicitly allow AI crawlers for public content
 User-agent: GPTBot
-Disallow:
+Disallow: /admin
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /api/
 
 User-agent: ClaudeBot
-Disallow:
+Disallow: /admin
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /api/
 
 User-agent: PerplexityBot
-Disallow:
+Disallow: /admin
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /api/
 
 # Allow CommonCrawl (used in training AI & research datasets)
 User-agent: CCBot
-Disallow:
+Disallow: /admin
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /api/
 
 # Sitemap (important for crawling)
 Sitemap: https://bdb.com/sitemap.xml
