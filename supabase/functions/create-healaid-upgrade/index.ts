@@ -8,34 +8,10 @@ const corsHeaders = {
 };
 
 const TIER_PRICES = {
-  'basic_weekly': {
-    amount: 99, // $0.99
-    label: 'Basic Weekly',
-    days: 7,
-    subscription: true,
-    interval: 'week',
-  },
-  'basic_monthly': {
-    amount: 299, // $2.99
-    label: 'Basic Monthly',
-    days: 30,
-    subscription: true,
-    interval: 'month',
-  },
-  'pro_monthly': {
-    amount: 499, // $4.99
-    label: 'Pro Monthly',
-    days: 30,
-    subscription: true,
-    interval: 'month',
-  },
-  'shop_monthly': {
-    amount: 2499, // $24.99
-    label: 'Shop/Artist Monthly',
-    days: 30,
-    subscription: true,
-    interval: 'month',
-  },
+  '7_days': { amount: 99, label: '7 Days', days: 7 },
+  '30_days': { amount: 299, label: '30 Days', days: 30 },
+  '90_days': { amount: 799, label: '90 Days (Pro)', days: 90 },
+  'studio': { amount: 3999, label: 'Studio Unlimited', subscription: true },
 };
 
 serve(async (req) => {
@@ -129,32 +105,26 @@ serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Heal-AId ${tierInfo.label}`,
-              description: `AI-powered tattoo healing analysis - ${tierInfo.label}`,
+              name: `Heal-AId ${tierInfo.label} Access`,
+              description: `Extend your Heal-AId AI access for ${tierInfo.label}`,
             },
             unit_amount: tierInfo.amount,
             ...(tierInfo.subscription && {
               recurring: {
-                interval: tierInfo.interval,
+                interval: 'month',
               },
             }),
           },
           quantity: 1,
         },
       ],
-      mode: 'subscription', // All new tiers are subscriptions
+      mode: tierInfo.subscription ? 'subscription' : 'payment',
       success_url: `${req.headers.get('origin')}/dashboard?upgrade=success`,
       cancel_url: `${req.headers.get('origin')}/dashboard?upgrade=cancelled`,
       metadata: {
         user_id: user.id,
         tier,
         subscription_id: subscription.id,
-      },
-      subscription_data: {
-        metadata: {
-          user_id: user.id,
-          tier: tier,
-        }
       },
     };
 

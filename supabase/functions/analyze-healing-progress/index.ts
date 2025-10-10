@@ -21,34 +21,6 @@ serve(async (req) => {
   try {
     const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, hotToTouch, feverSymptoms, sensitiveToTouch, hasTenderness, visibleRashes, rashDescription, previousAnalyses, userId } = await req.json();
     
-    // CHECK FREE TRIAL USAGE LIMIT (1 image analysis only)
-    if (userId) {
-      const { data: subscription } = await supabase
-        .from('healaid_subscriptions')
-        .select('tier')
-        .eq('user_id', userId)
-        .single();
-      
-      if (subscription?.tier === 'free_trial') {
-        const { count: analysisCount } = await supabase
-          .from('healing_progress')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId);
-        
-        if ((analysisCount || 0) >= 1) {
-          return new Response(
-            JSON.stringify({ 
-              success: false,
-              error: 'trial_limit_reached',
-              userMessage: 'Your free trial includes 1 image analysis. Upgrade to Basic ($0.99/week) or Pro ($4.99/month) for unlimited analyses.',
-              message: 'Free trial limit reached'
-            }),
-            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-      }
-    }
-    
     // RATE LIMITING - Per User (10/hour, 50/day)
     if (userId) {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
