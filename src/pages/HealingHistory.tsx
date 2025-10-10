@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Calendar, Award, AlertCircle, FileText, FolderArchive } from "lucide-react";
+import { Download, Calendar, Award, AlertCircle, FileText, FolderArchive, Plus } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { useHealingHistory } from "@/hooks/useHealingHistory";
 import { HealingHistoryCard } from "@/components/HealingHistoryCard";
 import { HealingPhotoTimeline } from "@/components/HealingPhotoTimeline";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -22,6 +22,19 @@ const HealingHistory = () => {
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  // Check if user was just redirected from new analysis
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('new') === 'true') {
+      toast({
+        title: "Analysis Complete!",
+        description: "Your latest healing analysis is shown below.",
+      });
+      // Remove query param from URL
+      window.history.replaceState({}, '', '/healing-history');
+    }
+  }, [toast]);
 
   const stats = entries ? {
     totalAnalyses: entries.length,
@@ -126,15 +139,24 @@ const HealingHistory = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold">My Healing Journey</h1>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setExportDialogOpen(true)}
-              disabled={!entries || entries.length === 0}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </Button>
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => navigate('/healing-tracker')}
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Analysis
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setExportDialogOpen(true)}
+                disabled={!entries || entries.length === 0}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Report
+              </Button>
+            </div>
           </div>
 
           {!entries || entries.length === 0 ? (
@@ -185,10 +207,11 @@ const HealingHistory = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {entries.map((entry) => (
+                    {entries.map((entry, index) => (
                       <HealingHistoryCard
                         key={entry.id}
                         entry={entry}
+                        isLatest={index === 0}
                         onClick={() => setSelectedEntry(entry)}
                       />
                     ))}

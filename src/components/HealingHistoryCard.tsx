@@ -7,9 +7,10 @@ import { HealingHistoryEntry } from "@/hooks/useHealingHistory";
 interface HealingHistoryCardProps {
   entry: HealingHistoryEntry;
   onClick?: () => void;
+  isLatest?: boolean;
 }
 
-export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) => {
+export const HealingHistoryCard = ({ entry, onClick, isLatest }: HealingHistoryCardProps) => {
   const getStageColor = (stage: string) => {
     const colors: Record<string, string> = {
       "Fresh": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
@@ -24,7 +25,9 @@ export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) 
 
   return (
     <Card 
-      className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+      className={`cursor-pointer hover:shadow-lg transition-all duration-200 ${
+        isLatest ? 'ring-2 ring-primary shadow-xl' : ''
+      }`}
       onClick={onClick}
     >
       <CardHeader className="pb-3">
@@ -33,9 +36,16 @@ export const HealingHistoryCard = ({ entry, onClick }: HealingHistoryCardProps) 
             <Calendar className="w-4 h-4" />
             {format(new Date(entry.created_at), "MMM dd, yyyy 'at' h:mm a")}
           </div>
-          <Badge className={getStageColor(entry.healing_stage)}>
-            {entry.healing_stage}
-          </Badge>
+          <div className="flex items-center gap-2">
+            {isLatest && (
+              <Badge className="bg-primary">
+                ✨ Latest
+              </Badge>
+            )}
+            <Badge className={getStageColor(entry.healing_stage)}>
+              {entry.healing_stage}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

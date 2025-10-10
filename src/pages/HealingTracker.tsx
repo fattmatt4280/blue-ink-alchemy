@@ -304,17 +304,38 @@ const HealingTracker = () => {
             
             if (progressData) {
               setSavedHealingProgressId(progressData.id);
+              
+              // Clear form state
+              setUploadedImages([]);
+              setTattooAge("");
+              setCleanedWithAlcohol("");
+              setCoveringType("");
+              setAftercareProducts("");
+              setAllergies("");
+              setHotToTouch("");
+              setFeverSymptoms("");
+              setSensitiveToTouch("");
+              setHasTenderness("");
+              setVisibleRashes("");
+              setRashDescription("");
+              setTosAccepted(false);
+              
+              // Show success message and redirect
+              toast({
+                title: "Analysis Complete!",
+                description: "Redirecting to your healing history...",
+              });
+              
+              // Redirect to healing history with query param
+              setTimeout(() => {
+                navigate('/healing-history?new=true');
+              }, 1500);
             }
           }
         } catch (dbError) {
           console.error('Failed to save analysis:', dbError);
           // Don't fail the whole operation if DB save fails
         }
-
-        toast({
-          title: "Analysis Complete!",
-          description: "Your tattoo healing progress has been assessed.",
-        });
       } else {
         throw new Error('Analysis failed');
       }
@@ -344,7 +365,7 @@ const HealingTracker = () => {
   return (
     <div className="min-h-screen futuristic-bg">
       <AppHeader />
-      <div className="container mx-auto px-4 pt-24 pb-8 max-w-6xl">
+      <div className="container mx-auto px-4 pt-24 pb-8 max-w-4xl">
 
         {/* Info Alert */}
         <Alert className="mb-6 neon-border">
@@ -354,9 +375,7 @@ const HealingTracker = () => {
           </AlertDescription>
         </Alert>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Upload Section */}
-          <div className="space-y-6">
+        <div className="space-y-6">
             <HealAidSubscriptionStatus />
             <Card className="neon-border">
               <CardHeader>
@@ -636,338 +655,45 @@ const HealingTracker = () => {
               </CardContent>
             </Card>
 
-            {/* Educational Tips */}
-            <Card className="neon-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Healing Timeline
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-red-500 mt-2" />
-                  <div>
-                    <p className="font-medium">Days 0-3: Fresh</p>
-                    <p className="text-sm text-muted-foreground">Redness, swelling, oozing plasma</p>
-                  </div>
+          {/* Educational Tips */}
+          <Card className="neon-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Healing Timeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-red-500 mt-2" />
+                <div>
+                  <p className="font-medium">Days 0-3: Fresh</p>
+                  <p className="text-sm text-muted-foreground">Redness, swelling, oozing plasma</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500 mt-2" />
-                  <div>
-                    <p className="font-medium">Days 4-14: Peeling</p>
-                    <p className="text-sm text-muted-foreground">Scabbing, flaking, itching</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-yellow-500 mt-2" />
+                <div>
+                  <p className="font-medium">Days 4-14: Peeling</p>
+                  <p className="text-sm text-muted-foreground">Scabbing, flaking, itching</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 mt-2" />
-                  <div>
-                    <p className="font-medium">Days 15-30: Settling</p>
-                    <p className="text-sm text-muted-foreground">Colors settle, skin regenerates</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-blue-500 mt-2" />
+                <div>
+                  <p className="font-medium">Days 15-30: Settling</p>
+                  <p className="text-sm text-muted-foreground">Colors settle, skin regenerates</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2" />
-                  <div>
-                    <p className="font-medium">30+ Days: Healed</p>
-                    <p className="text-sm text-muted-foreground">Fully healed, ready for touch-ups</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-green-500 mt-2" />
+                <div>
+                  <p className="font-medium">30+ Days: Healed</p>
+                  <p className="text-sm text-muted-foreground">Fully healed, ready for touch-ups</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Results Section */}
-          <div className="space-y-6">
-            {analysis ? (
-              <>
-                {/* Personalized Greeting & Tattoo Description */}
-                <Card className="neon-border">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-2xl mb-2">
-                          {analysis.personalGreeting || 'Healing Progress Assessment'}
-                        </CardTitle>
-                        {analysis.tattooDescription && (
-                          <CardDescription className="text-base">
-                            {analysis.tattooDescription}
-                          </CardDescription>
-                        )}
-                      </div>
-                      <Badge className={`${getStageColor(analysis.healingStage)} text-lg px-4 py-2 ml-4`}>
-                        {analysis.healingStage}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {tattooAge && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4" />
-                        <span>Tattoo Age: {tattooAge} days</span>
-                      </div>
-                    )}
-
-                    {analysis.summary && (
-                      <div>
-                        <h3 className="text-sm font-semibold mb-2">Analysis Summary</h3>
-                        <p className="text-sm leading-relaxed">
-                          {analysis.summary}
-                        </p>
-                      </div>
-                    )}
-
-                    {analysis.visualAssessment && Object.keys(analysis.visualAssessment).length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-semibold mb-2">Visual Assessment</h3>
-                        <div className="space-y-1 text-sm">
-                          {analysis.visualAssessment.colorAssessment && (
-                            <p><span className="font-medium">Color:</span> {analysis.visualAssessment.colorAssessment}</p>
-                          )}
-                          {analysis.visualAssessment.textureAssessment && (
-                            <p><span className="font-medium">Texture:</span> {analysis.visualAssessment.textureAssessment}</p>
-                          )}
-                          {analysis.visualAssessment.overallCondition && (
-                            <p><span className="font-medium">Overall:</span> {analysis.visualAssessment.overallCondition}</p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Recommendations */}
-                <Card className="neon-border">
-                  <CardHeader>
-                    <CardTitle>Aftercare Recommendations</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {analysis.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="text-primary mt-1">✓</span>
-                          <span className="text-sm">{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                {/* Enhanced Risk Factors with Medical Evidence */}
-                {analysis.riskFactorsWithEvidence && analysis.riskFactorsWithEvidence.length > 0 && (
-                  <div className="space-y-4">
-                    <Card className="neon-border border-red-500/50">
-                      <CardHeader>
-                        <CardTitle className="text-red-500 flex items-center gap-2">
-                          ⚠️ Points of Attention
-                          <Badge variant="outline" className="ml-auto">Evidence-Based</Badge>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        {analysis.riskFactorsWithEvidence.map((risk, idx) => (
-                          <div key={idx}>
-                            <div className="flex items-start gap-3 mb-2">
-                              <AlertCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                                risk.severity === 'urgent' ? 'text-red-600' :
-                                risk.severity === 'concerning' ? 'text-orange-500' :
-                                risk.severity === 'monitor' ? 'text-yellow-500' :
-                                'text-blue-500'
-                              }`} />
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <p className="font-semibold text-sm">{risk.concern}</p>
-                                  <Badge variant={
-                                    risk.severity === 'urgent' ? 'destructive' :
-                                    risk.severity === 'concerning' ? 'default' : 'secondary'
-                                  } className="text-xs">
-                                    {risk.severity}
-                                  </Badge>
-                                </div>
-                              </div>
-                            </div>
-                            {risk.medicalReference && (
-                              <MedicalReferenceCard riskFactor={risk} />
-                            )}
-                            {idx < analysis.riskFactorsWithEvidence.length - 1 && (
-                              <div className="border-t border-border my-6" />
-                            )}
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-
-                    {analysis.medicalReferencesUsed && analysis.medicalReferencesUsed.length > 0 && (
-                      <MedicalSourcesList references={analysis.medicalReferencesUsed} />
-                    )}
-                  </div>
-                )}
-
-                {(!analysis.riskFactorsWithEvidence || analysis.riskFactorsWithEvidence.length === 0) && 
-                 analysis.riskFactors && analysis.riskFactors.length > 0 && (
-                  <Card className="neon-border border-red-500/50">
-                    <CardHeader>
-                      <CardTitle className="text-red-500">⚠️ Points of Attention</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {analysis.riskFactors.map((risk, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
-                            <span className="text-sm">{risk}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Follow-Up Questions Button */}
-                {analysis.suggestedQuestions && analysis.suggestedQuestions.length > 0 && (
-                  <Button
-                    onClick={() => setQaDialogOpen(true)}
-                    className="w-full"
-                    size="lg"
-                    variant="outline"
-                  >
-                    <MessageCircle className="mr-2 h-5 w-5" />
-                    Ask Follow-Up Questions
-                  </Button>
-                )}
-
-                {/* Product Recommendations */}
-                {analysis.productRecommendations && analysis.productRecommendations.length > 0 && (
-                  <Card className="neon-border">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <ShoppingBag className="h-5 w-5" />
-                        Recommended Products
-                      </CardTitle>
-                      <CardDescription>
-                        Our Blue Dream Budder products to help your healing
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {!productsLoading && products.length > 0 && (
-                        <div className="flex justify-center">
-                          {products.slice(0, 1).map((product) => (
-                            <Card key={product.id} className="max-w-xs border-2 border-muted hover:border-primary/50 transition-colors">
-                              <CardContent className="p-4 space-y-3">
-                                <div className="aspect-square relative overflow-hidden rounded-lg">
-                                  <img 
-                                    src={product.image_url || '/placeholder.svg'} 
-                                    alt={product.name}
-                                    className="object-cover w-full h-full"
-                                  />
-                                </div>
-                                <div>
-                                  <h5 className="font-semibold text-base">{product.name}</h5>
-                                  <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
-                                  <p className="text-lg font-bold text-primary mt-2">${product.price}</p>
-                                </div>
-                                <Button
-                                  onClick={() => handleAddToCart(product)}
-                                  className="w-full"
-                                  size="sm"
-                                >
-                                  Add to Cart
-                                </Button>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      )}
-                      
-                      <div className="mt-6 pt-6 border-t">
-                        <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                          <AlertCircle className="h-4 w-4 text-destructive" />
-                          Emergency Care Products
-                        </h4>
-                        <p className="text-xs text-muted-foreground mb-4">
-                          For infections or allergic reactions - seek medical advice if symptoms persist
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <Card className="border-2 border-muted">
-                            <CardContent className="p-4 space-y-2">
-                              <h5 className="font-medium text-sm">Dial Antibacterial Soap</h5>
-                              <p className="text-xs text-muted-foreground">For infection prevention & cleaning</p>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => window.open('https://amzn.to/3Krva3p', '_blank')}
-                              >
-                                View on Amazon
-                                <ExternalLink className="ml-2 h-3 w-3" />
-                              </Button>
-                            </CardContent>
-                          </Card>
-                          
-                          <Card className="border-2 border-muted">
-                            <CardContent className="p-4 space-y-2">
-                              <h5 className="font-medium text-sm">Benadryl Topical Spray</h5>
-                              <p className="text-xs text-muted-foreground">For allergic reactions & itching</p>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => window.open('https://amzn.to/4nwJR3v', '_blank')}
-                              >
-                                View on Amazon
-                                <ExternalLink className="ml-2 h-3 w-3" />
-                              </Button>
-                            </CardContent>
-                          </Card>
-
-                          <Card className="border-2 border-muted">
-                            <CardContent className="p-4 space-y-2">
-                              <h5 className="font-medium text-sm">Hustle Bubbles</h5>
-                              <p className="text-xs text-muted-foreground">Gentle tattoo cleanser</p>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => window.open('https://amzn.to/48f5e4L', '_blank')}
-                              >
-                                View on Amazon
-                                <ExternalLink className="ml-2 h-3 w-3" />
-                              </Button>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </div>
-                      
-                      <Button
-                        onClick={() => navigate('/shop')}
-                        className="w-full mt-4"
-                        variant="outline"
-                      >
-                        View All Products
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Branding Footer */}
-                <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-lg bg-muted/50 border border-border">
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">
-                      AI Analysis Powered by
-                    </p>
-                    <p className="text-sm font-semibold gradient-text">
-                      Heal-AId™ by Blue Dream Budder
-                    </p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <Card className="neon-border">
-                <CardContent className="py-12 text-center text-muted-foreground">
-                  <Upload className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Upload photos and click "Analyze" to see your healing progress assessment</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
