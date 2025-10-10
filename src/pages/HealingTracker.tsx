@@ -233,6 +233,19 @@ const HealingTracker = () => {
 
       // Handle specific error cases from the edge function
       if (!data.success) {
+        if (data.error === 'trial_limit_reached') {
+          toast({
+            title: "Free Trial Limit Reached",
+            description: "Your 1-day trial includes 1 image analysis. Upgrade to Basic ($0.99/week) or Pro ($4.99/month) for unlimited analyses.",
+            variant: "destructive",
+          });
+          // Redirect to dashboard to show upgrade options
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 2000);
+          return;
+        }
+        
         if (data.error === 'insufficient_credits') {
           toast({
             title: "Service Temporarily Unavailable",

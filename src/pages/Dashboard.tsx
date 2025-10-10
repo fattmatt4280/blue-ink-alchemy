@@ -171,71 +171,100 @@ const Dashboard = () => {
         {/* Upgrade Options */}
         <Card>
           <CardHeader>
-            <CardTitle>Extend Your Access</CardTitle>
+            <CardTitle>Upgrade Your Plan</CardTitle>
             <CardDescription>
-              Choose a plan that works for you
+              Choose the plan that fits your healing journey
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <Card className="border-2">
               <CardHeader>
-                <CardTitle className="text-lg">7 Days</CardTitle>
-                <CardDescription>Perfect for quick healing</CardDescription>
+                <CardTitle className="text-lg">Basic Weekly</CardTitle>
+                <CardDescription>Perfect for short-term tracking</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold mb-4">$0.99</p>
+                <p className="text-3xl font-bold mb-1">$0.99</p>
+                <p className="text-xs text-muted-foreground mb-4">per week</p>
+                <ul className="text-xs space-y-1 mb-4">
+                  <li>✓ Unlimited image uploads</li>
+                  <li>✓ Detailed AI analysis</li>
+                  <li>✓ Progress timeline</li>
+                </ul>
                 <Button
                   className="w-full"
-                  onClick={() => handleUpgrade('7_days')}
+                  onClick={() => handleUpgrade('basic_weekly')}
                 >
-                  Extend <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="text-lg">30 Days</CardTitle>
-                <CardDescription>Most popular choice</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold mb-4">$2.99</p>
-                <Button
-                  className="w-full"
-                  onClick={() => handleUpgrade('30_days')}
-                >
-                  Extend <ArrowRight className="w-4 h-4 ml-2" />
+                  Subscribe <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-primary">
               <CardHeader>
-                <CardTitle className="text-lg">90 Days Pro</CardTitle>
-                <CardDescription>Best value for healing</CardDescription>
+                <CardTitle className="text-lg">Basic Monthly</CardTitle>
+                <CardDescription>Most popular for healing</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold mb-4">$7.99</p>
+                <p className="text-3xl font-bold mb-1">$2.99</p>
+                <p className="text-xs text-muted-foreground mb-4">per month</p>
+                <ul className="text-xs space-y-1 mb-4">
+                  <li>✓ Unlimited image uploads</li>
+                  <li>✓ Detailed AI analysis</li>
+                  <li>✓ Progress timeline</li>
+                  <li>✓ Product recommendations</li>
+                </ul>
                 <Button
                   className="w-full"
-                  onClick={() => handleUpgrade('90_days')}
+                  onClick={() => handleUpgrade('basic_monthly')}
                 >
-                  Upgrade <ArrowRight className="w-4 h-4 ml-2" />
+                  Subscribe <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-accent">
               <CardHeader>
-                <CardTitle className="text-lg">Studio Unlimited</CardTitle>
-                <CardDescription>For tattoo professionals</CardDescription>
+                <CardTitle className="text-lg">Pro Monthly</CardTitle>
+                <CardDescription>Advanced features included</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold mb-4">$39.99<span className="text-sm font-normal">/mo</span></p>
+                <p className="text-3xl font-bold mb-1">$4.99</p>
+                <p className="text-xs text-muted-foreground mb-4">per month</p>
+                <ul className="text-xs space-y-1 mb-4">
+                  <li>✓ All Basic features</li>
+                  <li>✓ Early infection alerts</li>
+                  <li>✓ Custom aftercare planner</li>
+                  <li>✓ Priority AI processing</li>
+                  <li>✓ Email support</li>
+                </ul>
                 <Button
                   className="w-full"
                   variant="secondary"
-                  onClick={() => handleUpgrade('studio')}
+                  onClick={() => handleUpgrade('pro_monthly')}
+                >
+                  Upgrade <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-secondary">
+              <CardHeader>
+                <CardTitle className="text-lg">Shop/Artist</CardTitle>
+                <CardDescription>For tattoo professionals</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold mb-1">$24.99</p>
+                <p className="text-xs text-muted-foreground mb-4">per month</p>
+                <ul className="text-xs space-y-1 mb-4">
+                  <li>✓ Client management dashboard</li>
+                  <li>✓ Bulk QR activations</li>
+                  <li>✓ Analytics & reports</li>
+                  <li>✓ Custom branding</li>
+                </ul>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => handleUpgrade('shop_monthly')}
                 >
                   Subscribe <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -257,9 +286,20 @@ const Dashboard = () => {
               <span className="text-sm">Total Analyses Performed</span>
               <span className="text-2xl font-bold">{totalAnalyses}</span>
             </div>
+            {subscription?.tier === 'free_trial' && (
+              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  <strong>Free Trial:</strong> {totalAnalyses >= 1 ? 'Used (1/1)' : 'Available (0/1)'} - Upgrade for unlimited analyses
+                </p>
+              </div>
+            )}
             {isActive && daysRemaining > 0 ? (
               <p className="text-sm text-muted-foreground">
-                Your Heal-AId is active - track your healing progress now!
+                {subscription?.tier === 'free_trial' 
+                  ? totalAnalyses >= 1 
+                    ? 'Your free trial analysis is complete. Upgrade to continue tracking your healing!' 
+                    : 'Your Heal-AId trial is active - analyze your tattoo now!'
+                  : 'Your Heal-AId is active - track your healing progress with unlimited analyses!'}
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">

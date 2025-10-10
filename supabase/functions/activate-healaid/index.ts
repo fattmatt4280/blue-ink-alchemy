@@ -69,19 +69,20 @@ serve(async (req) => {
       );
     }
 
-    // Check if user already has an active subscription from the last month
-    if (userId) {
-      const { data: existingSubscription } = await supabase
-        .from('healaid_subscriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+    // Check if user has EVER used a free trial (LIFETIME limit, not just 30 days)
+    if (activationCode.tier === 'free_trial' && userId) {
+      const { data: existingTrials } = await supabase
+        .from('healaid_activation_codes')
+        .select('id')
+        .eq('activated_by', userId)
         .eq('tier', 'free_trial')
-        .single();
+        .eq('redeemed', true);
 
-      if (existingSubscription) {
+      if (existingTrials && existingTrials.length > 0) {
         return new Response(
-          JSON.stringify({ error: 'You have already used a free trial in the last 30 days' }),
+          JSON.stringify({ 
+            error: 'You have already used your one-time free trial. Please upgrade to a paid plan to continue.',
+          }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -89,12 +90,14 @@ serve(async (req) => {
 
     // Calculate subscription duration based on tier
     const tierHours = {
-      'free_trial': 72,   // 3 days
-      '7_day': 168,       // 7 days
-      '30_day': 720,      // 30 days
+      'free_trial': 24,          // 1 day (24 hours)
+      'basic_weekly': 168,       // 7 days
+      'basic_monthly': 720,      // 30 days
+      'pro_monthly': 720,        // 30 days
+      'shop_monthly': 720,       // 30 days
     };
 
-    const hours = tierHours[activationCode.tier] || 72; // Default to 72 hours
+    const hours = tierHours[activationCode.tier] || 24; // Default to 24 hours (1 day)
     
     const activationDate = new Date();
     const expirationDate = new Date(activationDate);
@@ -155,9 +158,11 @@ serve(async (req) => {
 
     // Create friendly tier names for response
     const tierNames = {
-      'free_trial': '3-day free trial',
-      '7_day': '7-day',
-      '30_day': '30-day',
+      'free_trial': '1-day free trial',
+      'basic_weekly': 'Basic Weekly',
+      'basic_monthly': 'Basic Monthly',
+      'pro_monthly': 'Pro Monthly',
+      'shop_monthly': 'Shop/Artist Monthly',
     };
 
     const tierName = tierNames[activationCode.tier] || 'subscription';
