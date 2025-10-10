@@ -19,7 +19,7 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, previousAnalyses, userId } = await req.json();
+    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, hotToTouch, feverSymptoms, sensitiveToTouch, hasTenderness, visibleRashes, rashDescription, previousAnalyses, userId } = await req.json();
     
     // RATE LIMITING - Per User (10/hour, 50/day)
     if (userId) {
@@ -212,13 +212,16 @@ TATTOO DESCRIPTION (Required in response):
 - Mention notable artistic elements (shading quality, linework, detail level)
 
 CRITICAL INFECTION SIGNS (flag immediately as "High Risk"):
+- HOT TO TOUCH: Skin noticeably warmer than surrounding areas
+- FEVER SYMPTOMS: Chills, body aches, feeling unwell systemically
+- EXCESSIVE SENSITIVITY: Severe pain beyond normal healing discomfort
+- SEVERE TENDERNESS: Pain with light pressure (not just touch)
+- VISIBLE RASHES: Bumps, hives, or spreading redness (potential allergic reaction)
 - Excessive redness spreading beyond tattoo borders
-- Significant swelling that's increasing or hot to touch
+- Significant swelling that's increasing
 - Pus, yellow/green discharge, or cloudy fluid
 - Red streaks radiating from tattoo
-- Fever symptoms or extreme pain
 - Foul odor from the area
-- Skin that feels hot compared to surrounding areas
 
 HEALING TIMELINE (be strict about age):
 - Days 0-2: Fresh/Open Wound - Red, slightly swollen, oozing plasma
@@ -332,6 +335,18 @@ Client Aftercare Routine:
 - Products and routine: ${aftercareProducts || 'Not specified'}
 
 Allergies: ${allergies || 'None reported'}
+
+SYMPTOM ASSESSMENT:
+- Hot to touch: ${hotToTouch || 'Not specified'}
+- Fever symptoms: ${feverSymptoms || 'Not specified'}
+- Sensitive to touch: ${sensitiveToTouch || 'Not specified'}
+- Tenderness: ${hasTenderness || 'Not specified'}
+- Visible rashes: ${visibleRashes || 'Not specified'}
+${rashDescription ? `- Rash description: ${rashDescription}` : ''}
+
+**IMPORTANT**: If the client reports YES to hot to touch, fever symptoms, severe sensitivity, 
+or visible rashes, this significantly increases infection/allergic reaction risk. 
+Cross-reference with medical reference database and provide urgent care guidance if needed.
 
 ${previousAnalyses && previousAnalyses.length > 0 ? `
 Previous Assessments:

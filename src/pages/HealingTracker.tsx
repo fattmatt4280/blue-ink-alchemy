@@ -82,6 +82,12 @@ const HealingTracker = () => {
   const [coveringType, setCoveringType] = useState<string>("");
   const [aftercareProducts, setAftercareProducts] = useState<string>("");
   const [allergies, setAllergies] = useState<string>("");
+  const [hotToTouch, setHotToTouch] = useState<string>("");
+  const [feverSymptoms, setFeverSymptoms] = useState<string>("");
+  const [sensitiveToTouch, setSensitiveToTouch] = useState<string>("");
+  const [hasTenderness, setHasTenderness] = useState<string>("");
+  const [visibleRashes, setVisibleRashes] = useState<string>("");
+  const [rashDescription, setRashDescription] = useState<string>("");
   const [tosAccepted, setTosAccepted] = useState<boolean>(false);
   const [qaDialogOpen, setQaDialogOpen] = useState(false);
   const [savedHealingProgressId, setSavedHealingProgressId] = useState<string | null>(null);
@@ -125,10 +131,11 @@ const HealingTracker = () => {
       return;
     }
 
-    if (!tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies) {
+    if (!tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies || 
+        !hotToTouch || !feverSymptoms || !sensitiveToTouch || !hasTenderness || !visibleRashes) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields including tattoo age, aftercare details, and allergy information.",
+        description: "Please fill in all required fields including tattoo age, aftercare details, allergy information, and symptom assessment.",
         variant: "destructive",
       });
       return;
@@ -188,6 +195,12 @@ const HealingTracker = () => {
           coveringType,
           aftercareProducts,
           allergies,
+          hotToTouch,
+          feverSymptoms,
+          sensitiveToTouch,
+          hasTenderness,
+          visibleRashes,
+          rashDescription,
           previousAnalyses,
           userName,
           userId: user?.id || null,
@@ -264,11 +277,27 @@ const HealingTracker = () => {
               .insert({
                 photo_url: uploadedImages[0],
                 photo_urls: uploadedImages,
-                analysis_result: data.analysis,
+                analysis_result: {
+                  ...data.analysis,
+                  symptoms: {
+                    hotToTouch,
+                    feverSymptoms,
+                    sensitiveToTouch,
+                    hasTenderness,
+                    visibleRashes,
+                    rashDescription
+                  }
+                },
                 healing_stage: data.analysis.healingStage,
                 recommendations: data.analysis.recommendations,
                 progress_score: 0,
                 user_id: userData.user.id,
+                hot_to_touch: hotToTouch === 'yes' || hotToTouch === 'slightly',
+                fever_symptoms: feverSymptoms === 'yes',
+                sensitive_to_touch: sensitiveToTouch === 'very' || sensitiveToTouch === 'moderate',
+                has_tenderness: hasTenderness === 'severe' || hasTenderness === 'moderate',
+                visible_rashes: visibleRashes === 'yes',
+                rash_description: rashDescription || null,
               })
               .select()
               .single();
@@ -444,6 +473,123 @@ const HealingTracker = () => {
                       required
                     />
                   </div>
+
+                  {/* Symptom Assessment Section */}
+                  <div className="mt-6 p-4 border-2 border-orange-500/30 rounded-lg bg-orange-500/5">
+                    <h3 className="text-lg font-semibold mb-3 text-orange-400 flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5" />
+                      Symptom Check (Important for Infection Detection)
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      {/* Hot to Touch */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Is the tattoo area hot to the touch? <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          value={hotToTouch}
+                          onChange={(e) => setHotToTouch(e.target.value)}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                          required
+                        >
+                          <option value="">Select an option</option>
+                          <option value="yes">Yes - noticeably warmer than surrounding skin</option>
+                          <option value="slightly">Slightly warm</option>
+                          <option value="no">No - same temperature as surrounding skin</option>
+                        </select>
+                      </div>
+
+                      {/* Fever Symptoms */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Are you experiencing any fever symptoms? <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          value={feverSymptoms}
+                          onChange={(e) => setFeverSymptoms(e.target.value)}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                          required
+                        >
+                          <option value="">Select an option</option>
+                          <option value="yes">Yes - feeling feverish, chills, or body aches</option>
+                          <option value="unsure">Unsure - feeling slightly off</option>
+                          <option value="no">No - feeling normal</option>
+                        </select>
+                      </div>
+
+                      {/* Sensitive to Touch */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Is the tattoo area sensitive or painful to touch? <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          value={sensitiveToTouch}
+                          onChange={(e) => setSensitiveToTouch(e.target.value)}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                          required
+                        >
+                          <option value="">Select an option</option>
+                          <option value="very">Yes - very painful when touched</option>
+                          <option value="moderate">Moderately sensitive</option>
+                          <option value="slight">Slightly sensitive (normal for healing)</option>
+                          <option value="no">No - not sensitive</option>
+                        </select>
+                      </div>
+
+                      {/* Tenderness */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Is there tenderness when pressure is applied? <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          value={hasTenderness}
+                          onChange={(e) => setHasTenderness(e.target.value)}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                          required
+                        >
+                          <option value="">Select an option</option>
+                          <option value="severe">Yes - severe tenderness</option>
+                          <option value="moderate">Moderate tenderness</option>
+                          <option value="mild">Mild tenderness (expected)</option>
+                          <option value="no">No tenderness</option>
+                        </select>
+                      </div>
+
+                      {/* Visible Rashes */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Do you see any rashes around or near the tattoo? <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          value={visibleRashes}
+                          onChange={(e) => setVisibleRashes(e.target.value)}
+                          className="w-full px-3 py-2 bg-background border border-border rounded-md"
+                          required
+                        >
+                          <option value="">Select an option</option>
+                          <option value="yes">Yes - visible rash or bumps</option>
+                          <option value="unsure">Maybe - seeing some unusual spots</option>
+                          <option value="no">No - no rashes visible</option>
+                        </select>
+                      </div>
+
+                      {/* Rash Description - Conditional */}
+                      {(visibleRashes === "yes" || visibleRashes === "unsure") && (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            Please describe the rash (location, color, size, pattern)
+                          </label>
+                          <textarea
+                            placeholder="e.g., Small red bumps around the border, itchy raised spots on left side, etc."
+                            value={rashDescription}
+                            onChange={(e) => setRashDescription(e.target.value)}
+                            className="w-full px-3 py-2 bg-background border border-border rounded-md min-h-[60px]"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-start gap-2 p-3 border border-border rounded-md bg-muted/50">
@@ -471,7 +617,7 @@ const HealingTracker = () => {
 
                 <Button
                   onClick={analyzeProgress}
-                  disabled={uploadedImages.length === 0 || isAnalyzing || !user || !tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies || !tosAccepted}
+                  disabled={uploadedImages.length === 0 || isAnalyzing || !user || !tattooAge || !cleanedWithAlcohol || !coveringType || !aftercareProducts || !allergies || !hotToTouch || !feverSymptoms || !sensitiveToTouch || !hasTenderness || !visibleRashes || !tosAccepted}
                   className="w-full"
                   size="lg"
                 >

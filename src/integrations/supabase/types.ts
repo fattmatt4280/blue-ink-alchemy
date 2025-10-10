@@ -924,38 +924,56 @@ export type Database = {
         Row: {
           analysis_result: Json
           created_at: string
+          fever_symptoms: boolean | null
+          has_tenderness: boolean | null
           healing_stage: string
+          hot_to_touch: boolean | null
           id: string
           medical_references_used: Json | null
           photo_url: string
           photo_urls: string[] | null
           progress_score: number | null
+          rash_description: string | null
           recommendations: string[]
+          sensitive_to_touch: boolean | null
           user_id: string | null
+          visible_rashes: boolean | null
         }
         Insert: {
           analysis_result: Json
           created_at?: string
+          fever_symptoms?: boolean | null
+          has_tenderness?: boolean | null
           healing_stage: string
+          hot_to_touch?: boolean | null
           id?: string
           medical_references_used?: Json | null
           photo_url: string
           photo_urls?: string[] | null
           progress_score?: number | null
+          rash_description?: string | null
           recommendations?: string[]
+          sensitive_to_touch?: boolean | null
           user_id?: string | null
+          visible_rashes?: boolean | null
         }
         Update: {
           analysis_result?: Json
           created_at?: string
+          fever_symptoms?: boolean | null
+          has_tenderness?: boolean | null
           healing_stage?: string
+          hot_to_touch?: boolean | null
           id?: string
           medical_references_used?: Json | null
           photo_url?: string
           photo_urls?: string[] | null
           progress_score?: number | null
+          rash_description?: string | null
           recommendations?: string[]
+          sensitive_to_touch?: boolean | null
           user_id?: string | null
+          visible_rashes?: boolean | null
         }
         Relationships: []
       }
