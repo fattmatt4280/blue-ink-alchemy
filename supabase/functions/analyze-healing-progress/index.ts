@@ -259,7 +259,7 @@ When the Expert Knowledge Base mentions "REFERENCE IMAGES AVAILABLE", you should
 
 RESPONSE FORMAT - Updated with medical evidence:
 {
-  "personalGreeting": "Warm, personalized opening addressing ${clientName} by name (e.g., 'Hi ${clientName}! Great to see you...')",
+  "personalGreeting": "Warm, personalized opening addressing ${userFirstName} by name (e.g., 'Hi ${userFirstName}! Great to see you...')",
   "tattooDescription": "Description of the tattoo design and artistic style visible in the photos",
   "healingStage": "stage name",
   "summary": "Personalized summary that references their history if available and shows continuity of care",
@@ -318,11 +318,11 @@ Example patterns:
 - Based on their history: "How does my current progress compare to my last check-in?"
 `;
 
-    const userPrompt = `Analyze ${clientName}'s tattoo healing progress from ${images.length} photo${images.length > 1 ? 's' : ''}.
+    const userPrompt = `Analyze ${userFirstName}'s tattoo healing progress from ${images.length} photo${images.length > 1 ? 's' : ''}.
 ${images.length > 1 ? 'Multiple angles have been provided for comprehensive analysis.' : ''}
 
 CLIENT INFORMATION:
-- Name: ${clientName}
+- Name: ${userFirstName}
 - This is their personal healing journey with Healyn by Blue Dream Budder
 
 Tattoo Age: ${tattooAge ? `${tattooAge} days` : 'Not specified'}
@@ -359,7 +359,7 @@ ${i + 1}. Date: ${new Date(a.date).toLocaleDateString()}
 ` : 'This is the first assessment for this tattoo.'}
 
 Remember to:
-- Address ${clientName} personally and warmly in your personalGreeting
+- Address ${userFirstName} personally and warmly in your personalGreeting
 - Describe their tattoo design and style in tattooDescription
 - Reference their previous visits if this isn't their first check-in
 - Provide continuity of care and personalized guidance
