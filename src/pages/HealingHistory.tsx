@@ -197,27 +197,220 @@ const HealingHistory = () => {
                 </Card>
               </div>
 
+              {/* Latest Analysis - Full Display */}
+              {entries[0] && (
+                <Card className="ring-2 ring-primary shadow-xl">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>Latest Analysis</CardTitle>
+                      <Badge className="bg-primary">
+                        ✨ Most Recent
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(entries[0].created_at), "MMMM dd, yyyy 'at' h:mm a")}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Photo */}
+                    <div className="relative aspect-square max-w-md mx-auto overflow-hidden rounded-lg border">
+                      <img
+                        src={entries[0].photo_url}
+                        alt="Latest healing progress"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Healing Stage */}
+                    <div>
+                      <Badge className="text-base px-4 py-2">
+                        {entries[0].healing_stage}
+                      </Badge>
+                      {entries[0].analysis_result?.tattooAgeDays && (
+                        <Badge variant="outline" className="ml-2">
+                          Day {entries[0].analysis_result.tattooAgeDays}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Personal Greeting */}
+                    {entries[0].analysis_result?.personalGreeting && (
+                      <Card className="bg-primary/5">
+                        <CardContent className="pt-6">
+                          <p className="text-sm leading-relaxed">{entries[0].analysis_result.personalGreeting}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Tattoo Description */}
+                    {entries[0].analysis_result?.tattooDescription && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Your Tattoo</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm leading-relaxed">{entries[0].analysis_result.tattooDescription}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Summary */}
+                    {entries[0].analysis_result?.summary && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Analysis Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm leading-relaxed">{entries[0].analysis_result.summary}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Visual Assessment */}
+                    {entries[0].analysis_result?.visualAssessment && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Visual Assessment</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          {entries[0].analysis_result.visualAssessment.colorAssessment && (
+                            <div>
+                              <div className="font-medium text-sm mb-1">Color Assessment</div>
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {entries[0].analysis_result.visualAssessment.colorAssessment}
+                              </p>
+                            </div>
+                          )}
+                          {entries[0].analysis_result.visualAssessment.textureAssessment && (
+                            <div>
+                              <div className="font-medium text-sm mb-1">Texture Assessment</div>
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {entries[0].analysis_result.visualAssessment.textureAssessment}
+                              </p>
+                            </div>
+                          )}
+                          {entries[0].analysis_result.visualAssessment.overallCondition && (
+                            <div>
+                              <div className="font-medium text-sm mb-1">Overall Condition</div>
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {entries[0].analysis_result.visualAssessment.overallCondition}
+                              </p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Recommendations */}
+                    {entries[0].recommendations && entries[0].recommendations.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Recommendations</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="list-disc list-inside space-y-2">
+                            {entries[0].recommendations.map((rec: string, idx: number) => (
+                              <li key={idx} className="text-sm leading-relaxed">{rec}</li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Risk Factors with Evidence */}
+                    {entries[0].analysis_result?.riskFactorsWithEvidence && 
+                     entries[0].analysis_result.riskFactorsWithEvidence.length > 0 && (
+                      <Card className="border-destructive/50 bg-destructive/5">
+                        <CardHeader>
+                          <CardTitle className="text-destructive flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5" />
+                            Medical Assessment
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {entries[0].analysis_result.riskFactorsWithEvidence.map((risk: any, idx: number) => (
+                            <div key={idx} className="space-y-2">
+                              <h4 className="font-semibold text-sm">{risk.concern}</h4>
+                              {risk.symptoms && risk.symptoms.length > 0 && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">Observed Symptoms:</p>
+                                  <ul className="list-disc list-inside space-y-1">
+                                    {risk.symptoms.map((symptom: string, sIdx: number) => (
+                                      <li key={sIdx} className="text-sm">{symptom}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {risk.medicalReference && (
+                                <div className="mt-3 p-3 bg-background rounded-lg border space-y-2">
+                                  <p className="text-xs font-semibold">Medical Reference:</p>
+                                  <p className="text-sm font-medium">{risk.medicalReference.source}</p>
+                                  {risk.medicalReference.keyQuote && (
+                                    <blockquote className="text-sm italic border-l-2 border-primary pl-3">
+                                      "{risk.medicalReference.keyQuote}"
+                                    </blockquote>
+                                  )}
+                                  {risk.medicalReference.url && (
+                                    <a 
+                                      href={risk.medicalReference.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                                    >
+                                      View Source →
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Product Recommendations */}
+                    {entries[0].analysis_result?.productRecommendations && 
+                     entries[0].analysis_result.productRecommendations.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-base">Product Recommendations</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="list-disc list-inside space-y-2">
+                            {entries[0].analysis_result.productRecommendations.map((product: string, idx: number) => (
+                              <li key={idx} className="text-sm leading-relaxed">{product}</li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Photo Timeline */}
               <HealingPhotoTimeline entries={entries} />
 
-              {/* History Cards */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Analysis History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {entries.map((entry, index) => (
-                      <HealingHistoryCard
-                        key={entry.id}
-                        entry={entry}
-                        isLatest={index === 0}
-                        onClick={() => setSelectedEntry(entry)}
-                      />
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* History Cards - Show remaining entries */}
+              {entries.length > 1 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Previous Analyses</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {entries.slice(1).map((entry) => (
+                        <HealingHistoryCard
+                          key={entry.id}
+                          entry={entry}
+                          isLatest={false}
+                          onClick={() => setSelectedEntry(entry)}
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
         </div>
