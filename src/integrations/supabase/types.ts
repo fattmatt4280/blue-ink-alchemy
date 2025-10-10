@@ -829,13 +829,17 @@ export type Database = {
       healaid_subscriptions: {
         Row: {
           activation_code: string | null
+          analyses_count: number | null
           created_at: string | null
+          daily_uploads_count: number | null
           email: string
           expiration_date: string
           id: string
           is_active: boolean | null
+          last_upload_date: string | null
           start_date: string | null
           stripe_customer_id: string | null
+          stripe_price_id: string | null
           stripe_subscription_id: string | null
           tier: string
           updated_at: string | null
@@ -843,13 +847,17 @@ export type Database = {
         }
         Insert: {
           activation_code?: string | null
+          analyses_count?: number | null
           created_at?: string | null
+          daily_uploads_count?: number | null
           email: string
           expiration_date: string
           id?: string
           is_active?: boolean | null
+          last_upload_date?: string | null
           start_date?: string | null
           stripe_customer_id?: string | null
+          stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           tier?: string
           updated_at?: string | null
@@ -857,13 +865,17 @@ export type Database = {
         }
         Update: {
           activation_code?: string | null
+          analyses_count?: number | null
           created_at?: string | null
+          daily_uploads_count?: number | null
           email?: string
           expiration_date?: string
           id?: string
           is_active?: boolean | null
+          last_upload_date?: string | null
           start_date?: string | null
           stripe_customer_id?: string | null
+          stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           tier?: string
           updated_at?: string | null
@@ -913,6 +925,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "healyn_upgrade_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "healaid_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      healaid_usage_tracking: {
+        Row: {
+          analyses_count: number | null
+          created_at: string | null
+          date: string
+          id: string
+          subscription_id: string | null
+          uploads_count: number | null
+          user_id: string
+        }
+        Insert: {
+          analyses_count?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          subscription_id?: string | null
+          uploads_count?: number | null
+          user_id: string
+        }
+        Update: {
+          analyses_count?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          subscription_id?: string | null
+          uploads_count?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healaid_usage_tracking_subscription_id_fkey"
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "healaid_subscriptions"

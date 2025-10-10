@@ -58,6 +58,92 @@ serve(async (req) => {
         );
       }
     }
+
+    // USAGE LIMITS CHECK - Must happen before processing
+    if (userId) {
+      const { data: subscription } = await supabase
+        .from('healaid_subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (!subscription || !subscription.is_active) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: 'no_subscription',
+            message: 'No active subscription. Please activate or upgrade.' 
+          }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const tier = subscription.tier;
+
+      // FREE TRIAL: 1 analysis total
+      if (tier === 'free_trial') {
+        const { count: analysisCount } = await supabase
+          .from('healing_progress')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId);
+        
+        if ((analysisCount || 0) >= 1) {
+          return new Response(
+            JSON.stringify({ 
+              success: false,
+              error: 'trial_limit_reached',
+              message: 'Your free trial allows 1 analysis. Upgrade to continue tracking your healing.' 
+            }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
+      // BASIC TIERS: 2 uploads per day
+      if (tier === 'basic_weekly' || tier === 'basic_monthly') {
+        const today = new Date().toISOString().split('T')[0];
+        
+        const { data: todayUsage } = await supabase
+          .from('healaid_usage_tracking')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('date', today)
+          .maybeSingle();
+        
+        const uploadsToday = todayUsage?.uploads_count || 0;
+        
+        if (uploadsToday >= 2) {
+          return new Response(
+            JSON.stringify({ 
+              success: false,
+              error: 'daily_limit_reached',
+              message: 'Basic tier allows 2 analyses per day. Upgrade to Pro for unlimited access.' 
+            }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        // Increment usage counter
+        if (todayUsage) {
+          await supabase
+            .from('healaid_usage_tracking')
+            .update({ uploads_count: uploadsToday + 1 })
+            .eq('id', todayUsage.id);
+        } else {
+          await supabase
+            .from('healaid_usage_tracking')
+            .insert({
+              user_id: userId,
+              subscription_id: subscription.id,
+              date: today,
+              uploads_count: 1,
+              analyses_count: 1,
+            });
+        }
+      }
+
+      // PRO and SHOP TIERS: No limits (continue normally)
+    }
     
     // Support both single image (legacy) and multiple images
     const images = imageUrls || [primaryImageUrl];

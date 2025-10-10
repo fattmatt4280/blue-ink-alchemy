@@ -8,10 +8,41 @@ const corsHeaders = {
 };
 
 const TIER_PRICES = {
-  '7_days': { amount: 99, label: '7 Days', days: 7 },
-  '30_days': { amount: 299, label: '30 Days', days: 30 },
-  '90_days': { amount: 799, label: '90 Days (Pro)', days: 90 },
-  'studio': { amount: 3999, label: 'Studio Unlimited', subscription: true },
+  'basic_weekly': { 
+    amount: 99, 
+    label: 'Basic Weekly', 
+    interval: 'week',
+    features: '2 uploads/day, AI summary, 7-day history',
+    stripe_price_id: 'price_BASIC_WEEKLY_ID' // Replace with actual Stripe Price ID
+  },
+  'basic_monthly': { 
+    amount: 299, 
+    label: 'Basic Monthly', 
+    interval: 'month',
+    features: '2 uploads/day, AI summary, 30-day history',
+    stripe_price_id: 'price_BASIC_MONTHLY_ID'
+  },
+  'pro_weekly': { 
+    amount: 199, 
+    label: 'Pro Weekly', 
+    interval: 'week',
+    features: 'Unlimited analyses, downloadable reports, medical docs',
+    stripe_price_id: 'price_PRO_WEEKLY_ID'
+  },
+  'pro_monthly': { 
+    amount: 499, 
+    label: 'Pro Monthly', 
+    interval: 'month',
+    features: 'All Pro features + custom planner + priority support',
+    stripe_price_id: 'price_PRO_MONTHLY_ID'
+  },
+  'shop_monthly': { 
+    amount: 2499, 
+    label: 'Shop / Artist', 
+    interval: 'month',
+    features: 'Client management, bulk QR, studio branding, analytics',
+    stripe_price_id: 'price_SHOP_MONTHLY_ID'
+  }
 };
 
 serve(async (req) => {
@@ -56,11 +87,11 @@ serve(async (req) => {
       .from('healaid_subscriptions')
       .select('*')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (subError || !subscription) {
       return new Response(
-        JSON.stringify({ error: 'No active Heal-AId subscription found. Please activate first.' }),
+        JSON.stringify({ error: 'No active Heal-Aid subscription found. Please activate first.' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -102,23 +133,11 @@ serve(async (req) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `Heal-AId ${tierInfo.label} Access`,
-              description: `Extend your Heal-AId AI access for ${tierInfo.label}`,
-            },
-            unit_amount: tierInfo.amount,
-            ...(tierInfo.subscription && {
-              recurring: {
-                interval: 'month',
-              },
-            }),
-          },
+          price: tierInfo.stripe_price_id,
           quantity: 1,
         },
       ],
-      mode: tierInfo.subscription ? 'subscription' : 'payment',
+      mode: 'subscription', // All paid tiers are subscriptions
       success_url: `${req.headers.get('origin')}/dashboard?upgrade=success`,
       cancel_url: `${req.headers.get('origin')}/dashboard?upgrade=cancelled`,
       metadata: {

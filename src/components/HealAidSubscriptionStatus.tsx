@@ -95,8 +95,8 @@ const HealAidSubscriptionStatus = () => {
     );
   }
 
-  // Trial ending soon
-  if (daysRemaining <= 2 && subscription.tier === 'free_trial') {
+  // Trial ending soon (24 hours or less)
+  if (daysRemaining <= 1 && subscription.tier === 'free_trial') {
     return (
       <Card className="mb-4 border-amber-500/20 bg-amber-500/5">
         <CardContent className="pt-6">
@@ -104,10 +104,10 @@ const HealAidSubscriptionStatus = () => {
             <Clock className="h-5 w-5 text-amber-600 mt-0.5" />
             <div className="flex-1">
               <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-2">
-                Your trial ends in {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'}
+                Your 24-hour trial expires soon
               </p>
               <p className="text-sm text-muted-foreground mb-3">
-                Extend your access to continue getting personalized healing insights from Charlie
+                Upgrade now to continue getting unlimited AI healing insights
               </p>
               <Button 
                 size="sm"

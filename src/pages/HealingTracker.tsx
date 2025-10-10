@@ -209,9 +209,31 @@ const HealingTracker = () => {
 
       if (error) {
         console.error('Function invocation error:', error);
-        // Gracefully handle normalized HTTP errors
-        // @ts-ignore - supabase error may include status
+        // @ts-ignore - supabase error may include status or message
+        const errorMessage = (error as any)?.message || '';
         const status = (error as any)?.status;
+        
+        // Handle tier-specific limits
+        if (errorMessage.includes('trial_limit_reached')) {
+          toast({
+            title: "Free Trial Limit Reached",
+            description: "Your trial includes 1 analysis. View upgrade options in your dashboard.",
+            variant: "destructive",
+          });
+          setTimeout(() => navigate('/dashboard'), 2000);
+          return;
+        }
+        
+        if (errorMessage.includes('daily_limit_reached')) {
+          toast({
+            title: "Daily Limit Reached",
+            description: "Basic tier allows 2 uploads per day. Upgrade to Pro for unlimited access!",
+            variant: "destructive",
+          });
+          setTimeout(() => navigate('/dashboard'), 2000);
+          return;
+        }
+        
         if (status === 402) {
           toast({
             title: "Service Temporarily Unavailable",

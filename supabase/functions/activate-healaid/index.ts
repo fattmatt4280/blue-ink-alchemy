@@ -69,27 +69,26 @@ serve(async (req) => {
       );
     }
 
-    // Check if user already has an active subscription from the last month
-    if (userId) {
-      const { data: existingSubscription } = await supabase
+    // Check if user has EVER used a free trial (lifetime restriction)
+    if (userId && activationCode.tier === 'free_trial') {
+      const { data: existingTrialEver } = await supabase
         .from('healaid_subscriptions')
         .select('*')
         .eq('user_id', userId)
-        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
         .eq('tier', 'free_trial')
-        .single();
+        .limit(1);
 
-      if (existingSubscription) {
+      if (existingTrialEver && existingTrialEver.length > 0) {
         return new Response(
-          JSON.stringify({ error: 'You have already used a free trial in the last 30 days' }),
+          JSON.stringify({ error: 'You have already used your free trial. Please upgrade to continue using Heal-Aid.' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
     }
 
-    // Calculate subscription duration based on tier
+    // Calculate subscription duration based on tier (24 hours for free trial)
     const tierHours = {
-      'free_trial': 72,   // 3 days
+      'free_trial': 24,   // Changed from 72 to 24 hours
       '7_day': 168,       // 7 days
       '30_day': 720,      // 30 days
     };
@@ -155,9 +154,9 @@ serve(async (req) => {
 
     // Create friendly tier names for response
     const tierNames = {
-      'free_trial': '3-day free trial',
-      '7_day': '7-day',
-      '30_day': '30-day',
+      'free_trial': '24-hour Free Trial',
+      '7_day': '7-Day Access',
+      '30_day': '30-Day Access',
     };
 
     const tierName = tierNames[activationCode.tier] || 'subscription';

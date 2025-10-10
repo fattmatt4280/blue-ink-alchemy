@@ -171,76 +171,116 @@ const Dashboard = () => {
         {/* Upgrade Options */}
         <Card>
           <CardHeader>
-            <CardTitle>Extend Your Access</CardTitle>
-            <CardDescription>
-              Choose a plan that works for you
-            </CardDescription>
+            <CardTitle>Upgrade Your Plan</CardTitle>
+            <CardDescription>Choose the plan that fits your healing journey</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="text-lg">7 Days</CardTitle>
-                <CardDescription>Perfect for quick healing</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold mb-4">$0.99</p>
-                <Button
-                  className="w-full"
-                  onClick={() => handleUpgrade('7_days')}
-                >
-                  Extend <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
+          <CardContent className="space-y-4">
+            {/* Basic Plans */}
+            <div className="space-y-2">
+              <h3 className="font-semibold text-sm text-muted-foreground">Basic Plans</h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                <Card className="border">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Basic Weekly</CardTitle>
+                    <CardDescription className="text-xs">2 uploads/day</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold mb-2">$0.99<span className="text-sm font-normal">/week</span></p>
+                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
+                      <li>• AI summary view</li>
+                      <li>• 7-day history</li>
+                      <li>• Product recommendations</li>
+                    </ul>
+                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('basic_weekly')}>
+                      Subscribe
+                    </Button>
+                  </CardContent>
+                </Card>
 
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="text-lg">30 Days</CardTitle>
-                <CardDescription>Most popular choice</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold mb-4">$2.99</p>
-                <Button
-                  className="w-full"
-                  onClick={() => handleUpgrade('30_days')}
-                >
-                  Extend <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
+                <Card className="border">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Basic Monthly</CardTitle>
+                    <CardDescription className="text-xs">2 uploads/day</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold mb-2">$2.99<span className="text-sm font-normal">/mo</span></p>
+                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
+                      <li>• All Basic Weekly features</li>
+                      <li>• 30-day history</li>
+                      <li>• Better value</li>
+                    </ul>
+                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('basic_monthly')}>
+                      Subscribe
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
 
-            <Card className="border-2 border-primary">
-              <CardHeader>
-                <CardTitle className="text-lg">90 Days Pro</CardTitle>
-                <CardDescription>Best value for healing</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold mb-4">$7.99</p>
-                <Button
-                  className="w-full"
-                  onClick={() => handleUpgrade('90_days')}
-                >
-                  Upgrade <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Pro Plans */}
+            <div className="space-y-2">
+              <h3 className="font-semibold text-sm text-muted-foreground">Pro Plans</h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                <Card className="border-2 border-primary">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Pro Weekly</CardTitle>
+                    <CardDescription className="text-xs">Unlimited uploads</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold mb-2">$1.99<span className="text-sm font-normal">/week</span></p>
+                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
+                      <li>• Unlimited analyses</li>
+                      <li>• Downloadable reports</li>
+                      <li>• Medical documentation</li>
+                    </ul>
+                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('pro_weekly')}>
+                      Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>
 
-            <Card className="border-2 border-accent">
-              <CardHeader>
-                <CardTitle className="text-lg">Studio Unlimited</CardTitle>
-                <CardDescription>For tattoo professionals</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold mb-4">$39.99<span className="text-sm font-normal">/mo</span></p>
-                <Button
-                  className="w-full"
-                  variant="secondary"
-                  onClick={() => handleUpgrade('studio')}
-                >
-                  Subscribe <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
+                <Card className="border-2 border-primary">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Pro Monthly</CardTitle>
+                    <CardDescription className="text-xs">Best value</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold mb-2">$4.99<span className="text-sm font-normal">/mo</span></p>
+                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
+                      <li>• All Pro Weekly features</li>
+                      <li>• Custom aftercare planner</li>
+                      <li>• Priority support</li>
+                    </ul>
+                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('pro_monthly')}>
+                      Upgrade
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Studio Plan */}
+            <div className="space-y-2">
+              <h3 className="font-semibold text-sm text-muted-foreground">For Professionals</h3>
+              <Card className="border-2 border-accent">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Shop / Artist</CardTitle>
+                  <CardDescription className="text-xs">Client management & analytics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold mb-2">$24.99<span className="text-sm font-normal">/mo</span></p>
+                  <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
+                    <li>• Client dashboard</li>
+                    <li>• Bulk QR activations</li>
+                    <li>• Studio branding</li>
+                    <li>• Advanced analytics</li>
+                  </ul>
+                  <Button size="sm" className="w-full" variant="secondary" onClick={() => handleUpgrade('shop_monthly')}>
+                    Subscribe
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </CardContent>
         </Card>
 
@@ -254,9 +294,26 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center p-4 bg-muted rounded-lg">
-              <span className="text-sm">Total Analyses Performed</span>
-              <span className="text-2xl font-bold">{totalAnalyses}</span>
+              <span className="text-sm">
+                {subscription?.tier === 'free_trial' ? 'Analyses Used' : 'Total Analyses'}
+              </span>
+              <span className="text-2xl font-bold">
+                {subscription?.tier === 'free_trial' 
+                  ? `${totalAnalyses}/1` 
+                  : totalAnalyses}
+              </span>
             </div>
+            {(subscription?.tier === 'basic_weekly' || subscription?.tier === 'basic_monthly') && (
+              <div className="text-xs text-muted-foreground p-3 bg-muted rounded">
+                Daily limit: 2 uploads per day
+              </div>
+            )}
+            {(subscription?.tier === 'pro_weekly' || subscription?.tier === 'pro_monthly' || subscription?.tier === 'shop_monthly') && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                <Sparkles className="w-4 h-4" />
+                Unlimited Access
+              </div>
+            )}
             {isActive && daysRemaining > 0 ? (
               <p className="text-sm text-muted-foreground">
                 Your Heal-AId is active - track your healing progress now!
