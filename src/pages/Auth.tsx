@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { MFAChallenge } from '@/components/MFAChallenge';
+import { GoogleNameCollectionDialog } from '@/components/GoogleNameCollectionDialog';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -18,6 +19,9 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showMFAChallenge, setShowMFAChallenge] = useState(false);
+  const [showNameCollection, setShowNameCollection] = useState(false);
+  const [nameCollectionSubmitting, setNameCollectionSubmitting] = useState(false);
+  const [pendingGoogleUserId, setPendingGoogleUserId] = useState<string | null>(null);
   const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -48,7 +52,7 @@ const Auth = () => {
             console.log('[Google OAuth] User authenticated:', data.user?.email);
             console.log('[Google OAuth] Session established:', !!data.session);
             
-            // Verify profile and role creation
+            // Verify profile and check if name is missing
             setTimeout(async () => {
               try {
                 const { data: profile } = await supabase
@@ -65,15 +69,27 @@ const Auth = () => {
                 
                 console.log('[Google OAuth] Profile created:', !!profile, profile);
                 console.log('[Google OAuth] Role assigned:', role?.role || 'none', role);
+                
+                // Check if name is missing from profile
+                if (profile && !profile.first_name) {
+                  console.log('[Google OAuth] Name missing from profile, requesting user input');
+                  setPendingGoogleUserId(data.user?.id || null);
+                  setShowNameCollection(true);
+                  setLoading(false);
+                  return;
+                }
+                
+                // If name exists, show welcome toast and proceed
+                toast({
+                  title: "Welcome!",
+                  description: "You've been signed in successfully.",
+                });
+                setLoading(false);
               } catch (verifyError) {
                 console.error('[Google OAuth] Error verifying account setup:', verifyError);
+                setLoading(false);
               }
             }, 1000);
-            
-            toast({
-              title: "Welcome!",
-              description: "You've been signed in successfully.",
-            });
           }
           
           // Clean up URL by removing query parameters
@@ -283,6 +299,53 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const handleGoogleNameSubmit = async (firstName: string, lastName: string) => {
+    if (!pendingGoogleUserId) return;
+    
+    setNameCollectionSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName
+        })
+        .eq('id', pendingGoogleUserId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Profile Updated!",
+        description: "Your name has been saved. Welcome!",
+      });
+      
+      setShowNameCollection(false);
+      setPendingGoogleUserId(null);
+      
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setNameCollectionSubmitting(false);
+    }
+  };
+
+  if (showNameCollection) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <GoogleNameCollectionDialog
+          isOpen={showNameCollection}
+          onSubmit={handleGoogleNameSubmit}
+          isSubmitting={nameCollectionSubmitting}
+        />
+      </div>
+    );
+  }
 
   if (showMFAChallenge) {
     return (
