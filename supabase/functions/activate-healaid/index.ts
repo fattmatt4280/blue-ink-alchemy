@@ -88,12 +88,17 @@ serve(async (req) => {
 
     // Calculate subscription duration based on tier (24 hours for free trial)
     const tierHours = {
-      'free_trial': 24,   // Changed from 72 to 24 hours
-      '7_day': 168,       // 7 days
-      '30_day': 720,      // 30 days
+      'free_trial': 24,   // 24-hour free trial
     };
 
-    const hours = tierHours[activationCode.tier] || 72; // Default to 72 hours
+    const hours = tierHours[activationCode.tier];
+    
+    if (!hours) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid activation code tier' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     const activationDate = new Date();
     const expirationDate = new Date(activationDate);
@@ -154,12 +159,10 @@ serve(async (req) => {
 
     // Create friendly tier names for response
     const tierNames = {
-      'free_trial': '24-hour Free Trial',
-      '7_day': '7-Day Access',
-      '30_day': '30-Day Access',
+      'free_trial': '24-Hour Free Trial',
     };
 
-    const tierName = tierNames[activationCode.tier] || 'subscription';
+    const tierName = tierNames[activationCode.tier] || '24-Hour Free Trial';
 
     return new Response(
       JSON.stringify({
