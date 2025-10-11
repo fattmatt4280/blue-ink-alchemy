@@ -788,6 +788,7 @@ export type Database = {
           code: string
           code_expiration_date: string | null
           created_at: string | null
+          duration_days: number
           email: string | null
           expiration_date: string | null
           id: string
@@ -802,6 +803,7 @@ export type Database = {
           code: string
           code_expiration_date?: string | null
           created_at?: string | null
+          duration_days?: number
           email?: string | null
           expiration_date?: string | null
           id?: string
@@ -816,6 +818,7 @@ export type Database = {
           code?: string
           code_expiration_date?: string | null
           created_at?: string | null
+          duration_days?: number
           email?: string | null
           expiration_date?: string | null
           id?: string

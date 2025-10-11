@@ -86,20 +86,11 @@ serve(async (req) => {
       }
     }
 
-    // Calculate subscription duration based on tier (24 hours for free trial)
-    const tierHours = {
-      'free_trial': 24,   // 24-hour free trial
-    };
+    // Calculate subscription duration based on code's configured duration_days
+    const durationDays = Number(activationCode.duration_days ?? 1);
+    const effectiveDays = Number.isFinite(durationDays) && durationDays > 0 ? durationDays : 1;
+    const hours = effectiveDays * 24;
 
-    const hours = tierHours[activationCode.tier];
-    
-    if (!hours) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid activation code tier' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
     const activationDate = new Date();
     const expirationDate = new Date(activationDate);
     expirationDate.setHours(expirationDate.getHours() + hours);
@@ -130,7 +121,7 @@ serve(async (req) => {
         .from('healaid_subscriptions')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (existingSub) {
         await supabase
@@ -139,7 +130,7 @@ serve(async (req) => {
             activation_code: code,
             start_date: activationDate.toISOString(),
             expiration_date: expirationDate.toISOString(),
-            tier: 'free_trial',
+            tier: activationCode.tier,
             is_active: true,
           })
           .eq('user_id', userId);
@@ -152,23 +143,26 @@ serve(async (req) => {
             activation_code: code,
             start_date: activationDate.toISOString(),
             expiration_date: expirationDate.toISOString(),
-            tier: 'free_trial',
+            tier: activationCode.tier,
           });
       }
     }
 
     // Create friendly tier names for response
-    const tierNames = {
-      'free_trial': '24-Hour Free Trial',
+    const baseNames: Record<string, string> = {
+      'free_trial': 'Free Trial',
+      'basic': 'Basic',
+      'pro': 'Pro',
     };
-
-    const tierName = tierNames[activationCode.tier] || '24-Hour Free Trial';
+    const baseName = baseNames[activationCode.tier] || 'Plan';
+    const tierName = `${effectiveDays}-Day ${baseName}`;
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Heal-AId ${tierName} activated successfully!`,
+        message: `Heal-Aid ${tierName} activated successfully!`,
         tier: activationCode.tier,
+        duration_days: effectiveDays,
         expiration_date: expirationDate.toISOString(),
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
