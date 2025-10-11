@@ -21,7 +21,7 @@ verify_jwt = false
 
 [[functions]]
 name = "create-payment"
-verify_jwt = false
+verify_jwt = true
 
 [[functions]]
 name = "stripe-webhook"
@@ -29,7 +29,7 @@ verify_jwt = false
 
 [[functions]]
 name = "create-subscription"
-verify_jwt = false
+verify_jwt = true
 
 [[functions]]
 name = "check-subscription"
@@ -37,7 +37,7 @@ verify_jwt = false
 
 [[functions]]
 name = "generate-invoice"
-verify_jwt = false
+verify_jwt = true
 
 [[functions]]
 name = "send-order-notifications"
@@ -53,11 +53,11 @@ verify_jwt = false
 
 [[functions]]
 name = "analyze-healing-progress"
-verify_jwt = false
+verify_jwt = true
 
 [[functions]]
 name = "healing-followup-qa"
-verify_jwt = false
+verify_jwt = true
 
 [[functions]]
 name = "activate-healaid"
