@@ -1071,6 +1071,65 @@ export type Database = {
           },
         ]
       }
+      healing_reminders: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          delivery_method: string
+          healing_progress_id: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          reminder_type: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          delivery_method?: string
+          healing_progress_id?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          reminder_type: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          delivery_method?: string
+          healing_progress_id?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          reminder_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healing_reminders_healing_progress_id_fkey"
+            columns: ["healing_progress_id"]
+            isOneToOne: false
+            referencedRelation: "healing_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       login_attempts: {
         Row: {
           created_at: string
@@ -1513,6 +1572,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reminder_templates: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          created_by: string | null
+          hours_after_tattoo: number
+          id: string
+          message_template: string
+          priority: number | null
+          reminder_type: string
+          requires_conditions: Json | null
+          template_name: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          hours_after_tattoo: number
+          id?: string
+          message_template: string
+          priority?: number | null
+          reminder_type: string
+          requires_conditions?: Json | null
+          template_name: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          hours_after_tattoo?: number
+          id?: string
+          message_template?: string
+          priority?: number | null
+          reminder_type?: string
+          requires_conditions?: Json | null
+          template_name?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       shipment_reminders: {
         Row: {
           created_at: string
@@ -1834,6 +1938,48 @@ export type Database = {
           id?: string
           region?: string | null
           source?: string | null
+        }
+        Relationships: []
+      }
+      user_reminder_preferences: {
+        Row: {
+          created_at: string | null
+          email_enabled: boolean | null
+          id: string
+          push_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          reminder_types: Json | null
+          snooze_duration_hours: number | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          push_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          reminder_types?: Json | null
+          snooze_duration_hours?: number | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          push_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          reminder_types?: Json | null
+          snooze_duration_hours?: number | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
