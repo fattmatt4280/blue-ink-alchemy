@@ -273,9 +273,10 @@ const AdminActivationCodes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Code</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Tier</TableHead>
-                  <TableHead>Status</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Tier</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Status</TableHead>
                   <TableHead>Expiration</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Actions</TableHead>
@@ -291,6 +292,7 @@ const AdminActivationCodes = () => {
                         {code.tier === 'pro' ? 'Pro' : 'Basic'}
                       </Badge>
                     </TableCell>
+                    <TableCell>{code.duration_days} day{code.duration_days !== 1 ? 's' : ''}</TableCell>
                     <TableCell>
                       <Badge variant={code.redeemed ? "secondary" : "default"}>
                         {code.redeemed ? "Redeemed" : "Available"}

@@ -37,7 +37,7 @@ const Activate = () => {
       
       setLoading(true);
 
-      const { data, error } = await supabase.functions.invoke("activate-healyn", {
+      const { data, error } = await supabase.functions.invoke("activate-healaid", {
         body: { 
           code: validated.code,
           email: validated.email 
