@@ -102,3 +102,27 @@ verify_jwt = false
 [[functions]]
 name = "send-security-alert"
 verify_jwt = false
+
+[[functions]]
+name = "track-shipment"
+verify_jwt = false
+
+[[functions]]
+name = "get-shipping-rates"
+verify_jwt = false
+
+[[functions]]
+name = "create-shipping-label"
+verify_jwt = false
+
+[[functions]]
+name = "send-push-notification"
+verify_jwt = false
+
+[[functions]]
+name = "send-shipment-reminder"
+verify_jwt = false
+
+[[functions]]
+name = "check-stalled-shipments"
+verify_jwt = false

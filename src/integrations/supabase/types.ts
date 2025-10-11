@@ -1486,6 +1486,93 @@ export type Database = {
         }
         Relationships: []
       }
+      reminder_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shipment_reminders: {
+        Row: {
+          created_at: string
+          email_recipient: string
+          id: string
+          message_template: string | null
+          metadata: Json | null
+          order_id: string
+          reminder_type: string
+          scheduled_for: string
+          sent_at: string | null
+          shipment_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_recipient: string
+          id?: string
+          message_template?: string | null
+          metadata?: Json | null
+          order_id: string
+          reminder_type: string
+          scheduled_for: string
+          sent_at?: string | null
+          shipment_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_recipient?: string
+          id?: string
+          message_template?: string | null
+          metadata?: Json | null
+          order_id?: string
+          reminder_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          shipment_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_reminders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_reminders_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipments: {
         Row: {
           carrier: string | null

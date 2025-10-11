@@ -32,6 +32,8 @@ import HealAidContentEditor from '@/components/HealAidContentEditor';
 import HealingTrackerContentEditor from '@/components/HealingTrackerContentEditor';
 import { UserBaseManager } from '@/components/UserBaseManager';
 import AbandonedCartsManager from '@/components/AbandonedCartsManager';
+import ShipmentReminderManager from '@/components/ShipmentReminderManager';
+import ReminderSettingsPanel from '@/components/ReminderSettingsPanel';
 
 interface SiteContent {
   id: string;
@@ -156,7 +158,7 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 h-auto">
+          <TabsList className="grid w-full grid-cols-7 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
@@ -172,6 +174,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Product Management</span>
               <span className="sm:hidden">Products</span>
+            </TabsTrigger>
+            <TabsTrigger value="shipping" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Shipping</span>
+              <span className="sm:hidden">Ship</span>
             </TabsTrigger>
             <TabsTrigger value="blog" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Blog</span>
@@ -285,6 +291,23 @@ const AdminDashboard = () => {
 
             {/* Affiliate Products Management */}
             <AffiliateProductManager />
+          </TabsContent>
+
+          <TabsContent value="shipping" className="space-y-6">
+            <Tabs defaultValue="reminders" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="reminders">Shipment Reminders</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="reminders">
+                <ShipmentReminderManager />
+              </TabsContent>
+
+              <TabsContent value="settings">
+                <ReminderSettingsPanel />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="blog" className="space-y-6">
