@@ -9,6 +9,7 @@ import { Sparkles, Clock, ArrowRight, History } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import AppHeader from "@/components/AppHeader";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
+import { DashboardWelcomeDialog } from "@/components/DashboardWelcomeDialog";
 
 interface Subscription {
   tier: string;
@@ -22,6 +23,8 @@ const Dashboard = () => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [totalAnalyses, setTotalAnalyses] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
 
   useEffect(() => {
     checkSubscription();
@@ -47,8 +50,9 @@ const Dashboard = () => {
       }
 
       if (!data) {
-        toast.error("No subscription found. Please activate first.");
-        navigate("/activate");
+        // Show welcome dialog instead of redirecting
+        setShowWelcomeDialog(true);
+        setIsLoading(false);
         return;
       }
 
@@ -65,6 +69,39 @@ const Dashboard = () => {
       console.error("Error:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleActivateTrial = async () => {
+    setIsActivating(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please sign in first");
+        navigate("/auth");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('start-free-trial', {
+        body: { 
+          email: user.email,
+          userId: user.id 
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success("Free trial activated! Check your email for your activation code.");
+      setShowWelcomeDialog(false);
+      
+      // Refresh subscription data
+      await checkSubscription();
+    } catch (error: any) {
+      console.error("Trial activation error:", error);
+      toast.error(error.message || "Failed to activate trial");
+    } finally {
+      setIsActivating(false);
     }
   };
 
@@ -114,6 +151,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <AppHeader />
+      
+      <DashboardWelcomeDialog
+        isOpen={showWelcomeDialog}
+        onActivateTrial={handleActivateTrial}
+        onViewPlans={() => setShowWelcomeDialog(false)}
+        isActivating={isActivating}
+      />
+      
       <div className="p-4 md:p-8 pt-24">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
