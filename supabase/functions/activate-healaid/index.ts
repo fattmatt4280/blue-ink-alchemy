@@ -21,6 +21,10 @@ serve(async (req) => {
       );
     }
 
+    // Normalize the code: trim whitespace and convert to uppercase for case-insensitive matching
+    const normalizedCode = String(code).trim().toUpperCase();
+    console.log('Activating code:', normalizedCode);
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -35,12 +39,12 @@ serve(async (req) => {
       userId = user?.id;
     }
 
-    // Check if code exists and is not redeemed
+    // Check if code exists and is not redeemed (case-insensitive lookup)
     const { data: activationCode, error: codeError } = await supabase
       .from('healaid_activation_codes')
       .select('*')
-      .eq('code', code)
-      .single();
+      .ilike('code', normalizedCode)
+      .maybeSingle();
 
     if (codeError || !activationCode) {
       return new Response(
@@ -105,7 +109,7 @@ serve(async (req) => {
         activation_date: activationDate.toISOString(),
         expiration_date: expirationDate.toISOString(),
       })
-      .eq('code', code);
+      .eq('id', activationCode.id);
 
     if (updateError) {
       console.error('Error updating activation code:', updateError);
@@ -127,7 +131,7 @@ serve(async (req) => {
         await supabase
           .from('healaid_subscriptions')
           .update({
-            activation_code: code,
+            activation_code: normalizedCode,
             start_date: activationDate.toISOString(),
             expiration_date: expirationDate.toISOString(),
             tier: activationCode.tier,
@@ -140,7 +144,7 @@ serve(async (req) => {
           .insert({
             user_id: userId,
             email,
-            activation_code: code,
+            activation_code: normalizedCode,
             start_date: activationDate.toISOString(),
             expiration_date: expirationDate.toISOString(),
             tier: activationCode.tier,

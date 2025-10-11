@@ -99,7 +99,7 @@ export const ActivationDialog = ({ open, onOpenChange, prefilledCode = "" }: Act
               id="code"
               placeholder="HLN-XXXXX"
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onChange={(e) => setCode(e.target.value.toUpperCase().trim())}
               required
               maxLength={50}
             />

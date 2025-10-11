@@ -86,7 +86,7 @@ const Activate = () => {
                   id="code"
                   placeholder="HLN-XXXXX"
                   value={code}
-                  onChange={(e) => setCode(e.target.value)}
+                  onChange={(e) => setCode(e.target.value.toUpperCase().trim())}
                   required
                   maxLength={50}
                   className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
