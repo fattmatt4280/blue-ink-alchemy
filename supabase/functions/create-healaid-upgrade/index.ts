@@ -13,35 +13,35 @@ const TIER_PRICES = {
     label: 'Basic Weekly', 
     interval: 'week',
     features: '2 uploads/day, AI summary, 7-day history',
-    stripe_price_id: 'price_BASIC_WEEKLY_ID' // Replace with actual Stripe Price ID
+    stripe_price_id: 'price_1SGrFSDiBqghYX9irfq6njZE'
   },
   'basic_monthly': { 
     amount: 299, 
     label: 'Basic Monthly', 
     interval: 'month',
     features: '2 uploads/day, AI summary, 30-day history',
-    stripe_price_id: 'price_BASIC_MONTHLY_ID'
+    stripe_price_id: 'price_1SGrKsDiBqghYX9i23HgSW8Y'
   },
   'pro_weekly': { 
     amount: 199, 
     label: 'Pro Weekly', 
     interval: 'week',
     features: 'Unlimited analyses, downloadable reports, medical docs',
-    stripe_price_id: 'price_PRO_WEEKLY_ID'
+    stripe_price_id: 'price_1SGrOkDiBqghYX9is1wTdLvS'
   },
   'pro_monthly': { 
     amount: 499, 
     label: 'Pro Monthly', 
     interval: 'month',
     features: 'All Pro features + custom planner + priority support',
-    stripe_price_id: 'price_PRO_MONTHLY_ID'
+    stripe_price_id: 'price_1SGrQhDiBqghYX9iJG7w6iFa'
   },
   'shop_monthly': { 
     amount: 2499, 
     label: 'Shop / Artist', 
     interval: 'month',
     features: 'Client management, bulk QR, studio branding, analytics',
-    stripe_price_id: 'price_SHOP_MONTHLY_ID'
+    stripe_price_id: 'price_1SGrcoDiBqghYX9iyO1XH8tq'
   }
 };
 
