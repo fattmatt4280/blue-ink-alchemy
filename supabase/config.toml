@@ -126,3 +126,19 @@ verify_jwt = false
 [[functions]]
 name = "check-stalled-shipments"
 verify_jwt = false
+
+[[functions]]
+name = "generate-tts"
+verify_jwt = false
+
+[[functions]]
+name = "generate-healing-reminders"
+verify_jwt = false
+
+[[functions]]
+name = "send-healing-reminder"
+verify_jwt = false
+
+[[functions]]
+name = "process-healing-reminders"
+verify_jwt = false

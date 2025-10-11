@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { generateSingleEntryReport, generateCompleteReport, downloadHtmlReport } from "@/utils/healingReportExport";
 import { useToast } from "@/hooks/use-toast";
+import { TextToSpeechButton } from "@/components/TextToSpeechButton";
 
 const HealingHistory = () => {
   const { user, loading: authLoading } = useAuth();
@@ -258,7 +259,12 @@ const HealingHistory = () => {
                     {entries[0].analysis_result?.summary && (
                       <Card>
                         <CardHeader>
-                          <CardTitle className="text-base">Analysis Summary</CardTitle>
+                          <div className="flex items-center justify-between gap-4">
+                            <CardTitle className="text-base">Analysis Summary</CardTitle>
+                            <TextToSpeechButton 
+                              text={entries[0].analysis_result.summary} 
+                            />
+                          </div>
                         </CardHeader>
                         <CardContent>
                           <p className="text-sm leading-relaxed">{entries[0].analysis_result.summary}</p>
