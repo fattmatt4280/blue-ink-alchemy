@@ -149,7 +149,7 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
             disabled={isDisabled || loading}
             className="neon-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isDisabled ? 'Add Budder for Free Trial' : loading ? 'Checking...' : 'Add to Cart'}
+            {isDisabled ? 'Add Budder for Free Trial' : loading ? 'Checking...' : isHealAidProduct ? 'Subscribe' : 'Add to Cart'}
           </Button>
         </div>
       </div>
