@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Copy, Download, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -18,6 +19,8 @@ const AdminActivationCodes = () => {
   const [codes, setCodes] = useState<any[]>([]);
   const [count, setCount] = useState(10);
   const [email, setEmail] = useState("");
+  const [tier, setTier] = useState<string>("free_trial");
+  const [durationDays, setDurationDays] = useState<number>(1);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
@@ -83,7 +86,12 @@ const AdminActivationCodes = () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       const { data, error } = await supabase.functions.invoke('generate-activation-codes', {
-        body: { count, email: email || undefined },
+        body: { 
+          count, 
+          email: email || undefined,
+          tier: tier,
+          duration_days: durationDays
+        },
         headers: {
           Authorization: `Bearer ${session?.access_token}`
         },
@@ -100,6 +108,8 @@ const AdminActivationCodes = () => {
       loadCodes();
       setCount(10);
       setEmail("");
+      setTier("free_trial");
+      setDurationDays(1);
     } catch (error: any) {
       console.error("Generate error:", error);
       toast.error(error.message || "Failed to generate codes");
@@ -185,6 +195,33 @@ const AdminActivationCodes = () => {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="tier">Plan Type</Label>
+                <Select value={tier} onValueChange={setTier}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select plan type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="free_trial">Basic (Free Trial)</SelectItem>
+                    <SelectItem value="pro">Pro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="duration">Trial Duration</Label>
+                <Select value={durationDays.toString()} onValueChange={(val) => setDurationDays(parseInt(val))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 Day</SelectItem>
+                    <SelectItem value="7">7 Days</SelectItem>
+                    <SelectItem value="30">30 Days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <Button
                 className="w-full"
                 onClick={handleGenerate}
@@ -237,7 +274,9 @@ const AdminActivationCodes = () => {
                 <TableRow>
                   <TableHead>Code</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Tier</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Expiration</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -248,9 +287,19 @@ const AdminActivationCodes = () => {
                     <TableCell className="font-mono">{code.code}</TableCell>
                     <TableCell>{code.email || "-"}</TableCell>
                     <TableCell>
+                      <Badge variant={code.tier === 'pro' ? "default" : "secondary"}>
+                        {code.tier === 'pro' ? 'Pro' : 'Basic'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={code.redeemed ? "secondary" : "default"}>
                         {code.redeemed ? "Redeemed" : "Available"}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {code.code_expiration_date 
+                        ? new Date(code.code_expiration_date).toLocaleDateString()
+                        : 'N/A'}
                     </TableCell>
                     <TableCell>
                       {new Date(code.created_at).toLocaleDateString()}

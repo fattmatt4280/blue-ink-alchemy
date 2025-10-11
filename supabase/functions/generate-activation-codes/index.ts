@@ -21,7 +21,7 @@ serve(async (req) => {
   }
 
   try {
-    const { count = 1, email, tier = 'free_trial' } = await req.json();
+    const { count = 1, email, tier = 'free_trial', duration_days = 90 } = await req.json();
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -82,9 +82,9 @@ serve(async (req) => {
         existing = result.data;
       }
 
-      // Set code expiration to 90 days from now
+      // Set code expiration based on duration_days
       const codeExpirationDate = new Date();
-      codeExpirationDate.setDate(codeExpirationDate.getDate() + 90);
+      codeExpirationDate.setDate(codeExpirationDate.getDate() + duration_days);
 
       codes.push({
         code,
