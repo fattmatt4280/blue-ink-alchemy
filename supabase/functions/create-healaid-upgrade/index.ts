@@ -131,6 +131,7 @@ serve(async (req) => {
     const sessionParams: any = {
       customer: customerId,
       payment_method_types: ['card'],
+      billing_address_collection: 'auto', // Only for card verification
       line_items: [
         {
           price: tierInfo.stripe_price_id,
@@ -140,6 +141,11 @@ serve(async (req) => {
       mode: 'subscription', // All paid tiers are subscriptions
       success_url: `${req.headers.get('origin')}/dashboard?upgrade=success`,
       cancel_url: `${req.headers.get('origin')}/dashboard?upgrade=cancelled`,
+      allow_promotion_codes: true, // Allow discount codes
+      customer_update: {
+        address: 'auto', // Update billing address if needed
+        shipping: 'never', // Never collect shipping for digital service
+      },
       metadata: {
         user_id: user.id,
         tier,
