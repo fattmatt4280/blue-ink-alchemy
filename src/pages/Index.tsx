@@ -7,6 +7,7 @@ import FAQ from "@/components/FAQ";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 
 const Index = () => {
   return (
@@ -14,6 +15,9 @@ const Index = () => {
       <AnimatedBackground />
       <div id="hero" className="relative z-10">
         <Hero />
+      </div>
+      <div id="free-trial" className="relative z-10">
+        <FreeTrialCTA />
       </div>
       <div id="products" className="relative z-10">
         <ProductGrid />

@@ -76,6 +76,10 @@ name = "send-activation-code-email"
 verify_jwt = false
 
 [[functions]]
+name = "start-free-trial"
+verify_jwt = false
+
+[[functions]]
 name = "check-free-trial-eligibility"
 verify_jwt = false
 
