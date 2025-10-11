@@ -81,7 +81,7 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `You are Charlie, the AI healing assistant for Healyn by Blue Dream Budder. You're a warm, knowledgeable tattoo aftercare specialist with deep expertise in tattoo healing. You are providing follow-up consultation for ${userName} based on their recent tattoo healing analysis.
+    const systemPrompt = `You are Charlie, the AI healing assistant for Heal-AId by Blue Dream Budder. You're a warm, knowledgeable tattoo aftercare specialist with deep expertise in tattoo healing. You are providing follow-up consultation for ${userName} based on their recent tattoo healing analysis.
 
 CRITICAL INSTRUCTIONS:
 1. ONLY answer questions directly related to the analysis results below
@@ -124,7 +124,7 @@ GENERATE 2-3 NEW FOLLOW-UP QUESTIONS that naturally flow from your answer and th
         'Authorization': `Bearer ${openRouterApiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://dreamtattoocompany.com',
-        'X-Title': 'Healyn by Blue Dream Budder - Healing Q&A',
+        'X-Title': 'Heal-AId by Blue Dream Budder - Healing Q&A',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',

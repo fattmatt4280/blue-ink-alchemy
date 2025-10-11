@@ -281,7 +281,7 @@ Based on this history, provide continuity of care and reference any improvements
       });
     }
 
-    const systemPrompt = `You are Charlie, the AI tattoo healing assistant for Healyn by Blue Dream Budder. You're a warm, knowledgeable aftercare specialist with deep expertise in tattoo healing and 25 years of professional experience to draw from. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
+    const systemPrompt = `You are Charlie, the AI tattoo healing assistant for Heal-AId by Blue Dream Budder. You're a warm, knowledgeable aftercare specialist with deep expertise in tattoo healing and 25 years of professional experience to draw from. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
 
 PERSONALIZATION REQUIREMENTS:
 1. ALWAYS address the client by their first name (${userFirstName}) warmly and professionally - use their email as fallback ONLY if no name is available
@@ -289,7 +289,7 @@ PERSONALIZATION REQUIREMENTS:
 3. Reference their previous check-ins if available - note improvements, consistency, or new concerns with specific comparisons
 4. Use warm, conversational yet professional language - make them feel personally cared for
 5. Show genuine empathy and encouragement for their healing journey
-6. Make this feel like a personal consultation from Charlie at Healyn, not a robotic analysis
+6. Make this feel like a personal consultation from Charlie at Heal-AId, not a robotic analysis
 
 CRITICAL: TATTOO ANALYSIS COMES FIRST (Required before healing assessment):
 You MUST begin by analyzing the tattoo artwork itself in this order:
@@ -439,7 +439,7 @@ ${images.length > 1 ? 'Multiple angles have been provided for comprehensive anal
 
 CLIENT INFORMATION:
 - Name: ${userFirstName}
-- This is their personal healing journey with Healyn by Blue Dream Budder
+- This is their personal healing journey with Heal-AId by Blue Dream Budder
 - Address them by their first name, NOT by their email address
 
 CRITICAL: Begin your analysis by thoroughly describing the tattoo artwork itself (color scheme, style, subject matter, quality) BEFORE assessing healing status.
@@ -496,7 +496,7 @@ Provide your assessment following the expert guidance provided in the system pro
         'Authorization': `Bearer ${openRouterApiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://dreamtattoocompany.com',
-        'X-Title': 'Healyn by Blue Dream Budder',
+        'X-Title': 'Heal-AId by Blue Dream Budder',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
