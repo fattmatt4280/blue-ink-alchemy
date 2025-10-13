@@ -23,7 +23,12 @@ serve(async (req) => {
       throw new Error('ElevenLabs API key not configured');
     }
 
-    console.log('Generating TTS for text length:', text.length);
+    const MAX = 1500;
+    const originalLength = text.length;
+    const safeText = text.slice(0, MAX);
+    const truncated = originalLength > MAX;
+
+    console.log('Generating TTS', { originalLength, truncated });
 
     // Call ElevenLabs API
     const response = await fetch(
@@ -36,7 +41,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: text,
+          text: safeText,
           model_id: 'eleven_turbo_v2',
           voice_settings: {
             stability: 0.5,
@@ -63,12 +68,14 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         audioContent: base64Audio,
-        mimeType: 'audio/mpeg'
+        mimeType: 'audio/mpeg',
+        truncated
       }),
       {
         headers: { 
           ...corsHeaders, 
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store'
         },
       }
     );
@@ -80,7 +87,8 @@ serve(async (req) => {
         status: 500,
         headers: { 
           ...corsHeaders, 
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store' 
         },
       }
     );

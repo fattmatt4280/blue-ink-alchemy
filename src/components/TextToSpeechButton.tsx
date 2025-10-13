@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,9 +23,12 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
       return;
     }
 
-    // If audio already loaded, resume
+    // If audio already loaded, resume or replay
     if (audioRef.current && !isPlaying) {
-      audioRef.current.play();
+      if (audioRef.current.ended || audioRef.current.currentTime > 0) {
+        audioRef.current.currentTime = 0;
+      }
+      await audioRef.current.play();
       setIsPlaying(true);
       return;
     }
@@ -33,32 +36,40 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
     // Generate new audio
     setIsLoading(true);
     try {
+      const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 1200);
       const { data, error } = await supabase.functions.invoke('generate-tts', {
-        body: { text },
+        body: { text: ttsText },
       });
 
       if (error) throw error;
+
+      if (data?.truncated) {
+        toast({
+          title: "Long summary truncated",
+          description: "We trimmed the text to ensure reliable playback.",
+        });
+      }
 
       if (!data?.audioContent) {
         throw new Error('No audio content received');
       }
 
-      // Convert base64 to blob
-      const audioBlob = new Blob(
-        [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
-        { type: 'audio/mpeg' }
-      );
-      const audioUrl = URL.createObjectURL(audioBlob);
-
-      // Create and play audio
-      const audio = new Audio(audioUrl);
+      // Create audio using a data URL for reliability across browsers
+      const mime = data.mimeType || 'audio/mpeg';
+      const audioSrc = `data:${mime};base64,${data.audioContent}`;
+      const audio = new Audio(audioSrc);
       audioRef.current = audio;
 
       audio.onplay = () => setIsPlaying(true);
       audio.onpause = () => setIsPlaying(false);
-      audio.onended = () => {
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => {
         setIsPlaying(false);
-        URL.revokeObjectURL(audioUrl);
+        toast({
+          title: "Playback error",
+          description: "Audio couldn't be played. Please try again.",
+          variant: "destructive",
+        });
       };
 
       await audio.play();
@@ -73,6 +84,15 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        try { audioRef.current.pause(); } catch {}
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <Button
