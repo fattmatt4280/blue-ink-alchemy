@@ -13,6 +13,7 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const triedFallbackRef = useRef(false);
   const { toast } = useToast();
 
   const handlePlayPause = async () => {
@@ -37,11 +38,13 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
     setIsLoading(true);
     try {
       const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 1200);
+      console.log('TTS: invoking generate-tts', { length: ttsText.length });
       const { data, error } = await supabase.functions.invoke('generate-tts', {
         body: { text: ttsText },
       });
 
       if (error) throw error;
+      console.log('TTS: function response', { truncated: data?.truncated, mime: data?.mimeType, b64len: data?.audioContent?.length });
 
       if (data?.truncated) {
         toast({
@@ -63,21 +66,52 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
       audio.onplay = () => setIsPlaying(true);
       audio.onpause = () => setIsPlaying(false);
       audio.onended = () => setIsPlaying(false);
-      audio.onerror = () => {
+      audio.onerror = async () => {
+        console.error('TTS: audio element error', audioRef.current?.error);
         setIsPlaying(false);
+        if (!triedFallbackRef.current && data?.audioContent) {
+          triedFallbackRef.current = true;
+          try {
+            console.log('TTS: attempting Blob fallback');
+            const binary = atob(data.audioContent);
+            const len = binary.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+            const blob = new Blob([bytes], { type: mime });
+            const blobUrl = URL.createObjectURL(blob);
+            const fallbackAudio = new Audio(blobUrl);
+            audioRef.current = fallbackAudio;
+            fallbackAudio.onplay = () => setIsPlaying(true);
+            fallbackAudio.onpause = () => setIsPlaying(false);
+            fallbackAudio.onended = () => { setIsPlaying(false); URL.revokeObjectURL(blobUrl); };
+            fallbackAudio.onerror = () => {
+              console.error('TTS: blob fallback audio error', fallbackAudio.error);
+              setIsPlaying(false);
+              URL.revokeObjectURL(blobUrl);
+              toast({
+                title: 'Playback error',
+                description: 'Audio couldn\'t be played. Please try again.',
+                variant: 'destructive',
+              });
+            };
+            await fallbackAudio.play();
+            return;
+          } catch (e) {
+            console.error('TTS: Blob fallback failed', e);
+          }
+        }
         toast({
-          title: "Playback error",
+          title: 'Playback error',
           description: "Audio couldn't be played. Please try again.",
-          variant: "destructive",
+          variant: 'destructive',
         });
       };
-
       await audio.play();
     } catch (error) {
       console.error('Error generating speech:', error);
       toast({
         title: "Speech Generation Failed",
-        description: "Unable to generate audio. Please try again.",
+        description: (error as any)?.message || "Unable to generate audio. Please try again.",
         variant: "destructive",
       });
     } finally {
