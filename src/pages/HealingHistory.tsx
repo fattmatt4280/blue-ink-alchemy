@@ -476,141 +476,145 @@ const HealingHistory = () => {
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedEntry} onOpenChange={() => setSelectedEntry(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               Detailed Analysis - {selectedEntry && format(new Date(selectedEntry.created_at), "MMMM dd, yyyy 'at' h:mm a")}
             </DialogTitle>
           </DialogHeader>
-          {selectedEntry && (
-            <div className="space-y-6">
-              <div className="relative aspect-square overflow-hidden rounded-lg border">
-                <img
-                  src={selectedEntry.photo_url}
-                  alt="Healing progress"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <Badge className="text-base px-4 py-2">
-                    {selectedEntry.healing_stage}
-                  </Badge>
+          
+          {/* Scrollable content wrapper */}
+          <div className="overflow-y-scroll flex-1 -mx-6 px-6 pb-2" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {selectedEntry && (
+              <div className="space-y-6 pb-4">
+                <div className="relative aspect-square overflow-hidden rounded-lg border">
+                  <img
+                    src={selectedEntry.photo_url}
+                    alt="Healing progress"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
-                {selectedEntry.analysis_result?.summary && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Analysis Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.summary}</p>
-                      {selectedEntry.analysis_result?.tattooAgeDays && (
-                        <Badge variant="outline" className="mt-3">
-                          Tattoo Age: {selectedEntry.analysis_result.tattooAgeDays} days
-                        </Badge>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
+                <div className="space-y-6">
+                  <div>
+                    <Badge className="text-base px-4 py-2">
+                      {selectedEntry.healing_stage}
+                    </Badge>
+                  </div>
 
-                {!selectedEntry.analysis_result?.summary && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Analysis Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm leading-relaxed">
-                        Assessed stage: {selectedEntry.healing_stage}. 
-                        {selectedEntry.analysis_result?.concerns && selectedEntry.analysis_result.concerns !== 'None' 
-                          ? ` ${selectedEntry.analysis_result.concerns}` 
-                          : ' No major concerns observed.'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
+                  {selectedEntry.analysis_result?.summary && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Analysis Summary</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.summary}</p>
+                        {selectedEntry.analysis_result?.tattooAgeDays && (
+                          <Badge variant="outline" className="mt-3">
+                            Tattoo Age: {selectedEntry.analysis_result.tattooAgeDays} days
+                          </Badge>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
 
-                {selectedEntry.recommendations && selectedEntry.recommendations.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Recommendations</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc list-inside space-y-2">
-                        {selectedEntry.recommendations.map((rec: string, idx: number) => (
-                          <li key={idx} className="text-sm leading-relaxed">{rec}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )}
+                  {!selectedEntry.analysis_result?.summary && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Analysis Summary</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm leading-relaxed">
+                          Assessed stage: {selectedEntry.healing_stage}. 
+                          {selectedEntry.analysis_result?.concerns && selectedEntry.analysis_result.concerns !== 'None' 
+                            ? ` ${selectedEntry.analysis_result.concerns}` 
+                            : ' No major concerns observed.'}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
 
-                {selectedEntry.analysis_result?.risk_factors && (
-                  <Card className="border-destructive/50 bg-destructive/5">
-                    <CardHeader>
-                      <CardTitle className="text-destructive flex items-center gap-2">
-                        <span>⚠️</span> Risk Factors
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.risk_factors}</p>
-                    </CardContent>
-                  </Card>
-                )}
+                  {selectedEntry.recommendations && selectedEntry.recommendations.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Recommendations</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside space-y-2">
+                          {selectedEntry.recommendations.map((rec: string, idx: number) => (
+                            <li key={idx} className="text-sm leading-relaxed">{rec}</li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
 
-                {selectedEntry.analysis_result?.visual_assessment && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Visual Assessment</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {selectedEntry.analysis_result.visual_assessment.color_assessment && (
-                        <div>
-                          <div className="font-medium text-sm mb-1">Color Assessment</div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {selectedEntry.analysis_result.visual_assessment.color_assessment}
-                          </p>
-                        </div>
-                      )}
-                      {selectedEntry.analysis_result.visual_assessment.texture_assessment && (
-                        <div>
-                          <div className="font-medium text-sm mb-1">Texture Assessment</div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {selectedEntry.analysis_result.visual_assessment.texture_assessment}
-                          </p>
-                        </div>
-                      )}
-                      {selectedEntry.analysis_result.visual_assessment.overall_condition && (
-                        <div>
-                          <div className="font-medium text-sm mb-1">Overall Condition</div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {selectedEntry.analysis_result.visual_assessment.overall_condition}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
+                  {selectedEntry.analysis_result?.risk_factors && (
+                    <Card className="border-destructive/50 bg-destructive/5">
+                      <CardHeader>
+                        <CardTitle className="text-destructive flex items-center gap-2">
+                          <span>⚠️</span> Risk Factors
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm leading-relaxed">{selectedEntry.analysis_result.risk_factors}</p>
+                      </CardContent>
+                    </Card>
+                  )}
 
-                {selectedEntry.analysis_result?.product_recommendations && 
-                 selectedEntry.analysis_result.product_recommendations.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Product Recommendations</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-disc list-inside space-y-2">
-                        {selectedEntry.analysis_result.product_recommendations.map((product: string, idx: number) => (
-                          <li key={idx} className="text-sm leading-relaxed">{product}</li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )}
+                  {selectedEntry.analysis_result?.visual_assessment && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Visual Assessment</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {selectedEntry.analysis_result.visual_assessment.color_assessment && (
+                          <div>
+                            <div className="font-medium text-sm mb-1">Color Assessment</div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {selectedEntry.analysis_result.visual_assessment.color_assessment}
+                            </p>
+                          </div>
+                        )}
+                        {selectedEntry.analysis_result.visual_assessment.texture_assessment && (
+                          <div>
+                            <div className="font-medium text-sm mb-1">Texture Assessment</div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {selectedEntry.analysis_result.visual_assessment.texture_assessment}
+                            </p>
+                          </div>
+                        )}
+                        {selectedEntry.analysis_result.visual_assessment.overall_condition && (
+                          <div>
+                            <div className="font-medium text-sm mb-1">Overall Condition</div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {selectedEntry.analysis_result.visual_assessment.overall_condition}
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {selectedEntry.analysis_result?.product_recommendations && 
+                   selectedEntry.analysis_result.product_recommendations.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Product Recommendations</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside space-y-2">
+                          {selectedEntry.analysis_result.product_recommendations.map((product: string, idx: number) => (
+                            <li key={idx} className="text-sm leading-relaxed">{product}</li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
