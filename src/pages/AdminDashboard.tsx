@@ -34,6 +34,7 @@ import { UserBaseManager } from '@/components/UserBaseManager';
 import AbandonedCartsManager from '@/components/AbandonedCartsManager';
 import ShipmentReminderManager from '@/components/ShipmentReminderManager';
 import ReminderSettingsPanel from '@/components/ReminderSettingsPanel';
+import { TTSSettingsEditor } from '@/components/TTSSettingsEditor';
 
 interface SiteContent {
   id: string;
@@ -315,6 +316,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
               <TabsContent value="ai-training" className="space-y-6">
+                <TTSSettingsEditor />
                 <AITrainingAnalytics />
                 <AIInstructionsEditor />
                 <HealingAssessmentReviewer />

@@ -1908,6 +1908,33 @@ export type Database = {
         }
         Relationships: []
       }
+      tts_settings: {
+        Row: {
+          id: string
+          pitch: number
+          rate: number
+          updated_at: string
+          updated_by: string | null
+          volume: number
+        }
+        Insert: {
+          id?: string
+          pitch?: number
+          rate?: number
+          updated_at?: string
+          updated_by?: string | null
+          volume?: number
+        }
+        Update: {
+          id?: string
+          pitch?: number
+          rate?: number
+          updated_at?: string
+          updated_by?: string | null
+          volume?: number
+        }
+        Relationships: []
+      }
       user_demographics: {
         Row: {
           age_group: string | null

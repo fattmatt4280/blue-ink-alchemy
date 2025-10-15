@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TextToSpeechButtonProps {
   text: string;
@@ -12,7 +13,28 @@ interface TextToSpeechButtonProps {
 export const TextToSpeechButton = ({ text, className, label = "Listen to Summary" }: TextToSpeechButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [ttsSettings, setTtsSettings] = useState({ rate: 0.92, pitch: 1.0, volume: 1.0 });
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchTTSSettings = async () => {
+      const { data } = await supabase
+        .from('tts_settings')
+        .select('rate, pitch, volume')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (data) {
+        setTtsSettings({
+          rate: Number(data.rate),
+          pitch: Number(data.pitch),
+          volume: Number(data.volume),
+        });
+      }
+    };
+    fetchTTSSettings();
+  }, []);
 
   const isIOS = () => {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
@@ -119,9 +141,9 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
       const utterance = new SpeechSynthesisUtterance(chunks[currentIndex]);
       utterance.voice = selectedVoice;
       utterance.lang = lang;
-      utterance.rate = 1;
-      utterance.pitch = 1;
-      utterance.volume = 1;
+      utterance.rate = ttsSettings.rate;
+      utterance.pitch = ttsSettings.pitch;
+      utterance.volume = ttsSettings.volume;
       
       utterance.onstart = () => {
         hasStarted = true;
