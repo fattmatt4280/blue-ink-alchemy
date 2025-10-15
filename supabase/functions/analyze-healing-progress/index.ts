@@ -96,72 +96,71 @@ serve(async (req) => {
       );
     }
 
-      const tier = subscription.tier;
+    const tier = subscription.tier;
 
-      // FREE TRIAL: 1 analysis total
-      if (tier === 'free_trial') {
-        const { count: analysisCount } = await supabase
-          .from('healing_progress')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId);
-        
-        if ((analysisCount || 0) >= 1) {
-          return new Response(
-            JSON.stringify({ 
-              success: false,
-              error: 'trial_limit_reached',
-              message: 'Your free trial allows 1 analysis. Upgrade to continue tracking your healing.' 
-            }),
-            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
+    // FREE TRIAL: 1 analysis total
+    if (tier === 'free_trial') {
+      const { count: analysisCount } = await supabase
+        .from('healing_progress')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      
+      if ((analysisCount || 0) >= 1) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: 'trial_limit_reached',
+            message: 'Your free trial allows 1 analysis. Upgrade to continue tracking your healing.' 
+          }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
-
-      // BASIC TIERS: 2 uploads per day
-      if (tier === 'basic_weekly' || tier === 'basic_monthly') {
-        const today = new Date().toISOString().split('T')[0];
-        
-        const { data: todayUsage } = await supabase
-          .from('healaid_usage_tracking')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('date', today)
-          .maybeSingle();
-        
-        const uploadsToday = todayUsage?.uploads_count || 0;
-        
-        if (uploadsToday >= 2) {
-          return new Response(
-            JSON.stringify({ 
-              success: false,
-              error: 'daily_limit_reached',
-              message: 'Basic tier allows 2 analyses per day. Upgrade to Pro for unlimited access.' 
-            }),
-            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
-        // Increment usage counter
-        if (todayUsage) {
-          await supabase
-            .from('healaid_usage_tracking')
-            .update({ uploads_count: uploadsToday + 1 })
-            .eq('id', todayUsage.id);
-        } else {
-          await supabase
-            .from('healaid_usage_tracking')
-            .insert({
-              user_id: userId,
-              subscription_id: subscription.id,
-              date: today,
-              uploads_count: 1,
-              analyses_count: 1,
-            });
-        }
-      }
-
-      // PRO and SHOP TIERS: No limits (continue normally)
     }
+
+    // BASIC TIERS: 2 uploads per day
+    if (tier === 'basic_weekly' || tier === 'basic_monthly') {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data: todayUsage } = await supabase
+        .from('healaid_usage_tracking')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('date', today)
+        .maybeSingle();
+      
+      const uploadsToday = todayUsage?.uploads_count || 0;
+      
+      if (uploadsToday >= 2) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: 'daily_limit_reached',
+            message: 'Basic tier allows 2 analyses per day. Upgrade to Pro for unlimited access.' 
+          }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Increment usage counter
+      if (todayUsage) {
+        await supabase
+          .from('healaid_usage_tracking')
+          .update({ uploads_count: uploadsToday + 1 })
+          .eq('id', todayUsage.id);
+      } else {
+        await supabase
+          .from('healaid_usage_tracking')
+          .insert({
+            user_id: userId,
+            subscription_id: subscription.id,
+            date: today,
+            uploads_count: 1,
+            analyses_count: 1,
+          });
+      }
+    }
+
+    // PRO and SHOP TIERS: No limits (continue normally)
     
     // Support both single image (legacy) and multiple images
     const images = imageUrls || [primaryImageUrl];
@@ -169,18 +168,16 @@ serve(async (req) => {
     
     // Get user's first name for personalization
     let userFirstName = 'there';
-    if (userId) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, email')
-        .eq('id', userId)
-        .single();
-      
-      if (profile?.first_name) {
-        userFirstName = profile.first_name;
-      } else if (profile?.email) {
-        userFirstName = profile.email.split('@')[0];
-      }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('first_name, last_name, email')
+      .eq('id', userId)
+      .single();
+    
+    if (profile?.first_name) {
+      userFirstName = profile.first_name;
+    } else if (profile?.email) {
+      userFirstName = profile.email.split('@')[0];
     }
     
     console.log('Analyzing healing progress:', { imageCount: images.length, tattooAge, previousAnalysesCount: previousAnalyses?.length || 0, userFirstName });
