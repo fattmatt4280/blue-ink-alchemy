@@ -18,6 +18,11 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
   const playbackModeRef = useRef<'audio' | 'web-speech' | null>(null);
   const { toast } = useToast();
 
+  const isIOS = () => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  };
+
   const ensureVoices = (): Promise<SpeechSynthesisVoice[]> => {
     return new Promise((resolve) => {
       let voices = window.speechSynthesis.getVoices();
@@ -328,6 +333,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
       utterance.onstart = () => {
         hasStarted = true;
         setIsPlaying(true);
+        setIsLoading(false);
       };
 
       utterance.onend = () => {
@@ -353,24 +359,42 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
 
       // iOS/Safari watchdog: if speech doesn't start, try resume
       if (currentIndex === 0) {
+        const watchdogDelay = isIOS() ? 1500 : 800;
+        const finalCheckDelay = isIOS() ? 2000 : 1000;
+        
         setTimeout(() => {
           if (!hasStarted && playbackModeRef.current === 'web-speech') {
             console.log('TTS: watchdog triggering resume');
             window.speechSynthesis.resume();
             
-            // Final check
+            // Final check - verify speech truly isn't working
             setTimeout(() => {
-              if (!hasStarted && playbackModeRef.current === 'web-speech') {
+              const isSpeaking = window.speechSynthesis.speaking;
+              const isPending = window.speechSynthesis.pending;
+              
+              if (!hasStarted && 
+                  playbackModeRef.current === 'web-speech' &&
+                  !isSpeaking && 
+                  !isPending) {
                 setIsPlaying(false);
+                setIsLoading(false);
                 toast({
                   title: "Speech Not Starting",
-                  description: "Please check Silent mode and media volume, then retry.",
+                  description: isIOS() 
+                    ? "If you don't hear audio, check the Silent switch (left side of device) and volume, then retry."
+                    : "Please check Silent mode and media volume, then retry.",
                   variant: "destructive",
                 });
+              } else if (isSpeaking || isPending) {
+                // Speech is working, just slow to trigger onstart
+                console.log('TTS: Speech detected as working');
+                setIsLoading(false);
               }
-            }, 1000);
+            }, finalCheckDelay);
+          } else if (hasStarted) {
+            setIsLoading(false);
           }
-        }, 800);
+        }, watchdogDelay);
       }
     };
 
