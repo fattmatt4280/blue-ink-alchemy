@@ -108,7 +108,12 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
     
     // If admin has selected a specific voice, use it
     if (ttsSettings.voice_name) {
-      selectedVoice = voices.find(v => v.name === ttsSettings.voice_name);
+      const v = voices.find(v => v.name === ttsSettings.voice_name);
+      if (v) {
+        selectedVoice = v;
+      } else {
+        console.debug("[TTS] Preferred voice not found on this device:", ttsSettings.voice_name);
+      }
     }
     
     // Fallback to auto-selection if no admin preference or voice not found

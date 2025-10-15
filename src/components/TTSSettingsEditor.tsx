@@ -21,24 +21,47 @@ export const TTSSettingsEditor = () => {
   const [isTesting, setIsTesting] = useState(false);
   const { toast } = useToast();
 
+  const hasTTS = typeof window !== "undefined" && typeof window.speechSynthesis !== "undefined";
+
   useEffect(() => {
     fetchSettings();
     
-    // Load available voices
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        setAvailableVoices(voices);
-      }
-    };
+    // Load available voices with resilient loader
+    if (hasTTS) {
+      const ensureVoices = async () => {
+        try {
+          const v = window.speechSynthesis.getVoices();
+          if (v.length) {
+            setAvailableVoices(v);
+            return;
+          }
 
-    loadVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+          return new Promise<void>((resolve) => {
+            const onChange = () => {
+              const loaded = window.speechSynthesis.getVoices();
+              if (loaded.length) {
+                window.speechSynthesis.removeEventListener("voiceschanged", onChange);
+                setAvailableVoices(loaded);
+                resolve();
+              }
+            };
+            window.speechSynthesis.addEventListener("voiceschanged", onChange);
+            
+            // Fallback timeout
+            setTimeout(() => {
+              window.speechSynthesis.removeEventListener("voiceschanged", onChange);
+              setAvailableVoices(window.speechSynthesis.getVoices());
+              resolve();
+            }, 2000);
+          });
+        } catch (error) {
+          console.error('Error loading voices:', error);
+        }
+      };
 
-    return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
-    };
-  }, []);
+      ensureVoices();
+    }
+  }, [hasTTS]);
 
   const fetchSettings = async () => {
     try {
@@ -72,18 +95,44 @@ export const TTSSettingsEditor = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      // Get the most recent settings row
+      const { data: latest, error: fetchError } = await supabase
         .from('tts_settings')
-        .update({
-          rate,
-          pitch,
-          volume,
-          voice_name: selectedVoice || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', (await supabase.from('tts_settings').select('id').order('updated_at', { ascending: false }).limit(1).single()).data?.id);
+        .select('id')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
+
+      if (!latest?.id) {
+        // Insert new row if none exists
+        const { error: insertError } = await supabase
+          .from('tts_settings')
+          .insert([{
+            rate,
+            pitch,
+            volume,
+            voice_name: selectedVoice || null,
+            updated_at: new Date().toISOString(),
+          }]);
+
+        if (insertError) throw insertError;
+      } else {
+        // Update existing row
+        const { error: updateError } = await supabase
+          .from('tts_settings')
+          .update({
+            rate,
+            pitch,
+            volume,
+            voice_name: selectedVoice || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', latest.id);
+
+        if (updateError) throw updateError;
+      }
 
       toast({
         title: "Settings saved",
@@ -113,7 +162,7 @@ export const TTSSettingsEditor = () => {
   };
 
   const handleTest = () => {
-    if (!window.speechSynthesis) {
+    if (!hasTTS) {
       toast({
         title: "Not supported",
         description: "Text-to-speech is not available in this browser",
@@ -229,50 +278,56 @@ export const TTSSettingsEditor = () => {
         {/* Voice Selector */}
         <div className="space-y-2">
           <Label htmlFor="voice">Preferred Voice</Label>
-          <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+          <Select value={selectedVoice} onValueChange={setSelectedVoice} disabled={!hasTTS || availableVoices.length === 0}>
             <SelectTrigger id="voice">
               <SelectValue placeholder="Auto-select (default)" />
             </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="">Auto-select (default)</SelectItem>
-          <SelectSeparator />
-          <SelectGroup>
-            <SelectLabel>Male Voices</SelectLabel>
-            {availableVoices
-              .filter(v => v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
-              .map(voice => (
-                <SelectItem key={voice.name} value={voice.name}>
-                  {voice.name} ({voice.lang})
-                </SelectItem>
-              ))}
-          </SelectGroup>
-          <SelectSeparator />
-          <SelectGroup>
-            <SelectLabel>Female Voices</SelectLabel>
-            {availableVoices
-              .filter(v => v.name.toLowerCase().includes('female'))
-              .map(voice => (
-                <SelectItem key={voice.name} value={voice.name}>
-                  {voice.name} ({voice.lang})
-                </SelectItem>
-              ))}
-          </SelectGroup>
-          <SelectSeparator />
-          <SelectGroup>
-            <SelectLabel>Other Voices</SelectLabel>
-            {availableVoices
-              .filter(v => !v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
-              .map(voice => (
-                <SelectItem key={voice.name} value={voice.name}>
-                  {voice.name} ({voice.lang})
-                </SelectItem>
-              ))}
-          </SelectGroup>
-        </SelectContent>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="">Auto-select (default)</SelectItem>
+              </SelectGroup>
+              <SelectSeparator />
+              <SelectGroup>
+                <SelectLabel>Male Voices</SelectLabel>
+                {availableVoices
+                  .filter(v => v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
+                  .map(voice => (
+                    <SelectItem key={voice.name} value={voice.name}>
+                      {voice.name} ({voice.lang})
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+              <SelectSeparator />
+              <SelectGroup>
+                <SelectLabel>Female Voices</SelectLabel>
+                {availableVoices
+                  .filter(v => v.name.toLowerCase().includes('female'))
+                  .map(voice => (
+                    <SelectItem key={voice.name} value={voice.name}>
+                      {voice.name} ({voice.lang})
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+              <SelectSeparator />
+              <SelectGroup>
+                <SelectLabel>Other Voices</SelectLabel>
+                {availableVoices
+                  .filter(v => !v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
+                  .map(voice => (
+                    <SelectItem key={voice.name} value={voice.name}>
+                      {voice.name} ({voice.lang})
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+            </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
-            Select a specific voice or leave as auto-select to use browser default
-          </p>
+          {!hasTTS && <p className="text-xs text-muted-foreground">Text-to-speech is not supported in this browser.</p>}
+          {hasTTS && availableVoices.length === 0 && <p className="text-xs text-muted-foreground">No system voices found yet. Try clicking Test or re-opening this panel in a moment.</p>}
+          {hasTTS && availableVoices.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Select a specific voice or leave as auto-select to use browser default
+            </p>
+          )}
         </div>
 
         {/* Sample Text */}
