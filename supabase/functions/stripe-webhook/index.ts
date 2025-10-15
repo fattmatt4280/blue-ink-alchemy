@@ -182,7 +182,7 @@ serve(async (req) => {
                     
                     // Ensure uniqueness
                     let { data: existingCode } = await supabaseClient
-                      .from('healyn_activation_codes')
+                      .from('healaid_activation_codes')
                       .select('code')
                       .eq('code', activationCode)
                       .single();
@@ -190,7 +190,7 @@ serve(async (req) => {
                     while (existingCode) {
                       activationCode = generateActivationCode();
                       const result = await supabaseClient
-                        .from('healyn_activation_codes')
+                        .from('healaid_activation_codes')
                         .select('code')
                         .eq('code', activationCode)
                         .single();
@@ -203,7 +203,7 @@ serve(async (req) => {
 
                     // Insert activation code
                     const { error: codeInsertError } = await supabaseClient
-                      .from('healyn_activation_codes')
+                      .from('healaid_activation_codes')
                       .insert({
                         code: activationCode,
                         email: session.customer_email,

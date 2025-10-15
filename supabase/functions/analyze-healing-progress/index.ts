@@ -19,64 +19,82 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, hotToTouch, feverSymptoms, sensitiveToTouch, hasTenderness, visibleRashes, rashDescription, previousAnalyses, userId } = await req.json();
+    // Extract and verify user from JWT token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = user.id; // Use verified user ID from JWT, not client-supplied
+
+    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, hotToTouch, feverSymptoms, sensitiveToTouch, hasTenderness, visibleRashes, rashDescription, previousAnalyses } = await req.json();
     
     // RATE LIMITING - Per User (10/hour, 50/day)
-    if (userId) {
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-      const { count: hourlyCount } = await supabase
-        .from('ai_response_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', oneHourAgo);
+    const { count: hourlyCount } = await supabase
+      .from('ai_response_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', oneHourAgo);
 
-      const { count: dailyCount } = await supabase
-        .from('ai_response_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', oneDayAgo);
+    const { count: dailyCount } = await supabase
+      .from('ai_response_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', oneDayAgo);
 
-      if ((hourlyCount || 0) >= 10) {
-        await supabase.from('rate_limit_violations').insert({
-          identifier: userId,
-          action_type: 'ai_analysis',
-          violation_count: 1,
-        });
+    if ((hourlyCount || 0) >= 10) {
+      await supabase.from('rate_limit_violations').insert({
+        identifier: userId,
+        action_type: 'ai_analysis',
+        violation_count: 1,
+      });
 
-        return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again in an hour.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again in an hour.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-      if ((dailyCount || 0) >= 50) {
-        return new Response(
-          JSON.stringify({ error: 'Daily analysis limit reached. Please try again tomorrow.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+    if ((dailyCount || 0) >= 50) {
+      return new Response(
+        JSON.stringify({ error: 'Daily analysis limit reached. Please try again tomorrow.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // USAGE LIMITS CHECK - Must happen before processing
-    if (userId) {
-      const { data: subscription } = await supabase
-        .from('healaid_subscriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
+    const { data: subscription } = await supabase
+      .from('healaid_subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
 
-      if (!subscription || !subscription.is_active) {
-        return new Response(
-          JSON.stringify({ 
-            success: false,
-            error: 'no_subscription',
-            message: 'No active subscription. Please activate or upgrade.' 
-          }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+    if (!subscription || !subscription.is_active) {
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'no_subscription',
+          message: 'No active subscription. Please activate or upgrade.' 
+        }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
       const tier = subscription.tier;
 
