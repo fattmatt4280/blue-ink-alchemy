@@ -40,29 +40,34 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
   };
 
   const handlePlayPause = async () => {
-    // If already playing, pause/cancel based on mode
+    // PAUSE: Handle if currently playing
     if (isPlaying) {
       if (playbackModeRef.current === 'audio' && audioRef.current) {
         audioRef.current.pause();
+        setIsPlaying(false);
       } else if (playbackModeRef.current === 'web-speech') {
         window.speechSynthesis.cancel();
+        setIsPlaying(false);
       }
-      setIsPlaying(false);
       return;
     }
 
-    // If audio already loaded, resume or replay
-    if (audioRef.current && !isPlaying) {
-      if (audioRef.current.ended || audioRef.current.currentTime > 0) {
-        audioRef.current.currentTime = 0;
+    // RESUME: If audio exists and is paused (not ended), resume from current position
+    if (audioRef.current && playbackModeRef.current === 'audio' && !audioRef.current.ended) {
+      try {
+        console.log('TTS: resuming playback');
+        await audioRef.current.play();
+        // isPlaying will be set by onplay listener
+      } catch (error) {
+        console.error('TTS: resume failed', error);
+        setIsPlaying(false);
       }
-      await audioRef.current.play();
-      setIsPlaying(true);
       return;
     }
 
-    // Generate new audio
+    // GENERATE NEW: No existing audio or audio has ended
     setIsLoading(true);
+    triedFallbackRef.current = false; // Reset fallback flag for new generation
     const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 4000);
     
     try {
@@ -73,6 +78,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
 
       if (error) {
         console.error('TTS: cloud error', error);
+        setIsLoading(false);
         toast({
           title: "Cloud TTS Error",
           description: error.message || "Failed to generate speech",
@@ -100,12 +106,33 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
       audioRef.current = audio;
 
       playbackModeRef.current = 'audio';
-      audio.onplay = () => setIsPlaying(true);
-      audio.onpause = () => setIsPlaying(false);
-      audio.onended = () => setIsPlaying(false);
-      audio.onerror = async () => {
-        console.error('TTS: audio element error', audioRef.current?.error);
+      
+      // Set up event listeners with proper state management
+      audio.onplay = () => {
+        console.log('TTS: audio playing');
+        setIsPlaying(true);
+      };
+
+      audio.onpause = () => {
+        console.log('TTS: audio paused');
+        // Only set to false if not ended (ended has its own handler)
+        if (!audio.ended) {
+          setIsPlaying(false);
+        }
+      };
+
+      audio.onended = () => {
+        console.log('TTS: audio ended');
         setIsPlaying(false);
+        playbackModeRef.current = null; // Clear mode so next click regenerates
+      };
+
+      audio.onerror = async (e) => {
+        console.error('TTS: audio element error', audio.error, e);
+        setIsPlaying(false);
+        setIsLoading(false);
+        
+        // Only try fallback once
         if (!triedFallbackRef.current && data?.audioContent) {
           triedFallbackRef.current = true;
           try {
@@ -119,9 +146,23 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
             const fallbackAudio = new Audio(blobUrl);
             audioRef.current = fallbackAudio;
             playbackModeRef.current = 'audio';
-            fallbackAudio.onplay = () => setIsPlaying(true);
-            fallbackAudio.onpause = () => setIsPlaying(false);
-            fallbackAudio.onended = () => { setIsPlaying(false); URL.revokeObjectURL(blobUrl); };
+            
+            fallbackAudio.onplay = () => {
+              console.log('TTS: blob audio playing');
+              setIsPlaying(true);
+            };
+            fallbackAudio.onpause = () => {
+              console.log('TTS: blob audio paused');
+              if (!fallbackAudio.ended) {
+                setIsPlaying(false);
+              }
+            };
+            fallbackAudio.onended = () => {
+              console.log('TTS: blob audio ended');
+              setIsPlaying(false);
+              playbackModeRef.current = null;
+              URL.revokeObjectURL(blobUrl);
+            };
             fallbackAudio.onerror = () => {
               console.error('TTS: blob fallback audio error', fallbackAudio.error);
               setIsPlaying(false);
@@ -129,23 +170,76 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
               // Try Web Speech as final fallback
               startWebSpeech(ttsText);
             };
+            
             await fallbackAudio.play();
+            setIsLoading(false);
             return;
           } catch (e) {
             console.error('TTS: Blob fallback failed', e);
-            startWebSpeech(ttsText);
+            await startWebSpeech(ttsText);
+            setIsLoading(false);
           }
         } else {
-          startWebSpeech(ttsText);
+          await startWebSpeech(ttsText);
+          setIsLoading(false);
         }
       };
-      await audio.play();
+
+      // Attempt initial playback
+      try {
+        console.log('TTS: attempting initial playback');
+        await audio.play();
+        console.log('TTS: initial playback started successfully');
+        setIsLoading(false);
+      } catch (playError) {
+        console.error('TTS: initial play failed', playError);
+        setIsPlaying(false);
+        
+        // Don't rely on onerror for play failures, handle directly
+        if (!triedFallbackRef.current && data?.audioContent) {
+          triedFallbackRef.current = true;
+          try {
+            console.log('TTS: play failed, trying Blob approach');
+            const binary = atob(data.audioContent);
+            const len = binary.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+            const blob = new Blob([bytes], { type: mime });
+            const blobUrl = URL.createObjectURL(blob);
+            const fallbackAudio = new Audio(blobUrl);
+            audioRef.current = fallbackAudio;
+            playbackModeRef.current = 'audio';
+            
+            fallbackAudio.onplay = () => setIsPlaying(true);
+            fallbackAudio.onpause = () => !fallbackAudio.ended && setIsPlaying(false);
+            fallbackAudio.onended = () => {
+              setIsPlaying(false);
+              playbackModeRef.current = null;
+              URL.revokeObjectURL(blobUrl);
+            };
+            fallbackAudio.onerror = () => {
+              setIsPlaying(false);
+              URL.revokeObjectURL(blobUrl);
+              startWebSpeech(ttsText);
+            };
+            
+            await fallbackAudio.play();
+            setIsLoading(false);
+          } catch (e) {
+            console.error('TTS: Blob approach failed', e);
+            await startWebSpeech(ttsText);
+            setIsLoading(false);
+          }
+        } else {
+          await startWebSpeech(ttsText);
+          setIsLoading(false);
+        }
+      }
     } catch (error) {
-      console.error('Error generating speech:', error);
-      // Try Web Speech as fallback
-      startWebSpeech(ttsText);
-    } finally {
+      console.error('TTS: Error generating speech', error);
       setIsLoading(false);
+      // Try Web Speech as fallback
+      await startWebSpeech(ttsText);
     }
   };
 
@@ -156,6 +250,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
         description: "Your browser doesn't support text-to-speech.",
         variant: "destructive",
       });
+      setIsLoading(false);
       return;
     }
 
@@ -164,6 +259,12 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
       description: "Cloud TTS unavailable. Using your device's voice.",
     });
 
+    // Clear any existing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    
     playbackModeRef.current = 'web-speech';
     
     // Clear any stuck speech
@@ -278,13 +379,22 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
 
   useEffect(() => {
     return () => {
+      // Clean up audio
       if (audioRef.current) {
-        try { audioRef.current.pause(); } catch {}
+        try {
+          audioRef.current.pause();
+          audioRef.current.src = '';
+        } catch {}
         audioRef.current = null;
       }
+      
+      // Clean up speech synthesis
       if (playbackModeRef.current === 'web-speech') {
         window.speechSynthesis?.cancel();
       }
+      
+      // Reset state
+      playbackModeRef.current = null;
     };
   }, []);
 
