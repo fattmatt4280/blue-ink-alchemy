@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator, SelectLabel } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, SelectSeparator, SelectLabel } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Volume2, RotateCcw } from "lucide-react";
@@ -233,36 +233,42 @@ export const TTSSettingsEditor = () => {
             <SelectTrigger id="voice">
               <SelectValue placeholder="Auto-select (default)" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Auto-select (default)</SelectItem>
-              <SelectSeparator />
-              <SelectLabel>Male Voices</SelectLabel>
-              {availableVoices
-                .filter(v => v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
-                .map(voice => (
-                  <SelectItem key={voice.name} value={voice.name}>
-                    {voice.name} ({voice.lang})
-                  </SelectItem>
-                ))}
-              <SelectSeparator />
-              <SelectLabel>Female Voices</SelectLabel>
-              {availableVoices
-                .filter(v => v.name.toLowerCase().includes('female'))
-                .map(voice => (
-                  <SelectItem key={voice.name} value={voice.name}>
-                    {voice.name} ({voice.lang})
-                  </SelectItem>
-                ))}
-              <SelectSeparator />
-              <SelectLabel>Other Voices</SelectLabel>
-              {availableVoices
-                .filter(v => !v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
-                .map(voice => (
-                  <SelectItem key={voice.name} value={voice.name}>
-                    {voice.name} ({voice.lang})
-                  </SelectItem>
-                ))}
-            </SelectContent>
+        <SelectContent>
+          <SelectItem value="">Auto-select (default)</SelectItem>
+          <SelectSeparator />
+          <SelectGroup>
+            <SelectLabel>Male Voices</SelectLabel>
+            {availableVoices
+              .filter(v => v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
+              .map(voice => (
+                <SelectItem key={voice.name} value={voice.name}>
+                  {voice.name} ({voice.lang})
+                </SelectItem>
+              ))}
+          </SelectGroup>
+          <SelectSeparator />
+          <SelectGroup>
+            <SelectLabel>Female Voices</SelectLabel>
+            {availableVoices
+              .filter(v => v.name.toLowerCase().includes('female'))
+              .map(voice => (
+                <SelectItem key={voice.name} value={voice.name}>
+                  {voice.name} ({voice.lang})
+                </SelectItem>
+              ))}
+          </SelectGroup>
+          <SelectSeparator />
+          <SelectGroup>
+            <SelectLabel>Other Voices</SelectLabel>
+            {availableVoices
+              .filter(v => !v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
+              .map(voice => (
+                <SelectItem key={voice.name} value={voice.name}>
+                  {voice.name} ({voice.lang})
+                </SelectItem>
+              ))}
+          </SelectGroup>
+        </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
             Select a specific voice or leave as auto-select to use browser default
