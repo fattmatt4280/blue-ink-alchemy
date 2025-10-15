@@ -262,7 +262,20 @@ const HealingHistory = () => {
                           <div className="flex items-center justify-between gap-4">
                             <CardTitle className="text-base">Analysis Summary</CardTitle>
                             <TextToSpeechButton 
-                              text={entries[0].analysis_result.summary} 
+                              text={(() => {
+                                const entry = entries[0];
+                                return [
+                                  entry.analysis_result?.personalGreeting,
+                                  entry.analysis_result?.tattooDescription,
+                                  entry.analysis_result?.summary,
+                                  entry.analysis_result?.visualAssessment?.colorAssessment && `Color Assessment: ${entry.analysis_result.visualAssessment.colorAssessment}`,
+                                  entry.analysis_result?.visualAssessment?.textureAssessment && `Texture Assessment: ${entry.analysis_result.visualAssessment.textureAssessment}`,
+                                  entry.analysis_result?.visualAssessment?.overallCondition && `Overall Condition: ${entry.analysis_result.visualAssessment.overallCondition}`,
+                                  entry.recommendations?.length > 0 && `Recommendations: ${entry.recommendations.join('. ')}`,
+                                  entry.analysis_result?.riskFactorsWithEvidence?.length > 0 && `Important Medical Information: ${entry.analysis_result.riskFactorsWithEvidence.map((r: any) => r.concern).join('. ')}`,
+                                  entry.analysis_result?.productRecommendations?.length > 0 && `Product Recommendations: ${entry.analysis_result.productRecommendations.join('. ')}`
+                                ].filter(Boolean).join('. ');
+                              })()} 
                             />
                           </div>
                         </CardHeader>

@@ -24,7 +24,7 @@ serve(async (req) => {
       throw new Error('ElevenLabs API key not configured');
     }
 
-    const MAX = 1500;
+    const MAX = 5000;
     const originalLength = text.length;
     const safeText = text.slice(0, MAX);
     const truncated = originalLength > MAX;

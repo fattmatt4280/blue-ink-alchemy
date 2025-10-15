@@ -37,7 +37,7 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
     // Generate new audio
     setIsLoading(true);
     try {
-      const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 1200);
+      const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 4000);
       console.log('TTS: invoking generate-tts', { length: ttsText.length });
       const { data, error } = await supabase.functions.invoke('generate-tts', {
         body: { text: ttsText },
