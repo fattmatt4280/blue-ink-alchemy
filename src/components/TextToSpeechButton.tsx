@@ -18,6 +18,27 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
   const playbackModeRef = useRef<'audio' | 'web-speech' | null>(null);
   const { toast } = useToast();
 
+  const ensureVoices = (): Promise<SpeechSynthesisVoice[]> => {
+    return new Promise((resolve) => {
+      let voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        resolve(voices);
+        return;
+      }
+      
+      const timeout = setTimeout(() => {
+        voices = window.speechSynthesis.getVoices();
+        resolve(voices);
+      }, 2000);
+
+      window.speechSynthesis.onvoiceschanged = () => {
+        clearTimeout(timeout);
+        voices = window.speechSynthesis.getVoices();
+        resolve(voices);
+      };
+    });
+  };
+
   const handlePlayPause = async () => {
     // If already playing, pause/cancel based on mode
     if (isPlaying) {
@@ -50,7 +71,15 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
         body: { text: ttsText },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('TTS: cloud error', error);
+        toast({
+          title: "Cloud TTS Error",
+          description: error.message || "Failed to generate speech",
+          variant: "destructive",
+        });
+        throw error;
+      }
       console.log('TTS: function response', { truncated: data?.truncated, mime: data?.mimeType, b64len: data?.audioContent?.length });
 
       if (data?.truncated) {
@@ -120,7 +149,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
     }
   };
 
-  const startWebSpeech = (textToSpeak: string) => {
+  const startWebSpeech = async (textToSpeak: string) => {
     if (!window.speechSynthesis) {
       toast({
         title: "Text-to-Speech Unavailable",
@@ -132,30 +161,77 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
 
     toast({
       title: "Using Device Voice",
-      description: "Cloud TTS unavailable. Falling back to your device's voice.",
+      description: "Cloud TTS unavailable. Using your device's voice.",
     });
 
     playbackModeRef.current = 'web-speech';
     
-    // Split into sentences for better chunking
+    // Clear any stuck speech
+    window.speechSynthesis.cancel();
+
+    // Wait for voices to load
+    const voices = await ensureVoices();
+    if (voices.length === 0) {
+      toast({
+        title: "No Voices Available",
+        description: "Device voice not available. Please check your system settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Select appropriate voice
+    const lang = navigator.language || 'en-US';
+    let selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0])) || voices[0];
+
+    // Split into sentences, then break long ones into smaller chunks
     const sentences = textToSpeak.match(/[^.!?]+[.!?]+/g) || [textToSpeak];
+    const chunks: string[] = [];
+    
+    sentences.forEach(sentence => {
+      const trimmed = sentence.trim();
+      if (trimmed.length <= 300) {
+        chunks.push(trimmed);
+      } else {
+        // Break long sentences into ~200 char chunks
+        const words = trimmed.split(' ');
+        let currentChunk = '';
+        words.forEach(word => {
+          if ((currentChunk + ' ' + word).length > 200 && currentChunk) {
+            chunks.push(currentChunk.trim());
+            currentChunk = word;
+          } else {
+            currentChunk += (currentChunk ? ' ' : '') + word;
+          }
+        });
+        if (currentChunk) chunks.push(currentChunk.trim());
+      }
+    });
+
     let currentIndex = 0;
+    let hasStarted = false;
 
     const speakNext = () => {
-      if (currentIndex >= sentences.length) {
+      if (currentIndex >= chunks.length) {
         setIsPlaying(false);
         return;
       }
 
-      const utterance = new SpeechSynthesisUtterance(sentences[currentIndex].trim());
+      const utterance = new SpeechSynthesisUtterance(chunks[currentIndex]);
+      utterance.voice = selectedVoice;
+      utterance.lang = lang;
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
       
       utterance.onstart = () => {
+        hasStarted = true;
         setIsPlaying(true);
       };
 
       utterance.onend = () => {
         currentIndex++;
-        if (currentIndex < sentences.length) {
+        if (currentIndex < chunks.length) {
           speakNext();
         } else {
           setIsPlaying(false);
@@ -167,12 +243,34 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
         setIsPlaying(false);
         toast({
           title: "Speech Error",
-          description: "An error occurred during playback.",
+          description: "Playback failed. Check device volume and silent mode.",
           variant: "destructive",
         });
       };
 
       window.speechSynthesis.speak(utterance);
+
+      // iOS/Safari watchdog: if speech doesn't start, try resume
+      if (currentIndex === 0) {
+        setTimeout(() => {
+          if (!hasStarted && playbackModeRef.current === 'web-speech') {
+            console.log('TTS: watchdog triggering resume');
+            window.speechSynthesis.resume();
+            
+            // Final check
+            setTimeout(() => {
+              if (!hasStarted && playbackModeRef.current === 'web-speech') {
+                setIsPlaying(false);
+                toast({
+                  title: "Speech Not Starting",
+                  description: "Please check Silent mode and media volume, then retry.",
+                  variant: "destructive",
+                });
+              }
+            }, 1000);
+          }
+        }, 800);
+      }
     };
 
     speakNext();
