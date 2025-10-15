@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator, SelectLabel } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Volume2, RotateCcw } from "lucide-react";
@@ -12,6 +13,8 @@ export const TTSSettingsEditor = () => {
   const [rate, setRate] = useState(0.92);
   const [pitch, setPitch] = useState(1.0);
   const [volume, setVolume] = useState(1.0);
+  const [selectedVoice, setSelectedVoice] = useState<string>("");
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [sampleText, setSampleText] = useState("This is a test of the text to speech settings. Adjust the rate, pitch, and volume to your preference.");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -20,13 +23,28 @@ export const TTSSettingsEditor = () => {
 
   useEffect(() => {
     fetchSettings();
+    
+    // Load available voices
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setAvailableVoices(voices);
+      }
+    };
+
+    loadVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+    };
   }, []);
 
   const fetchSettings = async () => {
     try {
       const { data, error } = await supabase
         .from('tts_settings')
-        .select('rate, pitch, volume')
+        .select('rate, pitch, volume, voice_name')
         .order('updated_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -37,6 +55,7 @@ export const TTSSettingsEditor = () => {
         setRate(Number(data.rate));
         setPitch(Number(data.pitch));
         setVolume(Number(data.volume));
+        setSelectedVoice(data.voice_name || "");
       }
     } catch (error) {
       console.error('Error fetching TTS settings:', error);
@@ -59,6 +78,7 @@ export const TTSSettingsEditor = () => {
           rate,
           pitch,
           volume,
+          voice_name: selectedVoice || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', (await supabase.from('tts_settings').select('id').order('updated_at', { ascending: false }).limit(1).single()).data?.id);
@@ -85,6 +105,7 @@ export const TTSSettingsEditor = () => {
     setRate(0.92);
     setPitch(1.0);
     setVolume(1.0);
+    setSelectedVoice("");
     toast({
       title: "Reset to defaults",
       description: "Don't forget to save the changes",
@@ -108,6 +129,13 @@ export const TTSSettingsEditor = () => {
     utterance.rate = rate;
     utterance.pitch = pitch;
     utterance.volume = volume;
+
+    if (selectedVoice) {
+      const voice = availableVoices.find(v => v.name === selectedVoice);
+      if (voice) {
+        utterance.voice = voice;
+      }
+    }
 
     utterance.onend = () => setIsTesting(false);
     utterance.onerror = () => {
@@ -195,6 +223,49 @@ export const TTSSettingsEditor = () => {
           />
           <p className="text-xs text-muted-foreground">
             0% to 100% • Recommended: 100%
+          </p>
+        </div>
+
+        {/* Voice Selector */}
+        <div className="space-y-2">
+          <Label htmlFor="voice">Preferred Voice</Label>
+          <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+            <SelectTrigger id="voice">
+              <SelectValue placeholder="Auto-select (default)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Auto-select (default)</SelectItem>
+              <SelectSeparator />
+              <SelectLabel>Male Voices</SelectLabel>
+              {availableVoices
+                .filter(v => v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
+                .map(voice => (
+                  <SelectItem key={voice.name} value={voice.name}>
+                    {voice.name} ({voice.lang})
+                  </SelectItem>
+                ))}
+              <SelectSeparator />
+              <SelectLabel>Female Voices</SelectLabel>
+              {availableVoices
+                .filter(v => v.name.toLowerCase().includes('female'))
+                .map(voice => (
+                  <SelectItem key={voice.name} value={voice.name}>
+                    {voice.name} ({voice.lang})
+                  </SelectItem>
+                ))}
+              <SelectSeparator />
+              <SelectLabel>Other Voices</SelectLabel>
+              {availableVoices
+                .filter(v => !v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female'))
+                .map(voice => (
+                  <SelectItem key={voice.name} value={voice.name}>
+                    {voice.name} ({voice.lang})
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Select a specific voice or leave as auto-select to use browser default
           </p>
         </div>
 

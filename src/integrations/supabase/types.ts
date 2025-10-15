@@ -1915,6 +1915,7 @@ export type Database = {
           rate: number
           updated_at: string
           updated_by: string | null
+          voice_name: string | null
           volume: number
         }
         Insert: {
@@ -1923,6 +1924,7 @@ export type Database = {
           rate?: number
           updated_at?: string
           updated_by?: string | null
+          voice_name?: string | null
           volume?: number
         }
         Update: {
@@ -1931,6 +1933,7 @@ export type Database = {
           rate?: number
           updated_at?: string
           updated_by?: string | null
+          voice_name?: string | null
           volume?: number
         }
         Relationships: []

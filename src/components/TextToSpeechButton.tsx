@@ -13,14 +13,14 @@ interface TextToSpeechButtonProps {
 export const TextToSpeechButton = ({ text, className, label = "Listen to Summary" }: TextToSpeechButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [ttsSettings, setTtsSettings] = useState({ rate: 0.92, pitch: 1.0, volume: 1.0 });
+  const [ttsSettings, setTtsSettings] = useState({ rate: 0.92, pitch: 1.0, volume: 1.0, voice_name: null as string | null });
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchTTSSettings = async () => {
       const { data } = await supabase
         .from('tts_settings')
-        .select('rate, pitch, volume')
+        .select('rate, pitch, volume, voice_name')
         .order('updated_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -30,6 +30,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
           rate: Number(data.rate),
           pitch: Number(data.pitch),
           volume: Number(data.volume),
+          voice_name: data.voice_name,
         });
       }
     };
@@ -103,7 +104,17 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
 
     // Select appropriate voice
     const lang = navigator.language || 'en-US';
-    let selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0])) || voices[0];
+    let selectedVoice: SpeechSynthesisVoice | undefined;
+    
+    // If admin has selected a specific voice, use it
+    if (ttsSettings.voice_name) {
+      selectedVoice = voices.find(v => v.name === ttsSettings.voice_name);
+    }
+    
+    // Fallback to auto-selection if no admin preference or voice not found
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v => v.lang.startsWith(lang.split('-')[0])) || voices[0];
+    }
 
     // Split into sentences, then break long ones into smaller chunks
     const sentences = textToSpeak.match(/[^.!?]+[.!?]+/g) || [textToSpeak];
