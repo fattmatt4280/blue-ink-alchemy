@@ -13,7 +13,7 @@ export const TTSSettingsEditor = () => {
   const [rate, setRate] = useState(0.92);
   const [pitch, setPitch] = useState(1.0);
   const [volume, setVolume] = useState(1.0);
-  const [selectedVoice, setSelectedVoice] = useState<string>("");
+  const [selectedVoice, setSelectedVoice] = useState<string>("auto");
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [sampleText, setSampleText] = useState("This is a test of the text to speech settings. Adjust the rate, pitch, and volume to your preference.");
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +78,7 @@ export const TTSSettingsEditor = () => {
         setRate(Number(data.rate));
         setPitch(Number(data.pitch));
         setVolume(Number(data.volume));
-        setSelectedVoice(data.voice_name || "");
+        setSelectedVoice(data.voice_name || "auto");
       }
     } catch (error) {
       console.error('Error fetching TTS settings:', error);
@@ -105,6 +105,8 @@ export const TTSSettingsEditor = () => {
 
       if (fetchError) throw fetchError;
 
+      const voiceToSave = selectedVoice === "auto" ? null : selectedVoice;
+
       if (!latest?.id) {
         // Insert new row if none exists
         const { error: insertError } = await supabase
@@ -113,7 +115,7 @@ export const TTSSettingsEditor = () => {
             rate,
             pitch,
             volume,
-            voice_name: selectedVoice || null,
+            voice_name: voiceToSave,
             updated_at: new Date().toISOString(),
           }]);
 
@@ -126,7 +128,7 @@ export const TTSSettingsEditor = () => {
             rate,
             pitch,
             volume,
-            voice_name: selectedVoice || null,
+            voice_name: voiceToSave,
             updated_at: new Date().toISOString(),
           })
           .eq('id', latest.id);
@@ -154,7 +156,7 @@ export const TTSSettingsEditor = () => {
     setRate(0.92);
     setPitch(1.0);
     setVolume(1.0);
-    setSelectedVoice("");
+    setSelectedVoice("auto");
     toast({
       title: "Reset to defaults",
       description: "Don't forget to save the changes",
@@ -179,7 +181,7 @@ export const TTSSettingsEditor = () => {
     utterance.pitch = pitch;
     utterance.volume = volume;
 
-    if (selectedVoice) {
+    if (selectedVoice !== "auto") {
       const voice = availableVoices.find(v => v.name === selectedVoice);
       if (voice) {
         utterance.voice = voice;
@@ -284,7 +286,7 @@ export const TTSSettingsEditor = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="">Auto-select (default)</SelectItem>
+                <SelectItem value="auto">Auto-select (default)</SelectItem>
               </SelectGroup>
               <SelectSeparator />
               <SelectGroup>
