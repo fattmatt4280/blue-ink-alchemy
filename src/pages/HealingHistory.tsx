@@ -276,6 +276,7 @@ const HealingHistory = () => {
                                   entry.analysis_result?.productRecommendations?.length > 0 && `Product Recommendations: ${entry.analysis_result.productRecommendations.join('. ')}`
                                 ].filter(Boolean).join('. ');
                               })()} 
+                              label="Listen to Full Analysis"
                             />
                           </div>
                         </CardHeader>

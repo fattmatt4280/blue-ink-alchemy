@@ -7,19 +7,25 @@ import { useToast } from "@/hooks/use-toast";
 interface TextToSpeechButtonProps {
   text: string;
   className?: string;
+  label?: string;
 }
 
-export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps) => {
+export const TextToSpeechButton = ({ text, className, label = "Listen to Summary" }: TextToSpeechButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const triedFallbackRef = useRef(false);
+  const playbackModeRef = useRef<'audio' | 'web-speech' | null>(null);
   const { toast } = useToast();
 
   const handlePlayPause = async () => {
-    // If already playing, pause
-    if (isPlaying && audioRef.current) {
-      audioRef.current.pause();
+    // If already playing, pause/cancel based on mode
+    if (isPlaying) {
+      if (playbackModeRef.current === 'audio' && audioRef.current) {
+        audioRef.current.pause();
+      } else if (playbackModeRef.current === 'web-speech') {
+        window.speechSynthesis.cancel();
+      }
       setIsPlaying(false);
       return;
     }
@@ -36,8 +42,9 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
 
     // Generate new audio
     setIsLoading(true);
+    const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 4000);
+    
     try {
-      const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 4000);
       console.log('TTS: invoking generate-tts', { length: ttsText.length });
       const { data, error } = await supabase.functions.invoke('generate-tts', {
         body: { text: ttsText },
@@ -63,6 +70,7 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
       const audio = new Audio(audioSrc);
       audioRef.current = audio;
 
+      playbackModeRef.current = 'audio';
       audio.onplay = () => setIsPlaying(true);
       audio.onpause = () => setIsPlaying(false);
       audio.onended = () => setIsPlaying(false);
@@ -81,6 +89,7 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
             const blobUrl = URL.createObjectURL(blob);
             const fallbackAudio = new Audio(blobUrl);
             audioRef.current = fallbackAudio;
+            playbackModeRef.current = 'audio';
             fallbackAudio.onplay = () => setIsPlaying(true);
             fallbackAudio.onpause = () => setIsPlaying(false);
             fallbackAudio.onended = () => { setIsPlaying(false); URL.revokeObjectURL(blobUrl); };
@@ -88,35 +97,85 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
               console.error('TTS: blob fallback audio error', fallbackAudio.error);
               setIsPlaying(false);
               URL.revokeObjectURL(blobUrl);
-              toast({
-                title: 'Playback error',
-                description: 'Audio couldn\'t be played. Please try again.',
-                variant: 'destructive',
-              });
+              // Try Web Speech as final fallback
+              startWebSpeech(ttsText);
             };
             await fallbackAudio.play();
             return;
           } catch (e) {
             console.error('TTS: Blob fallback failed', e);
+            startWebSpeech(ttsText);
           }
+        } else {
+          startWebSpeech(ttsText);
         }
-        toast({
-          title: 'Playback error',
-          description: "Audio couldn't be played. Please try again.",
-          variant: 'destructive',
-        });
       };
       await audio.play();
     } catch (error) {
       console.error('Error generating speech:', error);
-      toast({
-        title: "Speech Generation Failed",
-        description: (error as any)?.message || "Unable to generate audio. Please try again.",
-        variant: "destructive",
-      });
+      // Try Web Speech as fallback
+      startWebSpeech(ttsText);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const startWebSpeech = (textToSpeak: string) => {
+    if (!window.speechSynthesis) {
+      toast({
+        title: "Text-to-Speech Unavailable",
+        description: "Your browser doesn't support text-to-speech.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Using Device Voice",
+      description: "Cloud TTS unavailable. Falling back to your device's voice.",
+    });
+
+    playbackModeRef.current = 'web-speech';
+    
+    // Split into sentences for better chunking
+    const sentences = textToSpeak.match(/[^.!?]+[.!?]+/g) || [textToSpeak];
+    let currentIndex = 0;
+
+    const speakNext = () => {
+      if (currentIndex >= sentences.length) {
+        setIsPlaying(false);
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(sentences[currentIndex].trim());
+      
+      utterance.onstart = () => {
+        setIsPlaying(true);
+      };
+
+      utterance.onend = () => {
+        currentIndex++;
+        if (currentIndex < sentences.length) {
+          speakNext();
+        } else {
+          setIsPlaying(false);
+        }
+      };
+
+      utterance.onerror = (event) => {
+        console.error('Web Speech error:', event);
+        setIsPlaying(false);
+        toast({
+          title: "Speech Error",
+          description: "An error occurred during playback.",
+          variant: "destructive",
+        });
+      };
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    speakNext();
   };
 
   useEffect(() => {
@@ -124,6 +183,9 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
       if (audioRef.current) {
         try { audioRef.current.pause(); } catch {}
         audioRef.current = null;
+      }
+      if (playbackModeRef.current === 'web-speech') {
+        window.speechSynthesis?.cancel();
       }
     };
   }, []);
@@ -149,7 +211,7 @@ export const TextToSpeechButton = ({ text, className }: TextToSpeechButtonProps)
       ) : (
         <>
           <Volume2 className="h-4 w-4 mr-2" />
-          Listen to Summary
+          {label}
         </>
       )}
     </Button>
