@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface TextToSpeechButtonProps {
@@ -13,9 +12,6 @@ interface TextToSpeechButtonProps {
 export const TextToSpeechButton = ({ text, className, label = "Listen to Summary" }: TextToSpeechButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const triedFallbackRef = useRef(false);
-  const playbackModeRef = useRef<'audio' | 'web-speech' | null>(null);
   const { toast } = useToast();
 
   const isIOS = () => {
@@ -47,205 +43,15 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
   const handlePlayPause = async () => {
     // PAUSE: Handle if currently playing
     if (isPlaying) {
-      if (playbackModeRef.current === 'audio' && audioRef.current) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else if (playbackModeRef.current === 'web-speech') {
-        window.speechSynthesis.cancel();
-        setIsPlaying(false);
-      }
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
       return;
     }
 
-    // RESUME: If audio exists and is paused (not ended), resume from current position
-    if (audioRef.current && playbackModeRef.current === 'audio' && !audioRef.current.ended) {
-      try {
-        console.log('TTS: resuming playback');
-        await audioRef.current.play();
-        // isPlaying will be set by onplay listener
-      } catch (error) {
-        console.error('TTS: resume failed', error);
-        setIsPlaying(false);
-      }
-      return;
-    }
-
-    // GENERATE NEW: No existing audio or audio has ended
+    // PLAY: Start Web Speech
     setIsLoading(true);
-    triedFallbackRef.current = false; // Reset fallback flag for new generation
     const ttsText = (text || "").replace(/\s+/g, " ").trim().slice(0, 4000);
-    
-    try {
-      console.log('TTS: invoking generate-tts', { length: ttsText.length });
-      const { data, error } = await supabase.functions.invoke('generate-tts', {
-        body: { text: ttsText },
-      });
-
-      if (error) {
-        console.error('TTS: cloud error', error);
-        setIsLoading(false);
-        toast({
-          title: "Cloud TTS Error",
-          description: error.message || "Failed to generate speech",
-          variant: "destructive",
-        });
-        throw error;
-      }
-      console.log('TTS: function response', { truncated: data?.truncated, mime: data?.mimeType, b64len: data?.audioContent?.length });
-
-      if (data?.truncated) {
-        toast({
-          title: "Long summary truncated",
-          description: "We trimmed the text to ensure reliable playback.",
-        });
-      }
-
-      if (!data?.audioContent) {
-        throw new Error('No audio content received');
-      }
-
-      // Create audio using a data URL for reliability across browsers
-      const mime = data.mimeType || 'audio/mpeg';
-      const audioSrc = `data:${mime};base64,${data.audioContent}`;
-      const audio = new Audio(audioSrc);
-      audioRef.current = audio;
-
-      playbackModeRef.current = 'audio';
-      
-      // Set up event listeners with proper state management
-      audio.onplay = () => {
-        console.log('TTS: audio playing');
-        setIsPlaying(true);
-      };
-
-      audio.onpause = () => {
-        console.log('TTS: audio paused');
-        // Only set to false if not ended (ended has its own handler)
-        if (!audio.ended) {
-          setIsPlaying(false);
-        }
-      };
-
-      audio.onended = () => {
-        console.log('TTS: audio ended');
-        setIsPlaying(false);
-        playbackModeRef.current = null; // Clear mode so next click regenerates
-      };
-
-      audio.onerror = async (e) => {
-        console.error('TTS: audio element error', audio.error, e);
-        setIsPlaying(false);
-        setIsLoading(false);
-        
-        // Only try fallback once
-        if (!triedFallbackRef.current && data?.audioContent) {
-          triedFallbackRef.current = true;
-          try {
-            console.log('TTS: attempting Blob fallback');
-            const binary = atob(data.audioContent);
-            const len = binary.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-            const blob = new Blob([bytes], { type: mime });
-            const blobUrl = URL.createObjectURL(blob);
-            const fallbackAudio = new Audio(blobUrl);
-            audioRef.current = fallbackAudio;
-            playbackModeRef.current = 'audio';
-            
-            fallbackAudio.onplay = () => {
-              console.log('TTS: blob audio playing');
-              setIsPlaying(true);
-            };
-            fallbackAudio.onpause = () => {
-              console.log('TTS: blob audio paused');
-              if (!fallbackAudio.ended) {
-                setIsPlaying(false);
-              }
-            };
-            fallbackAudio.onended = () => {
-              console.log('TTS: blob audio ended');
-              setIsPlaying(false);
-              playbackModeRef.current = null;
-              URL.revokeObjectURL(blobUrl);
-            };
-            fallbackAudio.onerror = () => {
-              console.error('TTS: blob fallback audio error', fallbackAudio.error);
-              setIsPlaying(false);
-              URL.revokeObjectURL(blobUrl);
-              // Try Web Speech as final fallback
-              startWebSpeech(ttsText);
-            };
-            
-            await fallbackAudio.play();
-            setIsLoading(false);
-            return;
-          } catch (e) {
-            console.error('TTS: Blob fallback failed', e);
-            await startWebSpeech(ttsText);
-            setIsLoading(false);
-          }
-        } else {
-          await startWebSpeech(ttsText);
-          setIsLoading(false);
-        }
-      };
-
-      // Attempt initial playback
-      try {
-        console.log('TTS: attempting initial playback');
-        await audio.play();
-        console.log('TTS: initial playback started successfully');
-        setIsLoading(false);
-      } catch (playError) {
-        console.error('TTS: initial play failed', playError);
-        setIsPlaying(false);
-        
-        // Don't rely on onerror for play failures, handle directly
-        if (!triedFallbackRef.current && data?.audioContent) {
-          triedFallbackRef.current = true;
-          try {
-            console.log('TTS: play failed, trying Blob approach');
-            const binary = atob(data.audioContent);
-            const len = binary.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-            const blob = new Blob([bytes], { type: mime });
-            const blobUrl = URL.createObjectURL(blob);
-            const fallbackAudio = new Audio(blobUrl);
-            audioRef.current = fallbackAudio;
-            playbackModeRef.current = 'audio';
-            
-            fallbackAudio.onplay = () => setIsPlaying(true);
-            fallbackAudio.onpause = () => !fallbackAudio.ended && setIsPlaying(false);
-            fallbackAudio.onended = () => {
-              setIsPlaying(false);
-              playbackModeRef.current = null;
-              URL.revokeObjectURL(blobUrl);
-            };
-            fallbackAudio.onerror = () => {
-              setIsPlaying(false);
-              URL.revokeObjectURL(blobUrl);
-              startWebSpeech(ttsText);
-            };
-            
-            await fallbackAudio.play();
-            setIsLoading(false);
-          } catch (e) {
-            console.error('TTS: Blob approach failed', e);
-            await startWebSpeech(ttsText);
-            setIsLoading(false);
-          }
-        } else {
-          await startWebSpeech(ttsText);
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      console.error('TTS: Error generating speech', error);
-      setIsLoading(false);
-      // Try Web Speech as fallback
-      await startWebSpeech(ttsText);
-    }
+    await startWebSpeech(ttsText);
   };
 
   const startWebSpeech = async (textToSpeak: string) => {
@@ -258,19 +64,6 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
       setIsLoading(false);
       return;
     }
-
-    toast({
-      title: "Using Device Voice",
-      description: "Cloud TTS unavailable. Using your device's voice.",
-    });
-
-    // Clear any existing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    
-    playbackModeRef.current = 'web-speech';
     
     // Clear any stuck speech
     window.speechSynthesis.cancel();
@@ -363,7 +156,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
         const finalCheckDelay = isIOS() ? 2000 : 1000;
         
         setTimeout(() => {
-          if (!hasStarted && playbackModeRef.current === 'web-speech') {
+          if (!hasStarted) {
             console.log('TTS: watchdog triggering resume');
             window.speechSynthesis.resume();
             
@@ -372,10 +165,7 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
               const isSpeaking = window.speechSynthesis.speaking;
               const isPending = window.speechSynthesis.pending;
               
-              if (!hasStarted && 
-                  playbackModeRef.current === 'web-speech' &&
-                  !isSpeaking && 
-                  !isPending) {
+              if (!hasStarted && !isSpeaking && !isPending) {
                 setIsPlaying(false);
                 setIsLoading(false);
                 toast({
@@ -403,22 +193,8 @@ export const TextToSpeechButton = ({ text, className, label = "Listen to Summary
 
   useEffect(() => {
     return () => {
-      // Clean up audio
-      if (audioRef.current) {
-        try {
-          audioRef.current.pause();
-          audioRef.current.src = '';
-        } catch {}
-        audioRef.current = null;
-      }
-      
       // Clean up speech synthesis
-      if (playbackModeRef.current === 'web-speech') {
-        window.speechSynthesis?.cancel();
-      }
-      
-      // Reset state
-      playbackModeRef.current = null;
+      window.speechSynthesis?.cancel();
     };
   }, []);
 
