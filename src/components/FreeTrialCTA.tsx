@@ -96,7 +96,7 @@ export const FreeTrialCTA = () => {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4 animate-fade-in">
               <Sparkles className="h-4 w-4" />
-              <span className="text-sm font-semibold">Limited Time Offer</span>
+              <span className="text-sm font-semibold text-gray-900">Limited Time Offer</span>
             </div>
             
             <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-blue-400">
