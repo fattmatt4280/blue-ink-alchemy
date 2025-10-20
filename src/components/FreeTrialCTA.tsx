@@ -119,7 +119,7 @@ export const FreeTrialCTA = () => {
                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center mt-0.5">
                   <Check className="h-4 w-4 text-primary" />
                 </div>
-                <p className="text-sm">{benefit}</p>
+                <p className="text-sm text-gray-900">{benefit}</p>
               </div>
             ))}
           </div>
