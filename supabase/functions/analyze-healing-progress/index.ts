@@ -40,7 +40,25 @@ serve(async (req) => {
 
     const userId = user.id; // Use verified user ID from JWT, not client-supplied
 
-    const { imageUrls, primaryImageUrl, tattooAge, cleanedWithAlcohol, coveringType, aftercareProducts, allergies, hotToTouch, feverSymptoms, sensitiveToTouch, hasTenderness, visibleRashes, rashDescription, previousAnalyses } = await req.json();
+    const { 
+      imageUrls, 
+      primaryImageUrl, 
+      tattooAge, 
+      cleanedWithAlcohol, 
+      coveringType, 
+      aftercareProducts, 
+      allergies, 
+      hotToTouch, 
+      feverSymptoms, 
+      sensitiveToTouch, 
+      hasTenderness, 
+      visibleRashes, 
+      rashDescription, 
+      previousAnalyses,
+      urgencyMode = 'progress', // 'progress' | 'concerns' | 'urgent'
+      userName = 'there',
+      symptoms = {} // New simplified symptoms object
+    } = await req.json();
     
     // RATE LIMITING - Per User (10/hour, 50/day)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -296,10 +314,20 @@ Based on this history, provide continuity of care and reference any improvements
       });
     }
 
+    // Determine urgency mode context
+    const urgencyContext = urgencyMode === 'progress' 
+      ? 'BRIEF PROGRESS CHECK: User is doing routine tracking. Provide a concise assessment. If ANY concerning signs are detected, flag for detailed follow-up.'
+      : urgencyMode === 'concerns'
+      ? 'USER HAS CONCERNS: Provide thorough analysis addressing their specific worries with medical context and reassurance.'
+      : 'URGENT ASSESSMENT: User needs immediate guidance. Prioritize identifying any issues requiring medical attention.';
+
     const systemPrompt = `You are Charlie, the AI tattoo healing assistant for Heal-AId by Blue Dream Budder. You're a warm, knowledgeable aftercare specialist with deep expertise in tattoo healing and 25 years of professional experience to draw from. Your PRIMARY responsibility is to identify potential infections and complications early while providing warm, personalized care.
 
+URGENCY MODE: ${urgencyMode.toUpperCase()}
+${urgencyContext}
+
 PERSONALIZATION REQUIREMENTS:
-1. ALWAYS address the client by their first name (${userFirstName}) warmly and professionally - use their email as fallback ONLY if no name is available
+1. ALWAYS address the client by their first name (${userName}) warmly and professionally
 2. Start your analysis by thoroughly describing what the tattoo itself depicts and its artistic characteristics
 3. Reference their previous check-ins if available - note improvements, consistency, or new concerns with specific comparisons
 4. Use warm, conversational yet professional language - make them feel personally cared for
