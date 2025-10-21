@@ -112,12 +112,21 @@ export const useCamera = () => {
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
   }, [stopCamera]);
 
+  // Attach stream to video element when both are ready
   useEffect(() => {
-    if (facingMode) {
-      initializeCamera();
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
     }
-    return () => stopCamera();
-  }, [facingMode, initializeCamera, stopCamera]);
+  }, [stream]);
+
+  useEffect(() => {
+    initializeCamera();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [facingMode]);
 
   return {
     stream,
