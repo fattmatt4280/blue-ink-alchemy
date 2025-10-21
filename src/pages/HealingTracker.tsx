@@ -103,6 +103,22 @@ const HealingTracker = () => {
                        user.email?.split('@')[0]?.split('.')[0] || 
                        'there';
 
+      // Fetch previous healing entries for context
+      const { data: previousEntries } = await supabase
+        .from('healing_progress')
+        .select('id, photo_url, healing_stage, progress_score, analysis_result, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      const previousAnalyses = previousEntries?.map(entry => ({
+        date: entry.created_at,
+        stage: entry.healing_stage,
+        score: entry.progress_score,
+        summary: (entry.analysis_result as any)?.summary || '',
+        tattooDescription: (entry.analysis_result as any)?.tattooDescription || ''
+      })) || [];
+
       // Call the analyze-healing-progress function
       const { data: analysisData, error: analysisError } = await supabase.functions.invoke(
         'analyze-healing-progress',
@@ -114,9 +130,10 @@ const HealingTracker = () => {
             knownAllergies: formData.knownAllergies,
             symptoms: formData.symptoms,
             additionalNotes: formData.additionalNotes,
-            urgencyMode: selectedMode, // Pass urgency context to AI
+            urgencyMode: selectedMode,
             userName,
             userId: user.id,
+            previousAnalyses,
           },
         }
       );
