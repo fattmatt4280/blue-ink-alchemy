@@ -60,11 +60,11 @@ export const PhotoReviewScreen = ({ photos, mode, onRetake, onContinue }: PhotoR
       </div>
 
       {/* Photo Display */}
-      <div className="flex-1 relative flex items-center justify-center bg-black">
+      <div className="flex-1 relative flex items-center justify-center bg-black overflow-auto">
         <img
           src={currentPhoto.dataUrl}
           alt={`Review ${currentIndex + 1}`}
-          className="max-w-full max-h-full object-contain"
+          className="max-w-full object-contain"
         />
 
         {/* Navigation Arrows for Multiple Photos */}
