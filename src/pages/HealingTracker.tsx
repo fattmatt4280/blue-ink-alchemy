@@ -10,7 +10,7 @@ import { HealingQuestionsOverlay, HealingQuestionData } from "@/components/Heali
 import CartDialog from "@/components/CartDialog";
 import HealingQADialog from "@/components/HealingQADialog";
 import { CapturedPhoto, CameraMode } from "@/hooks/useCamera";
-import { Loader2 } from "lucide-react";
+import { AnalyzingAnimation } from "@/components/AnalyzingAnimation";
 
 type Step = 'camera' | 'review' | 'questions' | 'analyzing';
 
@@ -217,12 +217,9 @@ const HealingTracker = () => {
           recommendations: analysisData.analysis?.recommendations || [],
           analysis_result: {
             ...analysisData.analysis,
-            urgencyMode: selectedMode, // Store urgency context
-            formData: formData, // Store form responses
+            urgencyMode: selectedMode,
+            formData: formData,
           },
-          tattoo_age: formData.tattooAge,
-          aftercare_products: formData.aftercareProducts,
-          known_allergies: formData.knownAllergies,
           hot_to_touch: formData.symptoms.heat,
           fever_symptoms: formData.symptoms.pain,
           sensitive_to_touch: formData.symptoms.swelling,
@@ -292,25 +289,7 @@ const HealingTracker = () => {
   }
 
   if (step === 'analyzing') {
-    return (
-      <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="text-center space-y-4 px-6">
-          <Loader2 className="h-16 w-16 text-primary animate-spin mx-auto" />
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-white">
-              {selectedMode === 'progress' && 'Logging Progress'}
-              {selectedMode === 'concerns' && 'Analyzing Your Concerns'}
-              {selectedMode === 'urgent' && 'Priority Analysis in Progress'}
-            </h2>
-            <p className="text-white/70">
-              {selectedMode === 'progress' && 'Quick check and logging to your history...'}
-              {selectedMode === 'concerns' && 'Carefully examining your photos and symptoms...'}
-              {selectedMode === 'urgent' && '⚡ Expedited analysis for immediate feedback'}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <AnalyzingAnimation mode={selectedMode} />;
   }
 
   // Fallback (shouldn't reach here)
