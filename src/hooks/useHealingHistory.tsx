@@ -10,6 +10,7 @@ export interface HealingHistoryEntry {
   recommendations: string[];
   analysis_result: any;
   created_at: string;
+  tattoo_title?: string;
 }
 
 export const useHealingHistory = (userId?: string) => {

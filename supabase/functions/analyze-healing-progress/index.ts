@@ -430,10 +430,19 @@ ANALYSIS PRIORITY:
 VISUAL COMPARISON INSTRUCTIONS:
 When the Expert Knowledge Base mentions "REFERENCE IMAGES AVAILABLE", you should visually compare the user's tattoo photo with what those documented conditions look like. Use these visual references to improve diagnostic accuracy for infections, allergic reactions, and healing complications.
 
+TATTOO TITLE EXTRACTION:
+Extract a concise title (1-3 words) that identifies the tattoo for ${userFirstName}'s records:
+- If it's a specific subject: Use that (e.g., "Skull", "Beta Fish", "Rose", "Dragon")
+- If it's a name tattoo: Use the name (e.g., "Mom", "Sarah", "Family Names")
+- If it's abstract/geometric: Describe pattern (e.g., "Geometric Mandala", "Tribal Band")
+- If zoomed in/unclear: Use body location (e.g., "Forearm Piece", "Elbow Detail")
+- Keep it SHORT and memorable for file naming
+
 RESPONSE FORMAT - Updated with medical evidence:
 {
   "personalGreeting": "Warm, personalized opening addressing ${userFirstName} by their actual first name (NOT their email unless no name exists). Example: 'Hi ${userFirstName}! Great to see you checking in with me again...'",
   "tattooDescription": "Natural, conversational description from Charlie that: 1) Uses authentic tattoo shop language, 2) Names the specific subject/design, 3) Identifies the style naturally, 4) References their collection if applicable, 5) Shows genuine enthusiasm or concern based on what you see. Should read like Charlie talking to ${userFirstName} in person, NOT a medical report.",
+  "tattooTitle": "SHORT title (1-3 words max) identifying the tattoo subject for client records. Examples: 'Beta Fish', 'Skull', 'Rose Bouquet', 'Mom Name', 'Geometric Sleeve', 'Forearm Piece'. Use the most specific identifiable subject. If zoomed in and unclear, use location like 'Forearm Detail' or 'Elbow Piece'.",
   "healingStage": "stage name",
   "summary": "Personalized summary that: 1) References what you observe about the current healing state, 2) Compares to their previous visits if available with specific details, 3) Explains your assessment reasoning with references to medical healing timelines, 4) Shows clear continuity of care",
   "tattooAgeDays": number or null,

@@ -6,6 +6,7 @@ import { format } from "date-fns";
  */
 export const generateSingleEntryReport = (entry: HealingHistoryEntry): string => {
   const date = format(new Date(entry.created_at), "MMMM dd, yyyy 'at' h:mm a");
+  const title = entry.tattoo_title || 'Tattoo Analysis';
   
   return `
 <!DOCTYPE html>
@@ -13,7 +14,7 @@ export const generateSingleEntryReport = (entry: HealingHistoryEntry): string =>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Healing Analysis Report - ${format(new Date(entry.created_at), "MMM dd, yyyy")}</title>
+  <title>${title} - ${format(new Date(entry.created_at), "MMM dd, yyyy")}</title>
   <style>
     @media print {
       body { margin: 0; padding: 20px; }
@@ -142,7 +143,7 @@ export const generateSingleEntryReport = (entry: HealingHistoryEntry): string =>
   <div class="report-container">
     <button class="print-button no-print" onclick="window.print()">Print / Save as PDF</button>
     
-    <h1>Tattoo Healing Analysis Report</h1>
+    <h1>${title} - Healing Analysis</h1>
     
     <div class="metadata">
       <div class="metadata-item">

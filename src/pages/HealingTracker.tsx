@@ -238,6 +238,7 @@ const HealingTracker = () => {
           healing_stage: analysisData.analysis?.healingStage || 'unknown',
           progress_score: analysisData.analysis?.progressScore || 50,
           recommendations: analysisData.analysis?.recommendations || [],
+          tattoo_title: analysisData.analysis?.tattooTitle || null,
           analysis_result: {
             ...analysisData.analysis,
             urgencyMode: selectedMode,

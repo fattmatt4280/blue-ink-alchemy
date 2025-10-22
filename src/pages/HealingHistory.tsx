@@ -47,7 +47,9 @@ const HealingHistory = () => {
     
     try {
       const html = generateSingleEntryReport(selectedEntry);
-      const filename = `healing-analysis-${format(new Date(selectedEntry.created_at), "yyyy-MM-dd")}.html`;
+      const dateStr = format(new Date(selectedEntry.created_at), "MM-dd-yyyy");
+      const title = selectedEntry.tattoo_title || 'Tattoo';
+      const filename = `${title.replace(/\s+/g, '-')}-${dateStr}.html`;
       downloadHtmlReport(html, filename);
       toast({
         title: "Report Downloaded",

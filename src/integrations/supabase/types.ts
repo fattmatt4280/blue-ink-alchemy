@@ -989,6 +989,7 @@ export type Database = {
           rash_description: string | null
           recommendations: string[]
           sensitive_to_touch: boolean | null
+          tattoo_title: string | null
           user_id: string | null
           visible_rashes: boolean | null
         }
@@ -1007,6 +1008,7 @@ export type Database = {
           rash_description?: string | null
           recommendations?: string[]
           sensitive_to_touch?: boolean | null
+          tattoo_title?: string | null
           user_id?: string | null
           visible_rashes?: boolean | null
         }
@@ -1025,6 +1027,7 @@ export type Database = {
           rash_description?: string | null
           recommendations?: string[]
           sensitive_to_touch?: boolean | null
+          tattoo_title?: string | null
           user_id?: string | null
           visible_rashes?: boolean | null
         }

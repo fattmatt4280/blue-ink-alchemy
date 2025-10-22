@@ -51,8 +51,22 @@ export const DownloadSelectionDialog = ({
     }
 
     const selectedEntries = entries.filter((e) => selectedIds.includes(e.id));
+    
+    // Create filename based on count
+    let filename: string;
+    if (selectedEntries.length === 1) {
+      const entry = selectedEntries[0];
+      const dateStr = format(new Date(entry.created_at), 'MM-dd-yyyy');
+      const title = entry.tattoo_title || 'Tattoo';
+      filename = `${title.replace(/\s+/g, '-')}-${dateStr}.html`;
+    } else {
+      // Multiple entries: use first title or "Complete"
+      const firstTitle = selectedEntries[0]?.tattoo_title || 'Healing';
+      filename = `${firstTitle.replace(/\s+/g, '-')}-Complete-Report.html`;
+    }
+    
     const html = generateCompleteReport(selectedEntries);
-    downloadHtmlReport(html, `healing-report-${Date.now()}.html`);
+    downloadHtmlReport(html, filename);
 
     toast({
       title: "Report Downloaded",
@@ -108,39 +122,43 @@ export const DownloadSelectionDialog = ({
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-3">
-                {entries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className={`flex items-start gap-3 p-3 rounded-lg border transition-colors cursor-pointer hover:bg-accent/50 ${
-                      selectedIds.includes(entry.id)
-                        ? "bg-accent border-primary"
-                        : "border-border"
-                    }`}
-                    onClick={() => toggleSelection(entry.id)}
-                  >
-                    <Checkbox
-                      checked={selectedIds.includes(entry.id)}
-                      onCheckedChange={() => toggleSelection(entry.id)}
-                      className="mt-1"
-                    />
-                    <img
-                      src={entry.photo_url}
-                      alt="Tattoo"
-                      className="w-20 h-20 rounded object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium">{entry.healing_stage}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(entry.created_at), "MMM dd, yyyy 'at' h:mm a")}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                          Score: {entry.progress_score}/100
-                        </span>
+                {entries.map((entry) => {
+                  const dateStr = format(new Date(entry.created_at), 'MM-dd-yyyy');
+                  const title = entry.tattoo_title || 'Tattoo';
+                  
+                  return (
+                    <div
+                      key={entry.id}
+                      className={`flex items-start gap-3 p-3 rounded-lg border transition-colors cursor-pointer hover:bg-accent/50 ${
+                        selectedIds.includes(entry.id)
+                          ? "bg-accent border-primary"
+                          : "border-border"
+                      }`}
+                      onClick={() => toggleSelection(entry.id)}
+                    >
+                      <Checkbox
+                        checked={selectedIds.includes(entry.id)}
+                        onCheckedChange={() => toggleSelection(entry.id)}
+                        className="mt-1"
+                      />
+                      <img
+                        src={entry.photo_url}
+                        alt={title}
+                        className="w-20 h-20 rounded object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold">{title}</p>
+                        <p className="text-sm text-muted-foreground">{dateStr}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{entry.healing_stage}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            Score: {entry.progress_score}/100
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </ScrollArea>
 
