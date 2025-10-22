@@ -96,10 +96,14 @@ export const HealingAssessmentResults = ({
     // Healing progress (directly from AI)
     const healingProgress = analysis.progressScore || 50;
 
-    // Extract color and texture from visual assessment
-    const visualAssessment = analysis.visualAssessment?.toLowerCase() || '';
-    const colorSaturation = extractColorScore(visualAssessment, analysis);
-    const textureQuality = extractTextureScore(visualAssessment, analysis);
+    // Extract color and texture from visual assessment object
+    const colorAssessment = analysis.visualAssessment?.colorAssessment?.toLowerCase() || '';
+    const textureAssessment = analysis.visualAssessment?.textureAssessment?.toLowerCase() || '';
+    const overallCondition = analysis.visualAssessment?.overallCondition?.toLowerCase() || '';
+
+    // Calculate scores using the correct properties
+    const colorSaturation = extractColorScore(colorAssessment, overallCondition, analysis);
+    const textureQuality = extractTextureScore(textureAssessment, overallCondition, analysis);
 
     // Overall health (weighted average - inflammation and infection are inverted)
     const overallHealth = Math.round(
@@ -120,45 +124,57 @@ export const HealingAssessmentResults = ({
     };
   };
 
-  const extractColorScore = (assessment: string, analysis: any): number => {
-    // Check for positive indicators
+  const extractColorScore = (colorAssessment: string, overallCondition: string, analysis: any): number => {
+    // Check color-specific indicators in colorAssessment
     if (
-      assessment.includes("vibrant") ||
-      assessment.includes("bold") ||
-      assessment.includes("saturated") ||
-      assessment.includes("excellent color")
+      colorAssessment.includes("vibrant") ||
+      colorAssessment.includes("bold") ||
+      colorAssessment.includes("saturated") ||
+      colorAssessment.includes("excellent")
     ) {
       return 85;
     }
-    if (assessment.includes("good color") || assessment.includes("solid saturation")) {
+    if (colorAssessment.includes("good") || colorAssessment.includes("solid")) {
       return 75;
     }
     if (
-      assessment.includes("fading") ||
-      assessment.includes("dull") ||
-      assessment.includes("pale")
+      colorAssessment.includes("fading") ||
+      colorAssessment.includes("dull") ||
+      colorAssessment.includes("pale")
     ) {
       return 45;
     }
+    
+    // Also check overall condition for color mentions
+    if (overallCondition.includes("vibrant") || overallCondition.includes("bold")) {
+      return 80;
+    }
+    
     // Default based on progress score
     return Math.min(90, Math.max(50, (analysis.progressScore || 50) + 10));
   };
 
-  const extractTextureScore = (assessment: string, analysis: any): number => {
-    // Check for positive indicators
-    if (assessment.includes("smooth") || assessment.includes("healed well")) {
+  const extractTextureScore = (textureAssessment: string, overallCondition: string, analysis: any): number => {
+    // Check texture-specific indicators
+    if (textureAssessment.includes("smooth") || textureAssessment.includes("healed well")) {
       return 85;
     }
     if (
-      assessment.includes("peeling") ||
-      assessment.includes("scabbing") ||
-      assessment.includes("flaking")
+      textureAssessment.includes("peeling") ||
+      textureAssessment.includes("scabbing") ||
+      textureAssessment.includes("flaking")
     ) {
       return 60;
     }
-    if (assessment.includes("rough") || assessment.includes("raised")) {
+    if (textureAssessment.includes("rough") || textureAssessment.includes("raised")) {
       return 45;
     }
+    
+    // Also check overall condition for texture mentions
+    if (overallCondition.includes("smooth") || overallCondition.includes("healthy")) {
+      return 80;
+    }
+    
     // Default based on healing stage
     const stage = analysis.healingStage?.toLowerCase() || '';
     if (stage.includes("healed") || stage.includes("matured")) return 90;
