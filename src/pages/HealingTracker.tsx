@@ -71,6 +71,10 @@ const HealingTracker = () => {
     setStep('review');
   };
 
+  const handleCancelCamera = () => {
+    navigate('/dashboard');
+  };
+
   const analyzeProgress = async (formData: HealingQuestionData) => {
     if (!user) {
       toast({
@@ -275,7 +279,7 @@ const HealingTracker = () => {
 
   // Camera-first flow rendering
   if (step === 'camera') {
-    return <CameraCapture onPhotosCapture={handlePhotosCapture} maxPhotos={5} />;
+    return <CameraCapture onPhotosCapture={handlePhotosCapture} onCancel={handleCancelCamera} maxPhotos={5} />;
   }
 
   if (step === 'review') {

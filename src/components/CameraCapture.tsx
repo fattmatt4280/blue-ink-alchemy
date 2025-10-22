@@ -7,10 +7,11 @@ import { Alert, AlertDescription } from "./ui/alert";
 
 interface CameraCaptureProps {
   onPhotosCapture: (photos: CapturedPhoto[], mode: CameraMode) => void;
+  onCancel?: () => void;
   maxPhotos?: number;
 }
 
-export const CameraCapture = ({ onPhotosCapture, maxPhotos = 5 }: CameraCaptureProps) => {
+export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: CameraCaptureProps) => {
   const [selectedMode, setSelectedMode] = useState<CameraMode>('progress');
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
@@ -73,6 +74,11 @@ export const CameraCapture = ({ onPhotosCapture, maxPhotos = 5 }: CameraCaptureP
     }
   };
 
+  const handleClose = () => {
+    stopCamera();
+    onCancel?.();
+  };
+
   const canCaptureMore = capturedPhotos.length < maxPhotos;
 
   return (
@@ -99,6 +105,15 @@ export const CameraCapture = ({ onPhotosCapture, maxPhotos = 5 }: CameraCaptureP
         {/* Top Controls */}
         <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              className="text-white hover:bg-white/20"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            
             {hasFlash && (
               <Button
                 variant="ghost"
