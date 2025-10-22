@@ -7,12 +7,15 @@ import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PhotoReviewScreen } from "@/components/PhotoReviewScreen";
 import { HealingQuestionsOverlay, HealingQuestionData } from "@/components/HealingQuestionsOverlay";
+import { HealingAssessmentResults } from "@/components/HealingAssessmentResults";
+import { DownloadSelectionDialog } from "@/components/DownloadSelectionDialog";
 import CartDialog from "@/components/CartDialog";
 import HealingQADialog from "@/components/HealingQADialog";
 import { CapturedPhoto, CameraMode } from "@/hooks/useCamera";
 import { AnalyzingAnimation } from "@/components/AnalyzingAnimation";
+import { generateSingleEntryReport, downloadHtmlReport } from "@/utils/healingReportExport";
 
-type Step = 'camera' | 'review' | 'questions' | 'analyzing';
+type Step = 'camera' | 'review' | 'questions' | 'analyzing' | 'results';
 
 const HealingTracker = () => {
   const navigate = useNavigate();
@@ -26,6 +29,9 @@ const HealingTracker = () => {
   const [showCartDialog, setShowCartDialog] = useState(false);
   const [showQADialog, setShowQADialog] = useState(false);
   const [lastAnalysisId, setLastAnalysisId] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [currentFormData, setCurrentFormData] = useState<HealingQuestionData | null>(null);
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false);
 
   // Route protection - redirect if no active subscription
   useEffect(() => {
@@ -251,18 +257,9 @@ const HealingTracker = () => {
 
       if (savedData) {
         setLastAnalysisId(savedData.id);
-        
-        toast({
-          title: "Analysis Complete!",
-          description: selectedMode === 'progress' 
-            ? "Progress logged to your history" 
-            : "Detailed analysis complete",
-        });
-        
-        // Redirect to healing history
-        setTimeout(() => {
-          navigate('/healing-history?new=true');
-        }, 1500);
+        setAnalysisResult(analysisData.analysis);
+        setCurrentFormData(formData);
+        setStep('results');
       }
     } catch (error: any) {
       console.error('Error analyzing healing progress:', error);
@@ -307,6 +304,35 @@ const HealingTracker = () => {
 
   if (step === 'analyzing') {
     return <AnalyzingAnimation mode={selectedMode} />;
+  }
+
+  if (step === 'results' && analysisResult && currentFormData) {
+    return (
+      <>
+        <HealingAssessmentResults
+          analysisData={analysisResult}
+          photoUrl={capturedPhotos[0].dataUrl}
+          formData={currentFormData}
+          onLogOnly={() => {
+            toast({
+              title: "Session Logged",
+              description: "Your healing assessment has been saved to your history",
+            });
+            navigate('/dashboard');
+          }}
+          onViewAnalysis={() => {
+            navigate('/healing-history?new=true');
+          }}
+          onDownload={() => {
+            setShowDownloadDialog(true);
+          }}
+        />
+        <DownloadSelectionDialog
+          open={showDownloadDialog}
+          onOpenChange={setShowDownloadDialog}
+        />
+      </>
+    );
   }
 
   // Fallback (shouldn't reach here)
