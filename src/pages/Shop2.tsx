@@ -12,7 +12,7 @@ const Shop2 = () => {
         <ProductGrid />
         
         <div className="grid md:grid-cols-3 gap-8 mt-16">
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6">
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 transition-all duration-300 hover:scale-105 hover:bg-black/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20">
             <h2 className="text-3xl font-bold mb-3 text-white">Featured Products</h2>
             
             <h3 className="text-xl font-semibold mb-4 text-gray-200">Our Famous Blue Dream Budder</h3>
@@ -31,7 +31,7 @@ const Shop2 = () => {
             </p>
           </div>
           
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6">
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 transition-all duration-300 hover:scale-105 hover:bg-black/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20">
             <h2 className="text-2xl font-semibold mb-4 text-white">Why Choose Us?</h2>
             <p className="text-gray-300 mb-4">
               We're committed to providing the highest quality aftercare products 
@@ -45,7 +45,7 @@ const Shop2 = () => {
             </ul>
           </div>
 
-          <div className="bg-gradient-to-br from-green-900/40 to-blue-900/40 backdrop-blur-md rounded-lg p-6 border border-green-400/30">
+          <div className="bg-gradient-to-br from-green-900/40 to-blue-900/40 backdrop-blur-md rounded-lg p-6 border border-green-400/30 transition-all duration-300 hover:scale-105 hover:from-green-900/50 hover:to-blue-900/50 hover:border-green-400/50 hover:shadow-lg hover:shadow-green-400/20">
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
               🎁 Free Heal-AId Trial Benefit
             </h2>
