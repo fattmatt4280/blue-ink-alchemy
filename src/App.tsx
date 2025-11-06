@@ -16,6 +16,7 @@ import Checkout from "./pages/Checkout";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Shop from "./pages/Shop";
+import Shop2 from "./pages/Shop2";
 import HowToUse from "./pages/HowToUse";
 import Reviews from "./pages/Reviews";
 import Wholesale from "./pages/Wholesale";
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/shop" element={<Shop />} />
+              <Route path="/shop2" element={<Shop2 />} />
               <Route path="/how-to-use" element={<HowToUse />} />
               <Route path="/reviews" element={<Reviews />} />
               <Route path="/wholesale" element={<Wholesale />} />
