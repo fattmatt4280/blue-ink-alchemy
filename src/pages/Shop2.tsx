@@ -9,14 +9,9 @@ const Shop2 = () => {
       <AnimatedBackground />
       <AppHeader />
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12 relative z-10">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-white">Shop All Products</h1>
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Discover our complete range of premium all-natural Blue Dream Budder aftercare products.
-          </p>
-        </div>
+        <ProductGrid />
         
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mt-16">
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6">
             <h2 className="text-2xl font-semibold mb-4 text-white">Featured Products</h2>
             <p className="text-gray-300 mb-4">
@@ -61,8 +56,6 @@ const Shop2 = () => {
             </p>
           </div>
         </div>
-
-        <ProductGrid />
       </div>
       
       <Footer />
