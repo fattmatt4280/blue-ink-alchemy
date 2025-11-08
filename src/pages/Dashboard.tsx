@@ -10,11 +10,13 @@ import { formatDistanceToNow } from "date-fns";
 import AppHeader from "@/components/AppHeader";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 import { DashboardWelcomeDialog } from "@/components/DashboardWelcomeDialog";
+import { HealingInsightsDashboard } from "@/components/HealingInsightsDashboard";
 
 interface Subscription {
   tier: string;
   expiration_date: string;
   is_active: boolean;
+  user_id: string;
 }
 
 const Dashboard = () => {
@@ -370,6 +372,19 @@ const Dashboard = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Healing Insights */}
+        {totalAnalyses > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Healing Insights</CardTitle>
+              <CardDescription>Analytics from your healing journey</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HealingInsightsDashboard userId={subscription?.user_id} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <Card>

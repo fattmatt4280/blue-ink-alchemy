@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Calendar, Award, AlertCircle, FileText, FolderArchive, Plus } from "lucide-react";
+import { Download, Calendar, Award, AlertCircle, FileText, FolderArchive, Plus, GitCompare } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import AppHeader from "@/components/AppHeader";
 import { useHealingHistory } from "@/hooks/useHealingHistory";
 import { HealingHistoryCard } from "@/components/HealingHistoryCard";
 import { HealingPhotoTimeline } from "@/components/HealingPhotoTimeline";
+import { HealingPhotoComparison } from "@/components/HealingPhotoComparison";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ const HealingHistory = () => {
   const { data: entries, isLoading } = useHealingHistory();
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
   const { toast } = useToast();
 
   // Check if user was just redirected from new analysis
@@ -149,6 +151,15 @@ const HealingHistory = () => {
               >
                 <Plus className="w-4 h-4 mr-2" />
                 New Analysis
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowComparison(true)}
+                disabled={!entries || entries.length < 2}
+              >
+                <GitCompare className="w-4 h-4 mr-2" />
+                Compare Photos
               </Button>
               <Button 
                 variant="outline" 
@@ -410,8 +421,24 @@ const HealingHistory = () => {
                 </Card>
               )}
 
-              {/* Photo Timeline */}
-              <HealingPhotoTimeline entries={entries} />
+            {/* Photo Comparison */}
+            {showComparison && entries && (
+              <HealingPhotoComparison 
+                entries={entries} 
+                onClose={() => setShowComparison(false)} 
+              />
+            )}
+
+            {/* Photo Comparison */}
+            {showComparison && entries && (
+              <HealingPhotoComparison 
+                entries={entries} 
+                onClose={() => setShowComparison(false)} 
+              />
+            )}
+
+            {/* Photo Timeline */}
+            <HealingPhotoTimeline entries={entries} />
 
               {/* History Cards - Show remaining entries */}
               {entries.length > 1 && (

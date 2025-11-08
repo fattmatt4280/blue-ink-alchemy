@@ -990,6 +990,7 @@ export type Database = {
           recommendations: string[]
           sensitive_to_touch: boolean | null
           tattoo_title: string | null
+          timelapse_url: string | null
           user_id: string | null
           visible_rashes: boolean | null
         }
@@ -1009,6 +1010,7 @@ export type Database = {
           recommendations?: string[]
           sensitive_to_touch?: boolean | null
           tattoo_title?: string | null
+          timelapse_url?: string | null
           user_id?: string | null
           visible_rashes?: boolean | null
         }
@@ -1028,6 +1030,7 @@ export type Database = {
           recommendations?: string[]
           sensitive_to_touch?: boolean | null
           tattoo_title?: string | null
+          timelapse_url?: string | null
           user_id?: string | null
           visible_rashes?: boolean | null
         }
@@ -2104,7 +2107,7 @@ export type Database = {
     }
     Functions: {
       get_approved_reviews: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           content: string
           created_at: string
@@ -2122,14 +2125,8 @@ export type Database = {
         Args: { metric_date: string; metric_name: string }
         Returns: undefined
       }
-      is_account_locked: {
-        Args: { check_email: string }
-        Returns: boolean
-      }
-      is_admin: {
-        Args: { user_id?: string }
-        Returns: boolean
-      }
+      is_account_locked: { Args: { check_email: string }; Returns: boolean }
+      is_admin: { Args: { user_id?: string }; Returns: boolean }
       log_login_attempt: {
         Args: {
           attempt_email: string
