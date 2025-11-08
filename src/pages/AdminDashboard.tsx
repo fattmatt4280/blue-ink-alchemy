@@ -35,6 +35,7 @@ import AbandonedCartsManager from '@/components/AbandonedCartsManager';
 import ShipmentReminderManager from '@/components/ShipmentReminderManager';
 import ReminderSettingsPanel from '@/components/ReminderSettingsPanel';
 import { TTSSettingsEditor } from '@/components/TTSSettingsEditor';
+import { OrderBackfillManager } from '@/components/OrderBackfillManager';
 
 interface SiteContent {
   id: string;
@@ -200,6 +201,7 @@ const AdminDashboard = () => {
               </Button>
             </div>
             <PushNotificationManager />
+            <OrderBackfillManager />
             <AbandonedCartsManager />
             <AnalyticsDashboard />
             <AdminAnalyticsManager />
