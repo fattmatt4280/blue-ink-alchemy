@@ -85,8 +85,8 @@ const handler = async (req: Request): Promise<Response> => {
         duration_days: healaidTrialDays,
         tier: 'trial',
         email: email,
-        expire_at: expirationDate.toISOString(),
-        used: false,
+        code_expiration_date: expirationDate.toISOString(),
+        redeemed: false,
       });
 
     if (insertError) {
