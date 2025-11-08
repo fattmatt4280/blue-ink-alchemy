@@ -150,3 +150,7 @@ verify_jwt = true
 [[functions]]
 name = "send-artist-alert"
 verify_jwt = false
+
+[[functions]]
+name = "send-custom-abandoned-cart"
+verify_jwt = true
