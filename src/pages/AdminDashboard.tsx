@@ -37,6 +37,7 @@ import ReminderSettingsPanel from '@/components/ReminderSettingsPanel';
 import { TTSSettingsEditor } from '@/components/TTSSettingsEditor';
 import { OrderBackfillManager } from '@/components/OrderBackfillManager';
 import { CustomAbandonedCartManager } from '@/components/CustomAbandonedCartManager';
+import { InvoicePreview } from '@/components/InvoicePreview';
 
 interface SiteContent {
   id: string;
@@ -201,6 +202,7 @@ const AdminDashboard = () => {
                 Manage Heal-AId Activation Codes
               </Button>
             </div>
+            <InvoicePreview />
             <PushNotificationManager />
             <OrderBackfillManager />
             <CustomAbandonedCartManager />
