@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.2";
+import Stripe from 'https://esm.sh/stripe@14.21.0';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -95,9 +96,102 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Generated HealAid activation code:", activationCode);
 
+    // Create or get abandoned cart record
+    const { data: existingCart } = await supabase
+      .from('abandoned_carts')
+      .select('id')
+      .eq('email', email)
+      .eq('converted', false)
+      .maybeSingle();
+
+    let cartId = existingCart?.id;
+    
+    if (!cartId) {
+      const { data: newCart, error: cartError } = await supabase
+        .from('abandoned_carts')
+        .insert({
+          email,
+          cart_items: cartItems,
+          cart_value: originalTotal,
+          converted: false
+        })
+        .select('id')
+        .single();
+
+      if (cartError || !newCart) {
+        console.error('Error creating abandoned cart:', cartError);
+      } else {
+        cartId = newCart.id;
+      }
+    }
+
+    console.log('Cart ID for restoration:', cartId);
+
     // Calculate discount
     const discountAmount = originalTotal * (discountPercent / 100);
     const newTotal = originalTotal - discountAmount;
+
+    // Create Stripe checkout session
+    let stripeCheckoutUrl = '';
+    
+    try {
+      const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+      if (stripeSecretKey) {
+        const stripe = new Stripe(stripeSecretKey, {
+          apiVersion: '2023-10-16',
+        });
+
+        // Get or create Stripe customer
+        const customers = await stripe.customers.list({ email, limit: 1 });
+        let customerId = customers.data[0]?.id;
+        
+        if (!customerId) {
+          const customer = await stripe.customers.create({
+            email,
+            name: customerName || undefined,
+          });
+          customerId = customer.id;
+        }
+
+        // Create line items with discount pre-applied
+        const lineItems = cartItems.map(item => ({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: item.name,
+            },
+            unit_amount: Math.round((item.price * (1 - discountPercent / 100)) * 100),
+          },
+          quantity: item.quantity,
+        }));
+
+        // Create checkout session
+        const session = await stripe.checkout.sessions.create({
+          customer: customerId,
+          payment_method_types: ['card'],
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `https://dreamtattoocompany.com/checkout?success=true`,
+          cancel_url: `https://dreamtattoocompany.com/checkout?cancelled=true`,
+          metadata: {
+            discount_code: discountCode,
+            healaid_code: activationCode!,
+            cart_id: cartId || '',
+          },
+        });
+
+        stripeCheckoutUrl = session.url || '';
+        console.log('Created Stripe session:', session.id);
+      }
+    } catch (stripeError) {
+      console.error('Stripe error:', stripeError);
+      // Continue without Stripe link
+    }
+
+    // Generate cart restoration URL
+    const cartRestoreUrl = cartId 
+      ? `https://dreamtattoocompany.com/checkout?restore=${cartId}&discount=${discountCode}`
+      : `https://dreamtattoocompany.com/shop`;
 
     // Build cart items HTML
     const cartItemsHtml = cartItems.map(item => `
@@ -184,11 +278,29 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
               </div>
 
+              ${stripeCheckoutUrl ? `
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: center;">
+                <h3 style="margin: 0 0 10px 0; font-size: 22px;">⚡ One-Click Checkout Available!</h3>
+                <p style="margin: 0; font-size: 16px;">Your ${discountPercent}% discount is already applied. Just click below to complete your order instantly!</p>
+              </div>
+              ` : ''}
+
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://dreamtattoocompany.com/shop" 
-                   style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
-                  Complete My Order 🛍️
+                <a href="${stripeCheckoutUrl || cartRestoreUrl}" 
+                   style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 48px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                  ${stripeCheckoutUrl ? `🛒 Complete My Order - ${discountPercent}% OFF Applied!` : '🛍️ Complete My Order'}
                 </a>
+                ${stripeCheckoutUrl ? `
+                <p style="margin-top: 20px;">
+                  <a href="${cartRestoreUrl}" style="color: #667eea; text-decoration: underline; font-size: 14px;">
+                    Or click here to view/modify your cart before checkout
+                  </a>
+                </p>
+                ` : `
+                <p style="margin-top: 16px; font-size: 14px; color: #7f8c8d;">
+                  Use code <strong style="color: #e74c3c; font-size: 16px;">${discountCode}</strong> at checkout
+                </p>
+                `}
               </div>
 
               <div style="background: #fff3cd; border-radius: 6px; padding: 15px; margin-top: 25px; text-align: center;">

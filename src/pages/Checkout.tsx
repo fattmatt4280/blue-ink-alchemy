@@ -13,11 +13,14 @@ import ShippingRateSelector from "@/components/ShippingRateSelector";
 import SubscriptionUpgradeDialog from "@/components/SubscriptionUpgradeDialog";
 
 const Checkout = () => {
-  const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart();
+  const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart, addToCart, setEmail } = useCart();
   const [searchParams] = useSearchParams();
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
+  const restoreCartId = searchParams.get('restore');
+  const urlDiscountCode = searchParams.get('discount');
   const [loading, setLoading] = useState(false);
+  const [cartRestored, setCartRestored] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState(false);
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -37,6 +40,79 @@ const Checkout = () => {
     sevenDay: any | null;
     thirtyDay: any | null;
   }>({ freeTrial: null, sevenDay: null, thirtyDay: null });
+
+  // Restore cart from URL parameters
+  useEffect(() => {
+    const restoreCart = async () => {
+      if (!restoreCartId || cartRestored) return;
+
+      console.log('Restoring cart from ID:', restoreCartId);
+      setLoading(true);
+
+      try {
+        const { data: abandonedCart, error } = await supabase
+          .from('abandoned_carts')
+          .select('*')
+          .eq('id', restoreCartId)
+          .single();
+
+        if (error) {
+          console.error('Error fetching abandoned cart:', error);
+          toast.error('Could not restore your cart. Please try again.');
+          return;
+        }
+
+        if (abandonedCart && abandonedCart.cart_items) {
+          // Clear existing cart
+          clearCart();
+
+          // Add items from abandoned cart
+          const cartItems = abandonedCart.cart_items as any[];
+          cartItems.forEach(item => {
+            addToCart({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              image_url: item.image_url
+            });
+            // Update quantity if not 1
+            if (item.quantity > 1) {
+              updateQuantity(item.id, item.quantity);
+            }
+          });
+
+          // Set email if available
+          if (abandonedCart.email) {
+            setEmail(abandonedCart.email);
+            setShippingInfo(prev => ({ ...prev, email: abandonedCart.email }));
+          }
+
+          // Auto-apply discount if provided in URL
+          if (urlDiscountCode) {
+            setDiscountCode(urlDiscountCode);
+            if (urlDiscountCode.toUpperCase() === 'COMEBACK10') {
+              const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+              const discount = subtotal * 0.1;
+              setDiscountAmount(discount);
+              setDiscountApplied(true);
+              toast.success('Your cart has been restored with 10% discount applied! 🎉');
+            }
+          } else {
+            toast.success('Your cart has been restored! 🛒');
+          }
+
+          setCartRestored(true);
+        }
+      } catch (error) {
+        console.error('Cart restoration error:', error);
+        toast.error('Failed to restore cart');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    restoreCart();
+  }, [restoreCartId, cartRestored]);
 
   // Fetch subscription products
   useEffect(() => {
@@ -94,7 +170,7 @@ const Checkout = () => {
   }, [success, cancelled]); // Removed clearCart from dependencies to prevent infinite loop
 
   const applyDiscountCode = () => {
-    if (discountCode.toUpperCase() === 'CART10') {
+    if (discountCode.toUpperCase() === 'CART10' || discountCode.toUpperCase() === 'COMEBACK10') {
       const discount = subtotal * 0.1;
       setDiscountAmount(discount);
       setDiscountApplied(true);
@@ -104,7 +180,7 @@ const Checkout = () => {
       supabase.from('analytics_events').insert({
         event_type: 'discount_code_used',
         event_data: {
-          code: 'CART10',
+          code: discountCode.toUpperCase(),
           discount_amount: discount,
           cart_value: subtotal
         }
