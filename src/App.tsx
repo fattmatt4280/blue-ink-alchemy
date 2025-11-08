@@ -31,6 +31,11 @@ import Dashboard from "./pages/Dashboard";
 import AdminActivationCodes from "./pages/AdminActivationCodes";
 import NotFound from "./pages/NotFound";
 import HealAid from "./pages/HealAid";
+import ArtistOnboarding from "./pages/ArtistOnboarding";
+import ArtistClientsPage from "./pages/ArtistClientsPage";
+import ArtistAlertsPage from "./pages/ArtistAlertsPage";
+import ArtistChatPage from "./pages/ArtistChatPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const App = () => (
   <TooltipProvider>
@@ -63,9 +68,42 @@ const App = () => (
                <Route path="/healing-history" element={<HealingHistory />} />
                <Route path="/activate" element={<Activate />} />
                <Route path="/dashboard" element={<Dashboard />} />
-               <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
-               <Route path="/heal-aid" element={<HealAid />} />
-               <Route path="*" element={<NotFound />} />
+              <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
+              <Route path="/heal-aid" element={<HealAid />} />
+              
+              {/* Artist routes */}
+              <Route path="/artist/onboarding" element={
+                <ProtectedRoute requireAuth>
+                  <ArtistOnboarding />
+                </ProtectedRoute>
+              } />
+              <Route path="/artist/dashboard" element={
+                <ProtectedRoute requireArtist>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/artist/clients" element={
+                <ProtectedRoute requireArtist>
+                  <ArtistClientsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/artist/clients/:clientId" element={
+                <ProtectedRoute requireArtist>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/artist/alerts" element={
+                <ProtectedRoute requireArtist>
+                  <ArtistAlertsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/artist/chat" element={
+                <ProtectedRoute requireArtist>
+                  <ArtistChatPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </CartProvider>

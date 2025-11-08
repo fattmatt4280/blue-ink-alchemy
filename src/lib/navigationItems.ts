@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound } from "lucide-react";
+import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound, Users, Bell, MessageSquare, Settings } from "lucide-react";
 
 export const mainNavItems = [
   { label: 'Home', path: '/', icon: Home },
@@ -15,6 +15,14 @@ export const healingTrackerNavItem = { label: 'Healing Tracker', path: '/healing
 export const userNavItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Healing History', path: '/healing-history', icon: History },
+];
+
+// Artist nav items
+export const artistNavItems = [
+  { label: 'Dashboard', path: '/artist/dashboard', icon: LayoutDashboard },
+  { label: 'My Clients', path: '/artist/clients', icon: Users },
+  { label: 'Alerts', path: '/artist/alerts', icon: Bell },
+  { label: 'Messages', path: '/artist/chat', icon: MessageSquare },
 ];
 
 // Admin nav items
