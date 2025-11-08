@@ -159,7 +159,8 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
               accept="image/*"
               multiple
               onChange={handleGalleryUpload}
-              className="hidden"
+              className="absolute w-px h-px opacity-0 overflow-hidden"
+              style={{ clip: 'rect(0,0,0,0)' }}
               disabled={!canCaptureMore}
             />
           </label>
@@ -231,7 +232,8 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
                 accept="image/*"
                 multiple
                 onChange={handleGalleryUpload}
-                className="hidden"
+                className="absolute w-px h-px opacity-0 overflow-hidden"
+                style={{ clip: 'rect(0,0,0,0)' }}
               />
             </label>
           </div>
