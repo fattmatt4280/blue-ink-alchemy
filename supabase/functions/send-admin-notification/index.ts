@@ -58,7 +58,7 @@ serve(async (req: Request) => {
       .eq('key', 'admin_notification_email')
       .single();
 
-    const adminEmail = siteContent?.value || 'orders@bluebudder.com';
+    const adminEmail = siteContent?.value || 'orders@bluedreambudder.com';
     logStep('Admin email', adminEmail);
 
     // Format order amount
@@ -132,7 +132,7 @@ serve(async (req: Request) => {
 
     // Send admin notification
     const { data: emailResponse, error: emailError } = await resend.emails.send({
-      from: 'Blue Dream Budder <orders@bluebudder.com>',
+      from: 'Blue Dream Budder <orders@bluedreambudder.com>',
       to: [adminEmail],
       subject: emailSubject,
       html: emailHtml,
