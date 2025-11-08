@@ -7,6 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isArtist: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, metadata?: { firstName?: string; lastName?: string }) => Promise<{ error: any }>;
@@ -27,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isArtist, setIsArtist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastActivity, setLastActivity] = useState(Date.now());
 
@@ -56,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else if (event === 'SIGNED_OUT') {
           console.log('[AuthContext] User signed out');
           setIsAdmin(false);
+          setIsArtist(false);
         } else if (event === 'TOKEN_REFRESHED') {
           console.log('[AuthContext] Token refreshed successfully');
         } else if (event === 'USER_UPDATED') {
@@ -144,6 +147,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('[AuthContext] Admin check result:', data ? 'IS ADMIN' : 'NOT ADMIN');
           setIsAdmin(data || false);
           
+          // Check artist status
+          const { data: artistData, error: artistError } = await supabase.rpc('is_artist', { p_user_id: user.id });
+          
+          if (artistError) {
+            console.error('[AuthContext] RPC error checking artist status:', artistError);
+            setIsArtist(false);
+          } else {
+            console.log('[AuthContext] Artist check result:', artistData ? 'IS ARTIST' : 'NOT ARTIST');
+            setIsArtist(artistData || false);
+          }
+          
           // Verify profile and role exist for this user
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -173,8 +187,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsAdmin(false);
         }
       } else {
-        console.log('[AuthContext] No user, setting isAdmin to false');
+        console.log('[AuthContext] No user, setting isAdmin and isArtist to false');
         setIsAdmin(false);
+        setIsArtist(false);
       }
     };
 
@@ -270,6 +285,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     isAdmin,
+    isArtist,
     loading,
     signIn,
     signUp,

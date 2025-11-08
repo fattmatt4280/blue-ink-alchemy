@@ -142,3 +142,11 @@ verify_jwt = false
 [[functions]]
 name = "process-healing-reminders"
 verify_jwt = false
+
+[[functions]]
+name = "generate-timelapse"
+verify_jwt = true
+
+[[functions]]
+name = "send-artist-alert"
+verify_jwt = false

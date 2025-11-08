@@ -724,6 +724,60 @@ Provide your assessment following the expert guidance provided in the system pro
       };
     }
 
+    // Check if we need to alert the artist
+    if (userId && analysis.riskFactors && analysis.riskFactors.length > 0) {
+      try {
+        // Check if client has an artist relationship
+        const { data: relationship } = await supabase
+          .from('client_artist_relationships')
+          .select('artist_user_id')
+          .eq('client_user_id', userId)
+          .eq('relationship_status', 'active')
+          .maybeSingle();
+
+        if (relationship && relationship.artist_user_id) {
+          // Determine severity based on risk factors
+          const criticalKeywords = ['infection', 'pus', 'fever', 'streaks', 'severe'];
+          const highKeywords = ['swelling', 'excessive', 'spreading', 'hot', 'concerning'];
+          
+          const riskText = analysis.riskFactors.join(' ').toLowerCase();
+          let severity = 'medium';
+          let alertType = 'follow_up_needed';
+          
+          if (criticalKeywords.some(kw => riskText.includes(kw))) {
+            severity = 'critical';
+            alertType = 'infection_suspected';
+          } else if (highKeywords.some(kw => riskText.includes(kw))) {
+            severity = 'high';
+            alertType = 'high_risk';
+          }
+          
+          // Trigger artist alert for high/critical severity
+          if (severity === 'high' || severity === 'critical') {
+            try {
+              await supabase.functions.invoke('send-artist-alert', {
+                body: {
+                  artistUserId: relationship.artist_user_id,
+                  clientUserId: userId,
+                  healingProgressId: null, // Will be set after saving healing_progress
+                  alertType,
+                  severity,
+                  alertTitle: `${severity === 'critical' ? '🚨' : '⚠️'} Healing Concerns Detected`,
+                  alertMessage: `AI analysis detected ${analysis.riskFactors.length} risk factor(s) that may require your attention: ${analysis.riskFactors.slice(0, 3).join(', ')}`,
+                  riskFactors: analysis.riskFactors,
+                },
+              });
+              console.log('Artist alert sent successfully');
+            } catch (alertError) {
+              console.error('Failed to send artist alert:', alertError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking for artist alert:', error);
+      }
+    }
+
     return new Response(
       JSON.stringify({ success: true, analysis }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
