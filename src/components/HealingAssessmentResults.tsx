@@ -81,37 +81,49 @@ export const HealingAssessmentResults = ({
   }, [analysisData, formData]);
 
   const calculateMetrics = (analysis: any, data: HealingQuestionData): Metrics => {
-    // Inflammation (from symptoms - inverted so higher = worse)
+    // 1. Healing Progress - Use AI's progressScore (already accounts for visual assessment and complications)
+    let healingProgress = analysis.progressScore;
+    
+    // Fallback: Simple age-based calculation if AI didn't provide progressScore
+    if (!healingProgress && analysis.tattooAgeDays) {
+      healingProgress = Math.min((analysis.tattooAgeDays / 62) * 100, 100);
+    }
+    
+    // Final fallback
+    healingProgress = healingProgress || 5;
+
+    // 2. Inflammation (from symptoms - higher = worse)
     const inflammation =
-      (data.symptoms.redness ? 30 : 0) +
-      (data.symptoms.swelling ? 30 : 0) +
-      (data.symptoms.heat ? 40 : 0);
+      (data.symptoms.redness ? 25 : 0) +
+      (data.symptoms.swelling ? 25 : 0) +
+      (data.symptoms.heat ? 35 : 0) +
+      (data.symptoms.discharge ? 15 : 0);
 
-    // Infection risk (from symptoms)
+    // 3. Infection Risk (from symptoms)
     const infectionRisk =
-      (data.symptoms.discharge ? 40 : 0) +
+      (data.symptoms.discharge ? 35 : 0) +
       (data.symptoms.heat ? 30 : 0) +
-      (data.symptoms.pain ? 30 : 0);
+      (data.symptoms.pain ? 20 : 0) +
+      (data.symptoms.swelling ? 15 : 0);
 
-    // Healing progress (directly from AI)
-    const healingProgress = analysis.progressScore || 50;
-
-    // Extract color and texture from visual assessment object
+    // 4. Extract color and texture from visual assessment
     const colorAssessment = analysis.visualAssessment?.colorAssessment?.toLowerCase() || '';
     const textureAssessment = analysis.visualAssessment?.textureAssessment?.toLowerCase() || '';
     const overallCondition = analysis.visualAssessment?.overallCondition?.toLowerCase() || '';
 
-    // Calculate scores using the correct properties
-    const colorSaturation = extractColorScore(colorAssessment, overallCondition, analysis);
-    const textureQuality = extractTextureScore(textureAssessment, overallCondition, analysis);
+    // 5. Color Saturation (extract from AI assessment, use healing progress as context)
+    const colorSaturation = extractColorScore(colorAssessment, overallCondition, healingProgress);
 
-    // Overall health (weighted average - inflammation and infection are inverted)
+    // 6. Texture Quality (extract from AI assessment, use healing progress as context)
+    const textureQuality = extractTextureScore(textureAssessment, overallCondition, healingProgress);
+
+    // 7. Overall Health (weighted average - inflammation and infection are BAD, so invert them)
     const overallHealth = Math.round(
-      healingProgress * 0.4 +
-        (100 - inflammation) * 0.2 +
-        (100 - infectionRisk) * 0.2 +
-        colorSaturation * 0.1 +
-        textureQuality * 0.1
+      healingProgress * 0.4 +           // 40% weight on actual healing progress
+      (100 - inflammation) * 0.25 +     // 25% weight (inverted - lower inflammation is better)
+      (100 - infectionRisk) * 0.25 +    // 25% weight (inverted - lower risk is better)
+      colorSaturation * 0.05 +          // 5% weight
+      textureQuality * 0.05             // 5% weight
     );
 
     return {
@@ -124,62 +136,74 @@ export const HealingAssessmentResults = ({
     };
   };
 
-  const extractColorScore = (colorAssessment: string, overallCondition: string, analysis: any): number => {
-    // Check color-specific indicators in colorAssessment
+  const extractColorScore = (
+    colorAssessment: string,
+    overallCondition: string,
+    healingProgress: number
+  ): number => {
+    // Good color indicators
     if (
       colorAssessment.includes("vibrant") ||
       colorAssessment.includes("bold") ||
       colorAssessment.includes("saturated") ||
       colorAssessment.includes("excellent")
     ) {
-      return 85;
+      return Math.min(healingProgress + 15, 95);
     }
     if (colorAssessment.includes("good") || colorAssessment.includes("solid")) {
-      return 75;
+      return Math.min(healingProgress + 8, 85);
     }
+    
+    // Poor color indicators
     if (
       colorAssessment.includes("fading") ||
       colorAssessment.includes("dull") ||
       colorAssessment.includes("pale")
     ) {
-      return 45;
+      return Math.max(healingProgress - 20, 20);
     }
     
-    // Also check overall condition for color mentions
+    // Check overall condition for color mentions
     if (overallCondition.includes("vibrant") || overallCondition.includes("bold")) {
-      return 80;
+      return Math.min(healingProgress + 10, 90);
     }
     
-    // Default based on progress score
-    return Math.min(90, Math.max(50, (analysis.progressScore || 50) + 10));
+    // Default: slightly better than healing progress
+    return Math.min(healingProgress + 5, 90);
   };
 
-  const extractTextureScore = (textureAssessment: string, overallCondition: string, analysis: any): number => {
-    // Check texture-specific indicators
+  const extractTextureScore = (
+    textureAssessment: string,
+    overallCondition: string,
+    healingProgress: number
+  ): number => {
+    // Good texture indicators
     if (textureAssessment.includes("smooth") || textureAssessment.includes("healed well")) {
-      return 85;
+      return Math.min(healingProgress + 18, 95);
     }
+    
+    // Expected texture for healing stage (normal scabbing/peeling)
     if (
       textureAssessment.includes("peeling") ||
       textureAssessment.includes("scabbing") ||
       textureAssessment.includes("flaking")
     ) {
-      return 60;
+      // Normal for early/mid healing - slight penalty
+      return Math.max(healingProgress - 5, 25);
     }
+    
+    // Poor texture indicators
     if (textureAssessment.includes("rough") || textureAssessment.includes("raised")) {
-      return 45;
+      return Math.max(healingProgress - 18, 20);
     }
     
-    // Also check overall condition for texture mentions
+    // Check overall condition for texture mentions
     if (overallCondition.includes("smooth") || overallCondition.includes("healthy")) {
-      return 80;
+      return Math.min(healingProgress + 12, 90);
     }
     
-    // Default based on healing stage
-    const stage = analysis.healingStage?.toLowerCase() || '';
-    if (stage.includes("healed") || stage.includes("matured")) return 90;
-    if (stage.includes("settling") || stage.includes("recovery")) return 70;
-    return 60;
+    // Default: aligned with healing progress
+    return Math.min(healingProgress + 3, 85);
   };
 
   const getMetricColor = (value: number, inverted: boolean = false): string => {
@@ -265,7 +289,14 @@ export const HealingAssessmentResults = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{item.icon}</span>
-                    <span className="text-white text-sm font-medium">{item.label}</span>
+                    <span className="text-white text-sm font-medium">
+                      {item.label}
+                      {item.label === "Healing Progress" && analysisData.tattooAgeDays && (
+                        <span className="text-white/60 text-xs ml-1">
+                          (Day {analysisData.tattooAgeDays}/62)
+                        </span>
+                      )}
+                    </span>
                   </div>
                   <span
                     className={`text-2xl font-bold ${getMetricTextColor(

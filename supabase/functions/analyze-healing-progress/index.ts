@@ -402,6 +402,147 @@ HEALING TIMELINE (be strict about age):
 - Days 15-30: Late Healing - Most peeling done, color returning
 - Days 30+: Settled - Fully healed, vibrant colors, no flaking
 
+EFFECTIVE HEALING AGE ASSESSMENT (CRITICAL - Visual-based progress tracking):
+
+You MUST determine the "effective healing age" by assessing what day the tattoo APPEARS to be at based on visual appearance, regardless of calendar age.
+
+**CORE PRINCIPLE**: Tattoos heal over a fixed 62-day regeneration cycle. Complications don't extend the timeline - they PAUSE healing progress. A tattoo with an infection is essentially frozen in time until the complication clears.
+
+**YOUR TASK**: Look at the photos and determine: "What day of healing does this tattoo LOOK like it's at?"
+
+VISUAL INDICATORS BY AGE (Use these to assess effective age):
+
+Days 0-3 (Fresh/Raw):
+- Raw, open wound appearance
+- Bright red inflammation border
+- Plasma oozing, shiny wetness
+- Ink may appear "blown out" or undefined edges
+- Significant swelling
+
+Days 4-7 (Early Scabbing):
+- Dark scabs forming over tattooed areas
+- Still red/pink around edges
+- Scabs may be thick and crusty
+- Some plasma dried on surface
+- Mild to moderate swelling
+
+Days 8-14 (Peak Peeling):
+- Scabs actively flaking/peeling off
+- Skin underneath looks dull, silvery, or milky
+- Lots of visible flakes and shedding skin
+- Colors appear muted or faded
+- Itching is common (client may report)
+
+Days 15-21 (Late Peeling):
+- Most scabs gone, minor flaking remains
+- Skin still slightly dull but improving
+- Colors starting to return
+- Minimal to no swelling
+- Texture smoothing out
+
+Days 22-30 (Settling):
+- Colors brightening back up
+- Skin texture nearly normal
+- Very minimal if any flaking
+- Looks almost healed but not quite "settled"
+
+Days 31-45 (Mature Healing):
+- Colors fully saturated and vibrant
+- Skin texture smooth and normal
+- No flaking, scabbing, or peeling
+- May have slight shininess that will fade
+
+Days 46-62 (Fully Healed):
+- Completely healed appearance
+- Skin texture matches surrounding skin perfectly
+- Colors are stable and vivid
+- No signs of healing process
+- Tattoo looks "settled in"
+
+**COMPLICATION IMPACTS** (How they affect effective age):
+
+Active Infection (pus, fever, heat, spreading redness):
+- Healing is PAUSED completely
+- Tattoo will look the same age as when infection started
+- Effective age = when infection began (roughly)
+- Example: Day 30 tattoo with 7-day infection → looks like Day 23
+
+Severe Inflammation (very red, hot, extremely swollen):
+- Healing is SEVERELY DELAYED
+- Tattoo looks younger than calendar age
+- Subtract 1-2 weeks from calendar age
+- Example: Day 20 with severe inflammation → looks like Day 10
+
+Allergic Reaction (rash, hives, spreading bumps):
+- Healing is PAUSED in affected areas
+- Can regress appearance (looks younger than it did before)
+- Effective age based on visible healing state
+- Example: Day 15 with allergic reaction → may look like Day 8
+
+Poor Aftercare (dried out, picking, no cleaning):
+- Slows healing by 30-50%
+- Tattoo looks 1-2 stages behind where it should be
+- More scabbing, slower peeling than normal
+- Example: Day 10 with poor care → looks like Day 6
+
+Normal Complications (expected redness, standard scabbing):
+- Minor delay, 0-3 days behind schedule
+- This is NORMAL healing variance
+- Don't penalize heavily for expected symptoms
+
+**CALCULATION PROCESS**:
+
+1. **Assess Calendar Age**: Note the actual days since tattoo was done
+2. **Assess Visual Appearance**: Compare photos to the visual indicators above - what day does it LOOK like?
+3. **Determine Effective Age**: This is what day the tattoo appears to be at visually
+4. **Calculate Healing Delay**: Calendar Age - Effective Age = Days Lost to Complications
+5. **Calculate Progress Score**: (Effective Age / 62) × 100
+
+**EXAMPLES**:
+
+Example 1 - Normal Healing:
+- Calendar Age: Day 31
+- Visual Assessment: Colors returning, mostly peeled, looks Day 28-30
+- Effective Age: 30
+- Healing Delay: 1 day (minimal)
+- Progress Score: (30/62) × 100 = 48%
+
+Example 2 - Active Infection:
+- Calendar Age: Day 25
+- Visual Assessment: Still heavily scabbed, inflamed, looks Day 10-12
+- Effective Age: 11
+- Healing Delay: 14 days (2 weeks lost)
+- Progress Score: (11/62) × 100 = 18%
+
+Example 3 - Perfect Healing:
+- Calendar Age: Day 35
+- Visual Assessment: Vibrant colors, smooth texture, looks Day 35-38
+- Effective Age: 36
+- Healing Delay: 0 days (healing ahead of schedule!)
+- Progress Score: (36/62) × 100 = 58%
+
+Example 4 - Resolved Complication:
+- Calendar Age: Day 40
+- Visual Assessment: Still some peeling, looks Day 25
+- Effective Age: 25
+- Healing Delay: 15 days (complication cost 2+ weeks)
+- Progress Score: (25/62) × 100 = 40%
+
+Example 5 - Fresh Tattoo:
+- Calendar Age: Day 3
+- Visual Assessment: Raw, oozing, bright red - classic Day 3
+- Effective Age: 3
+- Healing Delay: 0 days
+- Progress Score: (3/62) × 100 = 5%
+
+**CRITICAL RULES**:
+- Be REALISTIC about effective age based on actual visual appearance
+- A Day 5 tattoo should score ~8%, NOT 50%
+- Complications mean healing is BEHIND SCHEDULE (lower effective age)
+- Never assume progress based on calendar age alone - USE YOUR EYES
+- Progress score must reflect actual healing state, not time elapsed
+- If in doubt, be conservative (assess younger effective age rather than older)
+
 ${previousAnalysesContext}
 ${customInstructionsContext}
 ${expertContext}
@@ -446,6 +587,9 @@ RESPONSE FORMAT - Updated with medical evidence:
   "healingStage": "stage name",
   "summary": "Personalized summary that: 1) References what you observe about the current healing state, 2) Compares to their previous visits if available with specific details, 3) Explains your assessment reasoning with references to medical healing timelines, 4) Shows clear continuity of care",
   "tattooAgeDays": number or null,
+  "effectiveHealingAge": "Number representing what day the tattoo APPEARS to be at based on visual assessment (not calendar age). Compare photos to the visual indicators provided. This is the actual healing progress day.",
+  "healingDelay": "Number of days healing is behind schedule (tattooAgeDays - effectiveHealingAge). If 0 or negative, healing is on track or ahead. If positive, complications have paused healing. Example: 14 means '2 weeks lost to complications'",
+  "progressScore": "Number 1-100. Calculate as: (effectiveHealingAge / 62) × 100. This represents actual healing completion percentage. A Day 3 tattoo should be ~5%, Day 31 should be ~50%, Day 62 should be ~100%. Be realistic based on visual appearance, not calendar age.",
   "visualAssessment": {
     "colorAssessment": "description",
     "textureAssessment": "description",
