@@ -43,6 +43,7 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
   };
 
   const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Gallery change fired, files:", e.target.files?.length);
     const files = Array.from(e.target.files || []);
     
     files.forEach(file => {
@@ -148,23 +149,22 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
         </div>
 
         {/* Capture Button & Gallery */}
-        <div className="absolute bottom-24 left-0 right-0 flex items-center justify-center gap-6 px-6">
+        <div className="absolute bottom-24 left-0 right-0 z-20 flex items-center justify-center gap-6 px-6">
           {/* Gallery Button */}
-          <label htmlFor="gallery-upload" className="cursor-pointer">
+          <div className="relative">
             <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center hover:bg-white/30 transition-colors">
               <ImageIcon className="h-6 w-6 text-white" />
             </div>
             <input
               id="gallery-upload"
               type="file"
-              accept="image/*"
+              accept="image/*,.heic,.heif"
               multiple
               onChange={handleGalleryUpload}
-              className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none"
-              style={{ clip: 'rect(0,0,0,0)' }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               disabled={!canCaptureMore}
             />
-          </label>
+          </div>
 
           {/* Capture Button */}
           <button
@@ -224,20 +224,19 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
             <p className="text-white/70 mb-6">
               Please allow camera access to capture photos. You can also upload from your gallery.
             </p>
-            <label htmlFor="gallery-upload-fallback">
-              <Button className="w-full">
+            <div className="relative w-full">
+              <Button className="w-full pointer-events-none">
                 Upload from Gallery
               </Button>
               <input
                 id="gallery-upload-fallback"
                 type="file"
-                accept="image/*"
+                accept="image/*,.heic,.heif"
                 multiple
                 onChange={handleGalleryUpload}
-                className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none"
-                style={{ clip: 'rect(0,0,0,0)' }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-            </label>
+            </div>
           </div>
         </div>
       )}
