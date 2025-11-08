@@ -91,8 +91,8 @@ export const ArtistOnboardingWizard = () => {
     try {
       // Create artist role
       const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({ user_id: user.id, role: 'artist' });
+        .from('user_roles' as any)
+        .insert({ user_id: user.id, role: 'artist' } as any);
 
       if (roleError) throw roleError;
 

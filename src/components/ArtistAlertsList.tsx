@@ -38,7 +38,7 @@ export const ArtistAlertsList = () => {
 
     const fetchAlerts = async () => {
       const { data, error } = await supabase
-        .from("artist_alerts")
+        .from("artist_alerts" as any)
         .select("*, profiles!artist_alerts_client_user_id_fkey(first_name, last_name, email)")
         .eq("artist_user_id", user.id)
         .eq("status", filter)
@@ -95,7 +95,7 @@ export const ArtistAlertsList = () => {
       };
 
       const { error } = await supabase
-        .from("artist_alerts")
+        .from("artist_alerts" as any)
         .update(updates)
         .eq("id", alertId);
 

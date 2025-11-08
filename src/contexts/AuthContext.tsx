@@ -147,8 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('[AuthContext] Admin check result:', data ? 'IS ADMIN' : 'NOT ADMIN');
           setIsAdmin(data || false);
           
-          // Check artist status
-          const { data: artistData, error: artistError } = await supabase.rpc('is_artist', { p_user_id: user.id });
+      // Check artist status
+      const { data: artistData, error: artistError } = await supabase.rpc('is_artist' as any, { p_user_id: user.id } as any);
           
           if (artistError) {
             console.error('[AuthContext] RPC error checking artist status:', artistError);

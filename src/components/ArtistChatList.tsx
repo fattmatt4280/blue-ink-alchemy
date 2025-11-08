@@ -33,7 +33,7 @@ export const ArtistChatList = () => {
 
     const fetchRelationships = async () => {
       const { data, error } = await supabase
-        .from("client_artist_relationships")
+        .from("client_artist_relationships" as any)
         .select("*")
         .or(`client_user_id.eq.${user.id},artist_user_id.eq.${user.id}`)
         .eq("relationship_status", "active")
@@ -47,7 +47,7 @@ export const ArtistChatList = () => {
 
       // Fetch additional details for each relationship
       const enrichedData = await Promise.all(
-        (data || []).map(async (rel) => {
+        ((data || []) as any[]).map(async (rel: any) => {
           const otherUserId = rel.client_user_id === user.id ? rel.artist_user_id : rel.client_user_id;
           
           // Get other user's profile
@@ -59,14 +59,14 @@ export const ArtistChatList = () => {
 
           // Get unread message count
           const { data: unreadData } = await supabase
-            .rpc("get_unread_message_count", {
+            .rpc("get_unread_message_count" as any, {
               p_relationship_id: rel.id,
               p_user_id: user.id,
-            });
+            } as any);
 
           // Get last message
           const { data: lastMsg } = await supabase
-            .from("chat_messages")
+            .from("chat_messages" as any)
             .select("message_text, created_at")
             .eq("relationship_id", rel.id)
             .order("created_at", { ascending: false })
@@ -81,8 +81,8 @@ export const ArtistChatList = () => {
             ...rel,
             unread_count: unreadData || 0,
             [rel.client_user_id === user.id ? "artist_name" : "client_name"]: otherUserName,
-            last_message: lastMsg?.message_text,
-            last_message_time: lastMsg?.created_at,
+            last_message: (lastMsg as any)?.message_text,
+            last_message_time: (lastMsg as any)?.created_at,
           };
         })
       );

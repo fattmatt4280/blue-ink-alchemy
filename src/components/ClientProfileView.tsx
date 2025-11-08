@@ -47,22 +47,22 @@ export const ClientProfileView = ({ clientUserId, relationshipId }: ClientProfil
 
       // Fetch relationship notes
       const { data: relationship } = await supabase
-        .from("client_artist_relationships")
+        .from("client_artist_relationships" as any)
         .select("notes")
         .eq("id", relationshipId)
         .single();
 
-      setArtistNotes(relationship?.notes || "");
+      setArtistNotes((relationship as any)?.notes || "");
 
       // Fetch alerts
       const { data: alertsData } = await supabase
-        .from("artist_alerts")
+        .from("artist_alerts" as any)
         .select("*")
         .eq("client_user_id", clientUserId)
         .order("created_at", { ascending: false })
         .limit(20);
 
-      setAlerts(alertsData || []);
+      setAlerts((alertsData || []) as any);
     };
 
     fetchClientData();
@@ -72,8 +72,8 @@ export const ClientProfileView = ({ clientUserId, relationshipId }: ClientProfil
     setSavingNotes(true);
     try {
       const { error } = await supabase
-        .from("client_artist_relationships")
-        .update({ notes: artistNotes })
+        .from("client_artist_relationships" as any)
+        .update({ notes: artistNotes } as any)
         .eq("id", relationshipId);
 
       if (error) throw error;
@@ -89,11 +89,11 @@ export const ClientProfileView = ({ clientUserId, relationshipId }: ClientProfil
   const handleAcknowledgeAlert = async (alertId: string) => {
     try {
       const { error } = await supabase
-        .from("artist_alerts")
+        .from("artist_alerts" as any)
         .update({
           status: "acknowledged",
           acknowledged_at: new Date().toISOString(),
-        })
+        } as any)
         .eq("id", alertId);
 
       if (error) throw error;

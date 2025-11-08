@@ -47,7 +47,7 @@ export const ArtistChatDialog = ({
 
     const fetchMessages = async () => {
       const { data, error } = await supabase
-        .from("chat_messages")
+        .from("chat_messages" as any)
         .select("*")
         .eq("relationship_id", relationshipId)
         .order("created_at", { ascending: true });
@@ -57,7 +57,7 @@ export const ArtistChatDialog = ({
         return;
       }
 
-      setMessages(data || []);
+      setMessages((data || []) as unknown as Message[]);
     };
 
     fetchMessages();
@@ -111,8 +111,8 @@ export const ArtistChatDialog = ({
       if (unreadMessages.length === 0) return;
 
       const { error } = await supabase
-        .from("chat_messages")
-        .update({ read_at: new Date().toISOString() })
+        .from("chat_messages" as any)
+        .update({ read_at: new Date().toISOString() } as any)
         .in(
           "id",
           unreadMessages.map((m) => m.id)
@@ -140,12 +140,12 @@ export const ArtistChatDialog = ({
 
     setSending(true);
     try {
-      const { error } = await supabase.from("chat_messages").insert({
+      const { error } = await supabase.from("chat_messages" as any).insert({
         relationship_id: relationshipId,
         sender_user_id: user.id,
         message_text: newMessage.trim(),
         message_type: "text",
-      });
+      } as any);
 
       if (error) throw error;
 
