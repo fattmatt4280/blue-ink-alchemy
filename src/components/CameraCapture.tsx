@@ -150,16 +150,17 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
         {/* Capture Button & Gallery */}
         <div className="absolute bottom-24 left-0 right-0 flex items-center justify-center gap-6 px-6">
           {/* Gallery Button */}
-          <label className="cursor-pointer">
+          <label htmlFor="gallery-upload" className="cursor-pointer">
             <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center hover:bg-white/30 transition-colors">
               <ImageIcon className="h-6 w-6 text-white" />
             </div>
             <input
+              id="gallery-upload"
               type="file"
               accept="image/*"
               multiple
               onChange={handleGalleryUpload}
-              className="absolute w-px h-px opacity-0 overflow-hidden"
+              className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none"
               style={{ clip: 'rect(0,0,0,0)' }}
               disabled={!canCaptureMore}
             />
@@ -223,16 +224,17 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
             <p className="text-white/70 mb-6">
               Please allow camera access to capture photos. You can also upload from your gallery.
             </p>
-            <label>
+            <label htmlFor="gallery-upload-fallback">
               <Button className="w-full">
                 Upload from Gallery
               </Button>
               <input
+                id="gallery-upload-fallback"
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handleGalleryUpload}
-                className="absolute w-px h-px opacity-0 overflow-hidden"
+                className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none"
                 style={{ clip: 'rect(0,0,0,0)' }}
               />
             </label>
