@@ -128,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
                       <table width="100%" cellpadding="0" cellspacing="0">
                         <tr>
                           <td align="center" style="padding: 20px 0;">
-                            <a href="https://dreamtattoocompany.com/checkout" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 18px 50px; border-radius: 8px; font-size: 18px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                            <a href="https://bluedreambudder.com/checkout" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 18px 50px; border-radius: 8px; font-size: 18px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
                               Complete My Order →
                             </a>
                           </td>
@@ -149,7 +149,7 @@ const handler = async (req: Request): Promise<Response> => {
                         Premium Tattoo Aftercare Products
                       </p>
                       <p style="color: #999; font-size: 12px; margin: 0;">
-                        Questions? <a href="https://dreamtattoocompany.com/contact" style="color: #667eea; text-decoration: none;">Contact us</a>
+                        Questions? <a href="https://bluedreambudder.com/contact" style="color: #667eea; text-decoration: none;">Contact us</a>
                       </p>
                     </td>
                   </tr>

@@ -171,8 +171,8 @@ const handler = async (req: Request): Promise<Response> => {
           payment_method_types: ['card'],
           line_items: lineItems,
           mode: 'payment',
-          success_url: `https://dreamtattoocompany.com/checkout?success=true`,
-          cancel_url: `https://dreamtattoocompany.com/checkout?cancelled=true`,
+          success_url: `https://bluedreambudder.com/checkout?success=true`,
+          cancel_url: `https://bluedreambudder.com/checkout?cancelled=true`,
           metadata: {
             discount_code: discountCode,
             healaid_code: activationCode!,
@@ -190,8 +190,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Generate cart restoration URL
     const cartRestoreUrl = cartId 
-      ? `https://dreamtattoocompany.com/checkout?restore=${cartId}&discount=${discountCode}`
-      : `https://dreamtattoocompany.com/shop`;
+      ? `https://bluedreambudder.com/checkout?restore=${cartId}&discount=${discountCode}`
+      : `https://bluedreambudder.com/shop`;
 
     // Build cart items HTML
     const cartItemsHtml = cartItems.map(item => `
@@ -308,7 +308,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
 
               <p style="font-size: 14px; color: #888; margin-top: 30px; text-align: center;">
-                Questions? Reply to this email or visit our <a href="https://dreamtattoocompany.com/contact" style="color: #667eea;">contact page</a>.
+                Questions? Reply to this email or visit our <a href="https://bluedreambudder.com/contact" style="color: #667eea;">contact page</a>.
               </p>
             </div>
 
