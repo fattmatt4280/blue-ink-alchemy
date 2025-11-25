@@ -31,6 +31,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminActivationCodes from "./pages/AdminActivationCodes";
 import NotFound from "./pages/NotFound";
 import HealAid from "./pages/HealAid";
+import ProductDetail from "./pages/ProductDetail";
 import ArtistOnboarding from "./pages/ArtistOnboarding";
 import ArtistClientsPage from "./pages/ArtistClientsPage";
 import ArtistAlertsPage from "./pages/ArtistAlertsPage";
@@ -68,8 +69,9 @@ const App = () => (
                <Route path="/healing-history" element={<HealingHistory />} />
                <Route path="/activate" element={<Activate />} />
                <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
+               <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
               <Route path="/heal-aid" element={<HealAid />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
               
               {/* Artist routes */}
               <Route path="/artist/onboarding" element={

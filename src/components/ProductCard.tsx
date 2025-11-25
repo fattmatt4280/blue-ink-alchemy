@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trackEvent } from '@/components/AnalyticsTracker';
@@ -32,6 +33,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) => {
+  const navigate = useNavigate();
   const isFreeTrialProduct = product.name.includes('3-Day Free Trial');
   const { isEligible, loading } = useFreeTrialEligibility();
 
@@ -40,11 +42,16 @@ const ProductCard = ({ product, onAddToCart, onProductView }: ProductCardProps) 
 
   const isDisabled = isFreeTrialProduct && !isEligible;
 
+  const handleProductClick = () => {
+    onProductView(product);
+    navigate(`/product/${product.id}`);
+  };
+
   return (
     <div 
       id={isFreeTrialProduct ? 'free-trial-product' : undefined}
       className={`group neon-card rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative cursor-pointer ${isDisabled ? 'opacity-60' : ''}`}
-      onClick={() => onProductView(product)}
+      onClick={handleProductClick}
     >
       {isDisabled && (
         <Badge className="absolute top-4 left-4 z-10 bg-gray-500 text-white">
