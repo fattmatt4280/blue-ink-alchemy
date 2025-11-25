@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Mail, RefreshCw, ShoppingCart, DollarSign, TrendingUp, Clock } from "lucide-react";
+import { Mail, RefreshCw, ShoppingCart, DollarSign, TrendingUp, Clock, Trash2 } from "lucide-react";
+import { logAdminAction } from "@/utils/adminLogger";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface AbandonedCart {
@@ -101,6 +102,35 @@ const AbandonedCartsManager = () => {
     if (hours < 24) return `${hours}h ago`;
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
+  };
+
+  const deleteCart = async (cartId: string, email: string) => {
+    if (!confirm(`Are you sure you want to delete the abandoned cart for ${email}?`)) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('abandoned_carts')
+        .delete()
+        .eq('id', cartId);
+      
+      if (error) throw error;
+      
+      // Log the admin action
+      await logAdminAction({
+        action: 'deleted',
+        resourceType: 'abandoned_cart',
+        resourceId: cartId,
+        details: { email, cart_value: carts.find(c => c.id === cartId)?.cart_value }
+      });
+      
+      toast.success(`Deleted abandoned cart for ${email}`);
+      fetchCarts();
+    } catch (error: any) {
+      console.error('Error deleting cart:', error);
+      toast.error('Failed to delete cart');
+    }
   };
 
   const recoveryRate = stats.total > 0 ? ((stats.recovered / stats.total) * 100).toFixed(1) : '0';
@@ -202,12 +232,13 @@ const AbandonedCartsManager = () => {
                   <TableHead>Created</TableHead>
                   <TableHead>Email Status</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {carts.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              {carts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       No abandoned carts found
                     </TableCell>
                   </TableRow>
@@ -245,6 +276,16 @@ const AbandonedCartsManager = () => {
                         ) : (
                           <Badge variant="secondary">Abandoned</Badge>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteCart(cart.id, cart.email)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
