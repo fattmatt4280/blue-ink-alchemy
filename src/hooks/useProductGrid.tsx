@@ -39,7 +39,10 @@ export const useProductGrid = () => {
   };
 
   // Identify subscription products
-  const freeTrialProduct = products.find(p => p.name.includes('3-Day Free Trial'));
+  const freeTrialProduct = products.find(p => 
+    p.name.toLowerCase().includes('free trial') || 
+    p.name.toLowerCase().includes('3-day')
+  );
   const isPhysicalProduct = (product: Product) => !product.name.toLowerCase().includes('heal-aid');
   const isHealAidPlan = (product: Product) => 
     product.stripe_price_id && HEALAID_TIER_MAP[product.stripe_price_id];
