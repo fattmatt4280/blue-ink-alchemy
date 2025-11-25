@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Mail, RefreshCw, ShoppingCart, DollarSign, TrendingUp, Clock, Trash2 } from "lucide-react";
+import { Mail, RefreshCw, ShoppingCart, DollarSign, TrendingUp, Clock, Trash2, Send } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { logAdminAction } from "@/utils/adminLogger";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -24,6 +25,8 @@ interface AbandonedCart {
 const AbandonedCartsManager = () => {
   const [carts, setCarts] = useState<AbandonedCart[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCarts, setSelectedCarts] = useState<Set<string>>(new Set());
+  const [sendingEmails, setSendingEmails] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     pendingEmail: 0,
@@ -35,6 +38,7 @@ const AbandonedCartsManager = () => {
 
   const fetchCarts = async () => {
     setLoading(true);
+    setSelectedCarts(new Set()); // Clear selection on refresh
     try {
       const { data, error } = await supabase
         .from('abandoned_carts')
@@ -102,6 +106,92 @@ const AbandonedCartsManager = () => {
     if (hours < 24) return `${hours}h ago`;
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
+  };
+
+  const toggleCartSelection = (cartId: string) => {
+    setSelectedCarts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(cartId)) {
+        newSet.delete(cartId);
+      } else {
+        newSet.add(cartId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedCarts.size === carts.length) {
+      setSelectedCarts(new Set());
+    } else {
+      setSelectedCarts(new Set(carts.map(c => c.id)));
+    }
+  };
+
+  const sendFollowUpToSelected = async () => {
+    if (selectedCarts.size === 0) {
+      toast.error('Please select at least one cart');
+      return;
+    }
+
+    const selectedCartsList = carts.filter(c => selectedCarts.has(c.id));
+    
+    if (!confirm(`Send follow-up emails to ${selectedCartsList.length} selected cart(s)?`)) {
+      return;
+    }
+
+    setSendingEmails(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const cart of selectedCartsList) {
+      try {
+        const { error } = await supabase.functions.invoke('send-custom-abandoned-cart', {
+          body: {
+            email: cart.email,
+            customerName: cart.email.split('@')[0],
+            cartItems: cart.cart_items,
+            originalTotal: cart.cart_value,
+            discountPercent: 15,
+            discountCode: 'COMEBACK15',
+            healaidTrialDays: 3,
+          }
+        });
+
+        if (error) throw error;
+        
+        // Update the email_sent_at in database
+        await supabase
+          .from('abandoned_carts')
+          .update({ email_sent_at: new Date().toISOString() })
+          .eq('id', cart.id);
+
+        successCount++;
+        
+        // Log admin action
+        await logAdminAction({
+          action: 'sent_followup_email',
+          resourceType: 'abandoned_cart',
+          resourceId: cart.id,
+          details: { email: cart.email, cart_value: cart.cart_value }
+        });
+      } catch (error: any) {
+        console.error(`Error sending to ${cart.email}:`, error);
+        errorCount++;
+      }
+    }
+
+    setSendingEmails(false);
+    setSelectedCarts(new Set());
+    
+    if (successCount > 0) {
+      toast.success(`Sent ${successCount} follow-up email(s)`);
+    }
+    if (errorCount > 0) {
+      toast.error(`Failed to send ${errorCount} email(s)`);
+    }
+    
+    fetchCarts();
   };
 
   const deleteCart = async (cartId: string, email: string) => {
@@ -210,10 +300,21 @@ const AbandonedCartsManager = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button onClick={processAbandonedCarts} variant="default">
               <Mail className="w-4 h-4 mr-2" />
               Process Pending Carts Now
+            </Button>
+            <Button 
+              onClick={sendFollowUpToSelected}
+              variant="secondary"
+              disabled={selectedCarts.size === 0 || sendingEmails}
+            >
+              <Send className="w-4 h-4 mr-2" />
+              {sendingEmails 
+                ? `Sending (${selectedCarts.size})...` 
+                : `Send Email to Selected (${selectedCarts.size})`
+              }
             </Button>
             <Button onClick={fetchCarts} variant="outline">
               <RefreshCw className="w-4 h-4 mr-2" />
@@ -226,6 +327,13 @@ const AbandonedCartsManager = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox 
+                      checked={selectedCarts.size === carts.length && carts.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Select all"
+                    />
+                  </TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Items</TableHead>
                   <TableHead>Value</TableHead>
@@ -238,13 +346,20 @@ const AbandonedCartsManager = () => {
               <TableBody>
               {carts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No abandoned carts found
                     </TableCell>
                   </TableRow>
                 ) : (
                   carts.map((cart) => (
                     <TableRow key={cart.id}>
+                      <TableCell>
+                        <Checkbox 
+                          checked={selectedCarts.has(cart.id)}
+                          onCheckedChange={() => toggleCartSelection(cart.id)}
+                          aria-label={`Select cart for ${cart.email}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{cart.email}</TableCell>
                       <TableCell>{cart.cart_items?.length || 0} items</TableCell>
                       <TableCell>{formatCurrency(cart.cart_value)}</TableCell>
