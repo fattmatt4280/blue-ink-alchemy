@@ -109,34 +109,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleUpgrade = async (tier: string) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast.error("Please sign in to upgrade");
-        navigate("/auth");
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-healaid-upgrade', {
-        body: { tier },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        },
-      });
-
-      if (error) throw error;
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error: any) {
-      console.error("Upgrade error:", error);
-      toast.error(error.message || "Failed to start upgrade");
-    }
-  };
-
   if (isLoading || subscriptionStatus.loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -217,121 +189,15 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Upgrade Options */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upgrade Your Plan</CardTitle>
-            <CardDescription>Choose the plan that fits your healing journey</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Basic Plans */}
-            <div className="space-y-2">
-              <h3 className="font-semibold text-sm text-muted-foreground">Basic Plans</h3>
-              <div className="grid gap-3 md:grid-cols-2">
-                <Card className="border">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Basic Weekly</CardTitle>
-                    <CardDescription className="text-xs">2 uploads/day</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold mb-2">$0.99<span className="text-sm font-normal">/week</span></p>
-                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
-                      <li>• AI summary view</li>
-                      <li>• 7-day history</li>
-                      <li>• Product recommendations</li>
-                    </ul>
-                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('basic_weekly')}>
-                      Subscribe
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="border">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Basic Monthly</CardTitle>
-                    <CardDescription className="text-xs">2 uploads/day</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold mb-2">$2.99<span className="text-sm font-normal">/mo</span></p>
-                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
-                      <li>• All Basic Weekly features</li>
-                      <li>• 30-day history</li>
-                      <li>• Better value</li>
-                    </ul>
-                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('basic_monthly')}>
-                      Subscribe
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* Pro Plans */}
-            <div className="space-y-2">
-              <h3 className="font-semibold text-sm text-muted-foreground">Pro Plans</h3>
-              <div className="grid gap-3 md:grid-cols-2">
-                <Card className="border-2 border-primary">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Pro Weekly</CardTitle>
-                    <CardDescription className="text-xs">Unlimited uploads</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold mb-2">$1.99<span className="text-sm font-normal">/week</span></p>
-                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
-                      <li>• Unlimited analyses</li>
-                      <li>• Downloadable reports</li>
-                      <li>• Medical documentation</li>
-                    </ul>
-                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('pro_weekly')}>
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-primary">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Pro Monthly</CardTitle>
-                    <CardDescription className="text-xs">Best value</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold mb-2">$4.99<span className="text-sm font-normal">/mo</span></p>
-                    <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
-                      <li>• All Pro Weekly features</li>
-                      <li>• Custom aftercare planner</li>
-                      <li>• Priority support</li>
-                    </ul>
-                    <Button size="sm" className="w-full" onClick={() => handleUpgrade('pro_monthly')}>
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* Studio Plan */}
-            <div className="space-y-2">
-              <h3 className="font-semibold text-sm text-muted-foreground">For Professionals</h3>
-              <Card className="border-2 border-accent">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Shop / Artist</CardTitle>
-                  <CardDescription className="text-xs">Client management & analytics</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold mb-2">$24.99<span className="text-sm font-normal">/mo</span></p>
-                  <ul className="text-xs space-y-1 mb-3 text-muted-foreground">
-                    <li>• Client dashboard</li>
-                    <li>• Bulk QR activations</li>
-                    <li>• Studio branding</li>
-                    <li>• Advanced analytics</li>
-                  </ul>
-                  <Button size="sm" className="w-full" variant="secondary" onClick={() => handleUpgrade('shop_monthly')}>
-                    Subscribe
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Upgrade Button */}
+        <Button 
+          className="w-full" 
+          variant="outline"
+          onClick={() => navigate("/plans")}
+        >
+          <Sparkles className="w-4 h-4 mr-2" />
+          View Plans & Upgrade
+        </Button>
 
         {/* Usage Summary */}
         <Card>

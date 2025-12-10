@@ -33,6 +33,7 @@ import NotFound from "./pages/NotFound";
 import HealAid from "./pages/HealAid";
 import ProductDetail from "./pages/ProductDetail";
 import Referrals from "./pages/Referrals";
+import Plans from "./pages/Plans";
 import ArtistOnboarding from "./pages/ArtistOnboarding";
 import ArtistClientsPage from "./pages/ArtistClientsPage";
 import ArtistAlertsPage from "./pages/ArtistAlertsPage";
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/heal-aid" element={<HealAid />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/referrals" element={<Referrals />} />
+              <Route path="/plans" element={<Plans />} />
               
               {/* Artist routes */}
               <Route path="/artist/onboarding" element={
