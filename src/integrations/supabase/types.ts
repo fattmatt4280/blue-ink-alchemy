@@ -1558,6 +1558,117 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_profiles: {
+        Row: {
+          created_at: string | null
+          current_tier: string
+          free_budder_claimed: boolean
+          free_shipping_until: string | null
+          permanent_discount_percent: number
+          referral_code: string
+          store_credit_balance: number
+          total_referrals: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_tier?: string
+          free_budder_claimed?: boolean
+          free_shipping_until?: string | null
+          permanent_discount_percent?: number
+          referral_code: string
+          store_credit_balance?: number
+          total_referrals?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_tier?: string
+          free_budder_claimed?: boolean
+          free_shipping_until?: string | null
+          permanent_discount_percent?: number
+          referral_code?: string
+          store_credit_balance?: number
+          total_referrals?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string | null
+          credit_amount: number | null
+          discount_given: number | null
+          id: string
+          order_id: string | null
+          referral_code: string
+          referred_email: string
+          referred_user_id: string | null
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string | null
+          credit_amount?: number | null
+          discount_given?: number | null
+          id?: string
+          order_id?: string | null
+          referral_code: string
+          referred_email: string
+          referred_user_id?: string | null
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string | null
+          credit_amount?: number | null
+          discount_given?: number | null
+          id?: string
+          order_id?: string | null
+          referral_code?: string
+          referred_email?: string
+          referred_user_id?: string | null
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reminder_settings: {
         Row: {
           created_at: string
