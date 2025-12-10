@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell, Clock, Check, X, Droplets, Camera, AlertTriangle, Settings } from "lucide-react";
+import { Bell, Clock, Check, X, Droplets, Camera, AlertTriangle, Settings, Play, Loader2 } from "lucide-react";
 import { useHealingReminders } from "@/hooks/useHealingReminders";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface UpcomingRemindersCardProps {
   userId: string;
@@ -18,13 +21,45 @@ const REMINDER_ICONS: Record<string, React.ReactNode> = {
 
 export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
   const navigate = useNavigate();
+  const [isTesting, setIsTesting] = useState(false);
   const {
     upcomingReminders,
     isLoading,
     completeReminder,
     cancelReminder,
     isCompleting,
+    refetch,
   } = useHealingReminders(userId);
+
+  const handleTestReminder = async () => {
+    if (upcomingReminders.length === 0) {
+      toast.error("No pending reminders to test");
+      return;
+    }
+
+    const nextReminder = upcomingReminders[0];
+    setIsTesting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-healing-reminder', {
+        body: { reminderId: nextReminder.id }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success(`Test reminder sent! Check your ${nextReminder.delivery_method === 'email' ? 'email' : 'notifications'}.`);
+        refetch();
+      } else {
+        throw new Error(data?.error || 'Failed to send test reminder');
+      }
+    } catch (error: any) {
+      console.error("Test reminder error:", error);
+      toast.error(error.message || "Failed to send test reminder");
+    } finally {
+      setIsTesting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -55,13 +90,31 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
             <Bell className="w-5 h-5" />
             Upcoming Reminders
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/dashboard?tab=reminders")}
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            {displayReminders.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleTestReminder}
+                disabled={isTesting}
+                className="text-xs"
+              >
+                {isTesting ? (
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                ) : (
+                  <Play className="w-3 h-3 mr-1" />
+                )}
+                Test
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/dashboard?tab=reminders")}
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

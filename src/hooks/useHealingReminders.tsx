@@ -23,7 +23,7 @@ export const useHealingReminders = (userId?: string) => {
   const queryClient = useQueryClient();
 
   // Fetch all reminders for user
-  const { data: reminders, isLoading } = useQuery({
+  const { data: reminders, isLoading, refetch } = useQuery({
     queryKey: ["healing-reminders", userId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -144,6 +144,7 @@ export const useHealingReminders = (userId?: string) => {
     overdueReminders,
     completedReminders,
     isLoading,
+    refetch,
     snoozeReminder: snoozeReminderMutation.mutate,
     completeReminder: completeReminderMutation.mutate,
     cancelReminder: cancelReminderMutation.mutate,
