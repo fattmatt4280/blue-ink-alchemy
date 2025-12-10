@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu } from "lucide-react";
+import { Menu, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import CartIcon from "./CartIcon";
@@ -10,7 +10,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mainNavItems, userNavItems, footerNavItems, healingTrackerNavItem } from "@/lib/navigationItems";
+import { 
+  mainNavItems, 
+  userNavItems, 
+  footerNavItems, 
+  footerNavItemsCondensed,
+  healingTrackerNavItem,
+  activateCodeNavItem,
+  getFreeCreditsNavItem,
+  signInIcon,
+  signOutIcon
+} from "@/lib/navigationItems";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 
 const HeroHeader = () => {
@@ -23,6 +33,15 @@ const HeroHeader = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Get user's display name
+  const getUserDisplayName = () => {
+    if (!user) return '';
+    return user.user_metadata?.first_name || user.email?.split('@')[0] || 'User';
+  };
+
+  const SignInIcon = signInIcon;
+  const SignOutIcon = signOutIcon;
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50 py-4 px-6 bg-black/90 backdrop-blur-sm">
@@ -83,7 +102,101 @@ const HeroHeader = () => {
             <SheetContent side="right" className="w-80 bg-slate-900 border-slate-800">
               <ScrollArea className="h-[calc(100vh-4rem)] pr-4">
                 <nav className="flex flex-col space-y-6 mt-8">
-                  {/* Navigation Section */}
+                  {/* ACCOUNT Section - Now First */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ACCOUNT</h3>
+                    <div className="space-y-1">
+                      {user ? (
+                        <>
+                          {/* Welcome Card */}
+                          <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mx-3 mb-2">
+                            <span className="text-cyan-400 font-medium">
+                              Welcome back, {getUserDisplayName()}
+                            </span>
+                          </div>
+                          
+                          {/* Healing Tracker with badge */}
+                          {subscription.isActive && subscription.daysRemaining > 0 && (
+                            <Link
+                              to={healingTrackerNavItem.path}
+                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                              <healingTrackerNavItem.icon className="w-5 h-5" />
+                              <span>{healingTrackerNavItem.label}</span>
+                              <Badge variant="secondary" className="ml-auto bg-cyan-500/20 text-cyan-400">
+                                {subscription.daysRemaining}d
+                              </Badge>
+                            </Link>
+                          )}
+                          
+                          {/* Get free credits */}
+                          <Link
+                            to={getFreeCreditsNavItem.path}
+                            className="flex items-center gap-3 px-3 py-2 text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors"
+                          >
+                            <getFreeCreditsNavItem.icon className="w-5 h-5" />
+                            <span>{getFreeCreditsNavItem.label}</span>
+                          </Link>
+                          
+                          {/* User nav items (Dashboard, Healing History) */}
+                          {userNavItems.map((item) => (
+                            <Link
+                              key={item.path}
+                              to={item.path}
+                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <span>{item.label}</span>
+                            </Link>
+                          ))}
+                          
+                          {/* Activate Code (moved from Navigation) */}
+                          <Link
+                            to={activateCodeNavItem.path}
+                            className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                          >
+                            <activateCodeNavItem.icon className="w-5 h-5" />
+                            <span>{activateCodeNavItem.label}</span>
+                          </Link>
+                          
+                          {/* Sign Out */}
+                          <button
+                            onClick={signOut}
+                            className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors w-full text-left"
+                          >
+                            <SignOutIcon className="w-5 h-5" />
+                            <span>Sign Out</span>
+                          </button>
+                        </>
+                      ) : (
+                        <Link
+                          to="/auth"
+                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <SignInIcon className="w-5 h-5" />
+                          <span>Sign In</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Admin Section */}
+                  {isAdmin && (
+                    <div>
+                      <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ADMIN</h3>
+                      <div className="space-y-1">
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <LayoutDashboard className="w-5 h-5" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* NAVIGATION Section */}
                   <div>
                     <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">NAVIGATION</h3>
                     <div className="space-y-1">
@@ -100,85 +213,25 @@ const HeroHeader = () => {
                           </Link>
                         );
                       })}
-                    </div>
-                  </div>
-
-                  {/* Account Section */}
-                  <div>
-                    <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ACCOUNT</h3>
-                    <div className="space-y-1">
-                      {user ? (
-                        <>
-                          {userNavItems.map((item) => (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                            >
-                              <item.icon className="w-5 h-5" />
-                              <span>{item.label}</span>
-                            </Link>
-                          ))}
-                          {subscription.isActive && subscription.daysRemaining > 0 && (
-                            <Link
-                              to={healingTrackerNavItem.path}
-                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                            >
-                              <healingTrackerNavItem.icon className="w-5 h-5" />
-                              <span>{healingTrackerNavItem.label}</span>
-                              <Badge variant="secondary" className="ml-auto">
-                                {subscription.daysRemaining}d
-                              </Badge>
-                            </Link>
-                          )}
-                          <button
-                            onClick={signOut}
-                            className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors w-full text-left"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                            <span>Sign Out</span>
-                          </button>
-                        </>
-                      ) : (
+                      
+                      {/* Activate Code only shows in Navigation for logged-out users */}
+                      {!user && (
                         <Link
-                          to="/auth"
+                          to={activateCodeNavItem.path}
                           className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                          </svg>
-                          <span>Sign In</span>
+                          <activateCodeNavItem.icon className="w-5 h-5" />
+                          <span>{activateCodeNavItem.label}</span>
                         </Link>
                       )}
                     </div>
                   </div>
 
-                  {/* Admin Section */}
-                  {isAdmin && (
-                    <div>
-                      <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ADMIN</h3>
-                      <div className="space-y-1">
-                        <Link
-                          to="/admin"
-                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span>Admin Dashboard</span>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Information Section */}
+                  {/* INFORMATION Section */}
                   <div>
                     <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">INFORMATION</h3>
                     <div className="space-y-1">
-                      {footerNavItems.map((item) => (
+                      {(user ? footerNavItems : footerNavItemsCondensed).map((item) => (
                         <Link
                           key={item.path}
                           to={item.path}
