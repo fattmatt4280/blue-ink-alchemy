@@ -108,26 +108,26 @@ const HeroHeader = () => {
                     <div className="space-y-1">
                       {user ? (
                         <>
-                          {/* Welcome Card */}
-                          <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mx-3 mb-2">
+                          {/* Welcome Card with Healing Tracker inside */}
+                          <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mx-3 mb-2 flex flex-col gap-3">
                             <span className="text-cyan-400 font-medium">
                               Welcome back, {getUserDisplayName()}
                             </span>
+                            
+                            {/* Healing Tracker inside the welcome card */}
+                            {subscription.isActive && subscription.daysRemaining > 0 && (
+                              <Link
+                                to={healingTrackerNavItem.path}
+                                className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
+                              >
+                                <healingTrackerNavItem.icon className="w-5 h-5 text-white" />
+                                <span className="text-white">{healingTrackerNavItem.label}</span>
+                                <Badge variant="secondary" className="ml-auto bg-cyan-500/30 text-cyan-400">
+                                  {subscription.daysRemaining}d
+                                </Badge>
+                              </Link>
+                            )}
                           </div>
-                          
-                          {/* Healing Tracker with badge */}
-                          {subscription.isActive && subscription.daysRemaining > 0 && (
-                            <Link
-                              to={healingTrackerNavItem.path}
-                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                            >
-                              <healingTrackerNavItem.icon className="w-5 h-5" />
-                              <span>{healingTrackerNavItem.label}</span>
-                              <Badge variant="secondary" className="ml-auto bg-cyan-500/20 text-cyan-400">
-                                {subscription.daysRemaining}d
-                              </Badge>
-                            </Link>
-                          )}
                           
                           {/* Get free credits */}
                           <Link

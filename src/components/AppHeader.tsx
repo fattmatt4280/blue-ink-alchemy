@@ -119,29 +119,29 @@ const AppHeader = ({
                       <div className="flex flex-col gap-2">
                         {user ? (
                           <>
-                            {/* Welcome Card */}
-                            <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mb-2">
+                            {/* Welcome Card with Healing Tracker inside */}
+                            <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mb-2 flex flex-col gap-3">
                               <span className="text-cyan-400 font-medium">
                                 Welcome back, {getUserDisplayName()}
                               </span>
+                              
+                              {/* Healing Tracker inside the welcome card */}
+                              {subscription.isActive && subscription.daysRemaining > 0 && (
+                                <Link
+                                  to={healingTrackerNavItem.path}
+                                  onClick={() => setIsOpen(false)}
+                                  className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
+                                >
+                                  <healingTrackerNavItem.icon className="w-5 h-5 text-white" />
+                                  <span className="text-white flex items-center gap-2">
+                                    {healingTrackerNavItem.label}
+                                    <Badge variant="secondary" className="text-xs bg-cyan-500/30 text-cyan-400">
+                                      {subscription.daysRemaining}d
+                                    </Badge>
+                                  </span>
+                                </Link>
+                              )}
                             </div>
-                            
-                            {/* Healing Tracker with badge */}
-                            {subscription.isActive && subscription.daysRemaining > 0 && (
-                              <Link
-                                to={healingTrackerNavItem.path}
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors"
-                              >
-                                <healingTrackerNavItem.icon className="w-5 h-5" />
-                                <span className="flex items-center gap-2">
-                                  {healingTrackerNavItem.label}
-                                  <Badge variant="secondary" className="text-xs bg-cyan-500/20 text-cyan-400">
-                                    {subscription.daysRemaining}d
-                                  </Badge>
-                                </span>
-                              </Link>
-                            )}
                             
                             {/* Get free credits */}
                             <Link
