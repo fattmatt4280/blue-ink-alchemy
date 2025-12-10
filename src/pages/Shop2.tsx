@@ -2,6 +2,7 @@ import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
 import AppHeader from "@/components/AppHeader";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import ReviewBanner from "@/components/ReviewBanner";
 
 const Shop2 = () => {
   return (
@@ -9,6 +10,7 @@ const Shop2 = () => {
       <AnimatedBackground />
       <AppHeader />
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12 relative z-10">
+        <ReviewBanner />
         <ProductGrid />
         
         <div className="grid md:grid-cols-3 gap-8 mt-16">
