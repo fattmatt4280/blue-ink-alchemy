@@ -9,11 +9,9 @@ import { PhotoReviewScreen } from "@/components/PhotoReviewScreen";
 import { HealingQuestionsOverlay, HealingQuestionData } from "@/components/HealingQuestionsOverlay";
 import { HealingAssessmentResults } from "@/components/HealingAssessmentResults";
 import { DownloadSelectionDialog } from "@/components/DownloadSelectionDialog";
-import CartDialog from "@/components/CartDialog";
-import HealingQADialog from "@/components/HealingQADialog";
+import { ReminderOptInDialog } from "@/components/ReminderOptInDialog";
 import { CapturedPhoto, CameraMode } from "@/hooks/useCamera";
 import { AnalyzingAnimation } from "@/components/AnalyzingAnimation";
-import { generateSingleEntryReport, downloadHtmlReport } from "@/utils/healingReportExport";
 
 type Step = 'camera' | 'review' | 'questions' | 'analyzing' | 'results';
 
@@ -26,12 +24,11 @@ const HealingTracker = () => {
   const [step, setStep] = useState<Step>('camera');
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [selectedMode, setSelectedMode] = useState<CameraMode>('progress');
-  const [showCartDialog, setShowCartDialog] = useState(false);
-  const [showQADialog, setShowQADialog] = useState(false);
   const [lastAnalysisId, setLastAnalysisId] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [currentFormData, setCurrentFormData] = useState<HealingQuestionData | null>(null);
   const [showDownloadDialog, setShowDownloadDialog] = useState(false);
+  const [showReminderOptIn, setShowReminderOptIn] = useState(false);
 
   // Route protection - redirect if no active subscription
   useEffect(() => {
@@ -265,6 +262,18 @@ const HealingTracker = () => {
         setAnalysisResult(analysisData.analysis);
         setCurrentFormData(formData);
         setStep('results');
+
+        // Check if user has reminder preferences - if not, show opt-in
+        const { data: prefs } = await supabase
+          .from('user_reminder_preferences')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!prefs) {
+          // Delay showing the dialog to let user see results first
+          setTimeout(() => setShowReminderOptIn(true), 2000);
+        }
       }
     } catch (error: any) {
       console.error('Error analyzing healing progress:', error);
@@ -312,6 +321,10 @@ const HealingTracker = () => {
   }
 
   if (step === 'results' && analysisResult && currentFormData) {
+    const userName = user?.user_metadata?.first_name || 
+                     user?.email?.split('@')[0]?.split('.')[0] || 
+                     'there';
+
     return (
       <>
         <HealingAssessmentResults
@@ -336,6 +349,16 @@ const HealingTracker = () => {
           open={showDownloadDialog}
           onOpenChange={setShowDownloadDialog}
         />
+        {user && lastAnalysisId && (
+          <ReminderOptInDialog
+            open={showReminderOptIn}
+            onOpenChange={setShowReminderOptIn}
+            userId={user.id}
+            healingProgressId={lastAnalysisId}
+            tattooAge={Number(currentFormData.tattooAge) || 0}
+            userName={userName}
+          />
+        )}
       </>
     );
   }

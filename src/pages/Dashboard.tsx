@@ -11,6 +11,7 @@ import AppHeader from "@/components/AppHeader";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 import { DashboardWelcomeDialog } from "@/components/DashboardWelcomeDialog";
 import { HealingInsightsDashboard } from "@/components/HealingInsightsDashboard";
+import { UpcomingRemindersCard } from "@/components/UpcomingRemindersCard";
 
 interface Subscription {
   tier: string;
@@ -384,6 +385,11 @@ const Dashboard = () => {
               <HealingInsightsDashboard userId={subscription?.user_id} />
             </CardContent>
           </Card>
+        )}
+
+        {/* Upcoming Reminders */}
+        {subscription?.user_id && (
+          <UpcomingRemindersCard userId={subscription.user_id} />
         )}
 
         {/* Quick Actions */}
