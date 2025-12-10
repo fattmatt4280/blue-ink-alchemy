@@ -27,6 +27,20 @@ export const MFAChallenge = ({ onSuccess, onCancel }: MFAChallengeProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Check server-side lockout BEFORE attempting verification
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('mfa_locked_until, failed_mfa_attempts')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.mfa_locked_until && new Date(profile.mfa_locked_until) > new Date()) {
+        const remainingMinutes = Math.ceil((new Date(profile.mfa_locked_until).getTime() - Date.now()) / 60000);
+        toast.error(`Account locked. Try again in ${remainingMinutes} minute(s).`);
+        setLoading(false);
+        return;
+      }
+
       const { data: factors } = await supabase.auth.mfa.listFactors();
       const totpFactor = factors?.totp?.[0];
 
