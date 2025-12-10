@@ -15,7 +15,7 @@ export const activateCodeNavItem = { label: 'Activate Code', path: '/activate', 
 export const healingTrackerNavItem = { label: 'Healing Tracker', path: '/healing-tracker', icon: Package };
 
 // Get free credits item for logged-in users
-export const getFreeCreditsNavItem = { label: 'Get free credits', path: '/activate', icon: Gift };
+export const getFreeCreditsNavItem = { label: 'Get free credits', path: '/referrals', icon: Gift };
 
 export const userNavItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
