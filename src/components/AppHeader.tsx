@@ -17,6 +17,7 @@ import {
   healingTrackerNavItem,
   activateCodeNavItem,
   getFreeCreditsNavItem,
+  upgradeNavItem,
   signInIcon,
   signOutIcon
 } from "@/lib/navigationItems";
@@ -141,6 +142,16 @@ const AppHeader = ({
                                   </span>
                                 </Link>
                               )}
+                              
+                              {/* Upgrade Plan inside the welcome card */}
+                              <Link
+                                to={upgradeNavItem.path}
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
+                              >
+                                <upgradeNavItem.icon className="w-5 h-5 text-amber-400" />
+                                <span className="text-amber-400">{upgradeNavItem.label}</span>
+                              </Link>
                             </div>
                             
                             {/* Get free credits */}

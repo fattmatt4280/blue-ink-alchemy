@@ -1,4 +1,7 @@
-import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound, Users, Bell, MessageSquare, Gift, LogIn, LogOut } from "lucide-react";
+import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound, Users, Bell, MessageSquare, Gift, LogIn, LogOut, Sparkles } from "lucide-react";
+
+// Upgrade plan nav item
+export const upgradeNavItem = { label: 'Upgrade Plan', path: '/plans', icon: Sparkles };
 
 export const mainNavItems = [
   { label: 'Home', path: '/', icon: Home },
