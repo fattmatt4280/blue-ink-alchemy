@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { Resend } from "https://esm.sh/resend@2.0.0"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,6 +11,10 @@ interface SendReminderRequest {
   reminderId: string
 }
 
+const logStep = (step: string, details?: any) => {
+  console.log(`[send-healing-reminder] ${step}`, details ? JSON.stringify(details) : '')
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -18,23 +23,40 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const resendKey = Deno.env.get('RESEND_API_KEY')!
+    const resendKey = Deno.env.get('RESEND_API_KEY')
+    
+    if (!resendKey) {
+      throw new Error('RESEND_API_KEY is not configured')
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseKey)
+    const resend = new Resend(resendKey)
 
     const { reminderId }: SendReminderRequest = await req.json()
+    logStep('Processing reminder', { reminderId })
 
-    console.log('Sending reminder:', reminderId)
-
-    // Get reminder details
+    // Get reminder details (separate query, no join)
     const { data: reminder, error: reminderError } = await supabase
       .from('healing_reminders')
-      .select('*, user:user_id(email)')
+      .select('*')
       .eq('id', reminderId)
       .single()
 
     if (reminderError) {
+      logStep('Error fetching reminder', { error: reminderError })
       throw reminderError
     }
+
+    if (!reminder) {
+      throw new Error('Reminder not found')
+    }
+
+    logStep('Reminder found', { 
+      title: reminder.title, 
+      status: reminder.status, 
+      user_id: reminder.user_id,
+      delivery_method: reminder.delivery_method 
+    })
 
     if (reminder.status !== 'pending') {
       return new Response(
@@ -43,12 +65,31 @@ serve(async (req) => {
       )
     }
 
-    const userEmail = reminder.user.email
-    const results = { email: null, push: null }
+    // Get user email from profiles table (separate query)
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', reminder.user_id)
+      .single()
+
+    if (profileError) {
+      logStep('Error fetching user profile', { error: profileError })
+      throw new Error(`Could not fetch user profile: ${profileError.message}`)
+    }
+
+    if (!profile?.email) {
+      throw new Error('User email not found in profile')
+    }
+
+    const userEmail = profile.email
+    logStep('User email found', { email: userEmail })
+
+    const results: { email?: any; push?: any } = {}
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://dreamtattooco.com'
 
     // Send email if needed
     if (reminder.delivery_method === 'email' || reminder.delivery_method === 'both') {
-      console.log('Sending email to:', userEmail)
+      logStep('Sending email', { to: userEmail, subject: reminder.title })
       
       const emailHtml = `
         <!DOCTYPE html>
@@ -68,7 +109,7 @@ serve(async (req) => {
               </p>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${Deno.env.get('SITE_URL') || 'https://dreamtattooco-com'}${reminder.action_url}" 
+                <a href="${siteUrl}${reminder.action_url || '/healing-tracker'}" 
                    style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
                   Open Healing Tracker
                 </a>
@@ -77,7 +118,7 @@ serve(async (req) => {
               <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #666; text-align: center;">
                 <p>You're receiving this because you signed up for healing reminders with HealAid.</p>
                 <p style="margin-top: 10px;">
-                  <a href="${Deno.env.get('SITE_URL') || 'https://dreamtattooco-com'}/healing-tracker" style="color: #667eea; text-decoration: none;">
+                  <a href="${siteUrl}/healing-tracker" style="color: #667eea; text-decoration: none;">
                     Manage your reminder preferences
                   </a>
                 </p>
@@ -87,38 +128,29 @@ serve(async (req) => {
         </html>
       `
 
-      const emailResponse = await fetch('https://api.resend.com/emails/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      try {
+        const emailResponse = await resend.emails.send({
           from: 'HealAid <noreply@dreamtattooco.com>',
           to: [userEmail],
           subject: reminder.title,
           html: emailHtml,
-        }),
-      })
+        })
 
-      const emailResult = await emailResponse.json()
-      results.email = emailResult
-      console.log('Email result:', emailResult)
+        results.email = emailResponse
+        logStep('Email sent successfully', { response: emailResponse })
+      } catch (emailError: any) {
+        logStep('Email send error', { error: emailError.message })
+        results.email = { error: emailError.message }
+      }
     }
 
     // Send push notification if needed
     if (reminder.delivery_method === 'push' || reminder.delivery_method === 'both') {
-      console.log('Sending push notification to user:', reminder.user_id)
+      logStep('Sending push notification', { userId: reminder.user_id })
       
       try {
-        // Call the existing push notification function
-        const pushResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-push-notification`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        const pushResponse = await supabase.functions.invoke('send-push-notification', {
+          body: {
             userId: reminder.user_id,
             title: reminder.title,
             body: reminder.message,
@@ -127,13 +159,13 @@ serve(async (req) => {
               reminder_id: reminderId,
               action_url: reminder.action_url,
             },
-          }),
+          },
         })
 
-        results.push = await pushResponse.json()
-        console.log('Push notification result:', results.push)
-      } catch (pushError) {
-        console.error('Push notification error:', pushError)
+        results.push = pushResponse.data
+        logStep('Push notification result', { response: results.push })
+      } catch (pushError: any) {
+        logStep('Push notification error', { error: pushError.message })
         results.push = { error: pushError.message }
       }
     }
@@ -149,17 +181,18 @@ serve(async (req) => {
       .eq('id', reminderId)
 
     if (updateError) {
+      logStep('Error updating reminder status', { error: updateError })
       throw updateError
     }
 
-    console.log('Reminder sent successfully:', reminderId)
+    logStep('Reminder completed successfully', { reminderId, results })
 
     return new Response(
       JSON.stringify({ success: true, reminderId, results }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
-  } catch (error) {
-    console.error('Error sending reminder:', error)
+  } catch (error: any) {
+    logStep('Error sending reminder', { error: error.message })
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
