@@ -24,6 +24,7 @@ const Checkout = () => {
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState(false);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
@@ -170,18 +171,46 @@ const Checkout = () => {
   }, [success, cancelled]); // Removed clearCart from dependencies to prevent infinite loop
 
   const applyDiscountCode = () => {
-    if (discountCode.toUpperCase() === 'CART10' || discountCode.toUpperCase() === 'COMEBACK10') {
-      const discount = subtotal * 0.1;
+    // Prevent stacking - only one discount code per order
+    if (discountApplied) {
+      toast.error('Only one discount code can be used per order. Remove your current discount first.');
+      return;
+    }
+
+    const code = discountCode.toUpperCase();
+    
+    // Christmas 15% discount
+    if (code === 'XMAS15' || code === 'CHRISTMAS15') {
+      const discount = subtotal * 0.15;
       setDiscountAmount(discount);
+      setDiscountPercent(15);
       setDiscountApplied(true);
-      toast.success('10% discount applied!');
+      toast.success('🎄 Christmas discount applied - 15% off!');
       
-      // Track discount code usage
       supabase.from('analytics_events').insert({
         event_type: 'discount_code_used',
         event_data: {
-          code: discountCode.toUpperCase(),
+          code: code,
           discount_amount: discount,
+          discount_percent: 15,
+          cart_value: subtotal
+        }
+      });
+    }
+    // Existing 10% codes
+    else if (code === 'CART10' || code === 'COMEBACK10') {
+      const discount = subtotal * 0.1;
+      setDiscountAmount(discount);
+      setDiscountPercent(10);
+      setDiscountApplied(true);
+      toast.success('10% discount applied!');
+      
+      supabase.from('analytics_events').insert({
+        event_type: 'discount_code_used',
+        event_data: {
+          code: code,
+          discount_amount: discount,
+          discount_percent: 10,
           cart_value: subtotal
         }
       });
@@ -193,6 +222,7 @@ const Checkout = () => {
   const removeDiscount = () => {
     setDiscountCode('');
     setDiscountAmount(0);
+    setDiscountPercent(0);
     setDiscountApplied(false);
     toast.info('Discount removed');
   };
@@ -629,7 +659,7 @@ const Checkout = () => {
                         <div className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           <span className="text-sm font-medium text-green-800">
-                            {discountCode} Applied (10% off)
+                            {discountCode} Applied ({discountPercent}% off)
                           </span>
                         </div>
                         <Button 
@@ -651,7 +681,7 @@ const Checkout = () => {
                   
                   {discountApplied && (
                     <div className="flex justify-between text-green-600">
-                      <span>Discount (10%):</span>
+                      <span>Discount ({discountPercent}%):</span>
                       <span className="font-semibold">-${discountAmount.toFixed(2)}</span>
                     </div>
                   )}
