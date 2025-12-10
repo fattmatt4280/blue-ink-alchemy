@@ -237,7 +237,7 @@ const HealingTracker = () => {
           photo_url: uploadedUrls[0],
           photo_urls: uploadedUrls,
           healing_stage: analysisData.analysis?.healingStage || 'unknown',
-          progress_score: analysisData.analysis?.progressScore || 50,
+          progress_score: Math.round(analysisData.analysis?.progressScore) || 50,
           recommendations: analysisData.analysis?.recommendations || [],
           tattoo_title: analysisData.analysis?.tattooTitle || null,
           analysis_result: {
