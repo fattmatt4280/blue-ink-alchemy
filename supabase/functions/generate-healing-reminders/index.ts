@@ -95,13 +95,9 @@ serve(async (req) => {
         .replace(/{{hours}}/g, String(template.hours_after_tattoo))
         .replace(/{{days}}/g, String(Math.floor(template.hours_after_tattoo / 24)))
 
-      // Determine delivery method
-      let deliveryMethod = 'email'
-      if (preferences.email_enabled && preferences.push_enabled) {
-        deliveryMethod = 'both'
-      } else if (preferences.push_enabled) {
-        deliveryMethod = 'push'
-      }
+      // Determine delivery method - default to email only for web apps
+      // Push notifications require a native mobile app
+      const deliveryMethod = 'email'
 
       remindersToCreate.push({
         user_id: userId,
