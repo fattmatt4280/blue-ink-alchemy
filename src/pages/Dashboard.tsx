@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Sparkles, Clock, ArrowRight, History } from "lucide-react";
+import { Sparkles, Clock, ArrowRight, History, Bell } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import AppHeader from "@/components/AppHeader";
 import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 import { DashboardWelcomeDialog } from "@/components/DashboardWelcomeDialog";
 import { HealingInsightsDashboard } from "@/components/HealingInsightsDashboard";
 import { UpcomingRemindersCard } from "@/components/UpcomingRemindersCard";
+import { PushNotificationManager } from "@/components/PushNotificationManager";
 
 interface Subscription {
   tier: string;
@@ -391,6 +392,20 @@ const Dashboard = () => {
         {subscription?.user_id && (
           <UpcomingRemindersCard userId={subscription.user_id} />
         )}
+
+        {/* Notification Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="w-5 h-5" />
+              Notification Settings
+            </CardTitle>
+            <CardDescription>Enable push notifications to receive healing reminders</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PushNotificationManager />
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <Card>
