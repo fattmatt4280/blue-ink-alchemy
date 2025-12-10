@@ -61,12 +61,26 @@ serve(async (req) => {
       );
     }
 
-    // PROMPT INJECTION DETECTION
-    const suspiciousPatterns = [/ignore\s+instructions/i, /system\s+prompt/i];
+    // PROMPT INJECTION DETECTION - Comprehensive pattern list
+    const suspiciousPatterns = [
+      /ignore\s+(all\s+)?(previous\s+)?(instructions|prompts|rules)/i,
+      /disregard\s+(all\s+)?(previous\s+)?(instructions|prompts|rules)/i,
+      /forget\s+(your\s+)?(instructions|prompts|training|rules)/i,
+      /(you\s+are|act\s+as|pretend\s+to\s+be|roleplay\s+as)\s+(now\s+)?a\s+(?!tattoo|healing|aftercare)/i,
+      /(show|reveal|print|display|output)\s+(your\s+)?(system\s+prompt|instructions|configuration)/i,
+      /system\s+prompt/i,
+      /override\s+(your\s+)?(instructions|rules|programming)/i,
+      /bypass\s+(your\s+)?(restrictions|limitations|rules)/i,
+      /new\s+instructions?\s*:/i,
+      /\[SYSTEM\]/i,
+      /\[INST\]/i,
+      /<\/?system>/i,
+    ];
     for (const pattern of suspiciousPatterns) {
       if (pattern.test(questionText)) {
+        console.warn('Prompt injection attempt detected:', { userId, pattern: pattern.toString() });
         return new Response(
-          JSON.stringify({ error: 'Invalid question. Please rephrase.' }),
+          JSON.stringify({ error: 'Invalid question. Please rephrase your question about tattoo healing.' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
