@@ -1128,6 +1128,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_healing_reminders_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "healing_reminders_healing_progress_id_fkey"
             columns: ["healing_progress_id"]
             isOneToOne: false
