@@ -133,9 +133,9 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Failed to generate unique code');
     }
 
-    // Insert activation code
-    const expirationDate = new Date();
-    expirationDate.setHours(expirationDate.getHours() + 24);
+    // Insert activation code - NOT redeemed yet, user must activate it
+    // Duration is 3 days for free trial
+    const durationDays = 3;
 
     const { data: activationCode, error: insertError } = await supabase
       .from('healaid_activation_codes')
@@ -143,10 +143,8 @@ const handler = async (req: Request): Promise<Response> => {
         code,
         email,
         tier: 'free_trial',
-        redeemed: true,
-        activated_by: userId || null,
-        activation_date: new Date().toISOString(),
-        expiration_date: expirationDate.toISOString(),
+        duration_days: durationDays,
+        redeemed: false, // Code is NOT redeemed until user activates it
         code_expiration_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
       })
       .select()
@@ -159,27 +157,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Activation code created: ${code}`);
 
-    // Create subscription
-    const { data: subscription, error: subscriptionError } = await supabase
-      .from('healaid_subscriptions')
-      .insert({
-        user_id: userId || null,
-        email,
-        tier: 'free_trial',
-        activation_code: code,
-        start_date: new Date().toISOString(),
-        expiration_date: expirationDate.toISOString(),
-        is_active: true
-      })
-      .select()
-      .single();
-
-    if (subscriptionError) {
-      console.error('Error creating subscription:', subscriptionError);
-      throw subscriptionError;
-    }
-
-    console.log(`Subscription created for ${email}`);
+    // Don't create subscription yet - it will be created when user activates the code
+    console.log(`Activation code ${code} created for ${email} - awaiting activation`);
 
     // Send activation email
     try {
@@ -204,12 +183,8 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Free trial activated! Check your email for confirmation.',
-        subscription: {
-          id: subscription.id,
-          tier: subscription.tier,
-          expiration_date: subscription.expiration_date
-        }
+        message: 'Check your email for your activation code!',
+        code: code
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
