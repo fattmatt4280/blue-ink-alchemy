@@ -400,7 +400,41 @@ HEALING TIMELINE (be strict about age):
 - Days 5-7: Scabbing Phase - Darker scabs forming, itching starts
 - Days 8-14: Peeling Phase - Scabs flaking off, skin looks dull/silvery
 - Days 15-30: Late Healing - Most peeling done, color returning
-- Days 30+: Settled - Fully healed, vibrant colors, no flaking
+- Days 31-62: Settling/Healed - Fully healed, vibrant colors, no flaking
+- Days 63-90: Fully Settled - Healing cycle complete, tattoo is fully integrated
+- Days 90+: MATURE/FULLY HEALED TATTOO - This is NOT an actively healing tattoo!
+
+**CRITICAL - MATURE TATTOO HANDLING (90+ days old / months/years old):**
+
+If the tattoo age is greater than 90 days (3+ months, or expressed in months/years like "6 months", "1 year", "20 years"):
+- This is a MATURE/FULLY HEALED tattoo - the healing cycle is 100% COMPLETE
+- Healing Stage: "Fully Healed" or "Mature"
+- Progress Score: 100 (healing is complete - ALWAYS 100% for mature tattoos!)
+- effectiveHealingAge: 62 (max - healing cycle complete)
+- healingDelay: 0 (not applicable)
+
+For mature tattoos, SHIFT your assessment focus ENTIRELY to:
+1. Long-term tattoo health (fading, color retention, line integrity, blowouts)
+2. Skin condition around and within the tattoo
+3. Any NEW issues (sudden irritation, allergic reactions developing over time, raised bumps)
+4. Touch-up recommendations if needed (fading lines, color loss)
+5. Ongoing care (sunscreen protection, moisturizing for longevity)
+
+EXAMPLES OF MATURE TATTOOS:
+- "20 years old" = 7300 days → Progress Score: 100%, Stage: "Mature"
+- "5 months ago" = ~150 days → Progress Score: 100%, Stage: "Fully Healed"
+- "1 year old" = 365 days → Progress Score: 100%, Stage: "Mature"
+- "Got it 6 years ago" = 2190 days → Progress Score: 100%, Stage: "Mature"
+
+A 20-year-old tattoo with no issues = 100% healed, NOT 26%!
+A 5-month-old tattoo = 100% healed, NOT 40%!
+
+MATURE TATTOO RECOMMENDATIONS SHOULD FOCUS ON:
+- UV protection and sunscreen use
+- Moisturizing for skin health
+- Touch-up timing if colors have faded
+- Addressing any new concerns (bumps, reactions)
+- Celebrating a well-healed piece!
 
 EFFECTIVE HEALING AGE ASSESSMENT (CRITICAL - Visual-based progress tracking):
 
@@ -492,11 +526,26 @@ Normal Complications (expected redness, standard scabbing):
 
 **CALCULATION PROCESS**:
 
-1. **Assess Calendar Age**: Note the actual days since tattoo was done
-2. **Assess Visual Appearance**: Compare photos to the visual indicators above - what day does it LOOK like?
-3. **Determine Effective Age**: This is what day the tattoo appears to be at visually
-4. **Calculate Healing Delay**: Calendar Age - Effective Age = Days Lost to Complications
-5. **Calculate Progress Score**: (Effective Age / 62) × 100
+1. **Parse Tattoo Age Correctly**: 
+   - Convert years to days (1 year = 365 days)
+   - Convert months to days (1 month = 30 days)
+   - Handle typos (e.g., "2o years" = "20 years" = 7300 days)
+   - If user says "years" or "months", multiply appropriately
+
+2. **Check for Mature Tattoo (FIRST!)**:
+   - If calendar age > 90 days → MATURE TATTOO → Progress Score = 100%, Skip healing assessment
+   - This includes ANY tattoo described in months or years (e.g., "6 months", "2 years", "20 years")
+
+3. **For Actively Healing Tattoos (< 90 days)**:
+   - Assess Visual Appearance: Compare photos to the visual indicators above
+   - Determine Effective Age: What day does it LOOK like?
+   - Calculate Healing Delay: Calendar Age - Effective Age = Days Lost
+   - Calculate Progress Score: (Effective Age / 62) × 100
+
+**SCORING RULES SUMMARY**:
+- Tattoo age > 90 days (or months/years): Progress Score = 100 (mature/fully healed)
+- Tattoo age 62-90 days: Progress Score = 95-100 (settling/healed)
+- Tattoo age 0-62 days: Progress Score = (effectiveHealingAge / 62) × 100
 
 **EXAMPLES**:
 
