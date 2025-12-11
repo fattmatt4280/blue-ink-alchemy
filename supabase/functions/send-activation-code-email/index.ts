@@ -47,7 +47,7 @@ const handler = async (req: Request): Promise<Response> => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 90);
 
-    const activateUrl = `https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com/activate?code=${code}`;
+    const activateUrl = `https://bluedreambudder.com/activate?code=${code}`;
 
     const emailResponse = await resend.emails.send({
       from: "Dream Tattoo Company <noreply@updates.bluedreambudder.com>",
