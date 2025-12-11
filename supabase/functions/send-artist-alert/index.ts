@@ -123,7 +123,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Heal-AId Alerts <alerts@dreamtattooco.com>',
+        from: 'Heal-AId Alerts <alerts@updates.bluedreambudder.com>',
         to: [artistEmail],
         subject: `⚠️ ${alertData.severity.toUpperCase()}: ${alertData.alertTitle}`,
         html: emailHtml,

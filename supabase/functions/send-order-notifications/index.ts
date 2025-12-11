@@ -153,7 +153,7 @@ serve(async (req) => {
 
     // Send notification email
     const emailResponse = await resend.emails.send({
-      from: "Your Store <orders@yourdomain.com>",
+      from: "Dream Tattoo Company <orders@updates.bluedreambudder.com>",
       to: [order.email],
       subject: emailSubject,
       html: emailHtml,

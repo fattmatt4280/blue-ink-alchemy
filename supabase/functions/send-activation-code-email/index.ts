@@ -50,7 +50,7 @@ const handler = async (req: Request): Promise<Response> => {
     const activateUrl = `https://eddfac78-1921-4963-ae88-c91f314935b4.lovableproject.com/activate?code=${code}`;
 
     const emailResponse = await resend.emails.send({
-      from: "Dream Tattoo Company <onboarding@resend.dev>",
+      from: "Dream Tattoo Company <noreply@updates.bluedreambudder.com>",
       to: [email],
       subject: `Your Heal-AId Activation Code - ${tierName}`,
       html: `

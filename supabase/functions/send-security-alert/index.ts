@@ -42,7 +42,7 @@ const handler = async (req: Request): Promise<Response> => {
     };
 
     const emailResponse = await resend.emails.send({
-      from: "Security Alerts <onboarding@resend.dev>",
+      from: "Security Alerts <alerts@updates.bluedreambudder.com>",
       to: ["matt@dreamtattoocompany.com"],
       subject: `${severityEmoji[severity]} ${alertTypeLabel[alertType]} - ${severity.toUpperCase()}`,
       html: `

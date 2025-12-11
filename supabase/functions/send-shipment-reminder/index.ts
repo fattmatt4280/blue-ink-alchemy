@@ -141,7 +141,7 @@ serve(async (req) => {
     `;
 
     const { data: emailResult, error: emailError } = await resend.emails.send({
-      from: 'Dream Tattoo <onboarding@resend.dev>',
+      from: 'Dream Tattoo <noreply@updates.bluedreambudder.com>',
       to: [order.email],
       subject: subject,
       html: emailHtml,

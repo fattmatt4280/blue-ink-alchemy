@@ -130,7 +130,7 @@ serve(async (req) => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: 'HealAid <noreply@dreamtattooco.com>',
+          from: 'HealAid <noreply@updates.bluedreambudder.com>',
           to: [userEmail],
           subject: reminder.title,
           html: emailHtml,
