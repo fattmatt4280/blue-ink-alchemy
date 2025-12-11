@@ -132,7 +132,7 @@ serve(async (req: Request) => {
 
     // Send admin notification
     const { data: emailResponse, error: emailError } = await resend.emails.send({
-      from: 'Blue Dream Budder <orders@bluedreambudder.com>',
+      from: 'Blue Dream Budder <orders@updates.bluedreambudder.com>',
       to: [adminEmail],
       subject: emailSubject,
       html: emailHtml,

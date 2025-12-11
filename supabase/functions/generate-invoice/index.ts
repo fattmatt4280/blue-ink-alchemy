@@ -225,7 +225,7 @@ serve(async (req) => {
 
     // Send invoice email
     const emailResponse = await resend.emails.send({
-      from: "Blue Dream Budder <orders@bluedreambudder.com>",
+      from: "Blue Dream Budder <orders@updates.bluedreambudder.com>",
       to: [order.email],
       subject: `Invoice ${invoiceNumber} - Order Confirmation`,
       html: invoiceHtml,

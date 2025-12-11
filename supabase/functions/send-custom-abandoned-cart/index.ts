@@ -209,7 +209,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email
     const emailResponse = await resend.emails.send({
-      from: "Dream Tattoo Company <onboarding@resend.dev>",
+      from: "Dream Tattoo Company <noreply@updates.bluedreambudder.com>",
       to: [email],
       subject: `🎁 ${firstName}, Your Cart Awaits + FREE ${healaidTrialDays}-Day HealAid Trial!`,
       html: `

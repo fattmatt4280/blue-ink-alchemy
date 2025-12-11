@@ -162,7 +162,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Dream Tattoo Company <onboarding@resend.dev>",
+      from: "Dream Tattoo Company <noreply@updates.bluedreambudder.com>",
       to: [email],
       subject: "🎁 Complete Your Order - Enjoy 10% Off!",
       html: emailHtml,
