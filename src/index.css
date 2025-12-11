@@ -483,13 +483,24 @@ All colors MUST be HSL.
   contain: layout style paint;
 }
 
+/* Marquee animation for announcement banner */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   .neon-orb, .neon-particle, 
   .animate-float-1, .animate-float-2, .animate-float-3, 
   .animate-float-4, .animate-float-5, .animate-float-6,
   .animate-drift-1, .animate-drift-2, .animate-drift-3,
-  .animate-drift-4, .animate-drift-5, .animate-drift-6 {
+  .animate-drift-4, .animate-drift-5, .animate-drift-6,
+  .animate-marquee {
     animation: none !important;
   }
 }
