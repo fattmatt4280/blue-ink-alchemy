@@ -88,15 +88,6 @@ export const CustomAbandonedCartManager = () => {
     }
   };
 
-  // Quick fill for Roy
-  const fillRoyData = () => {
-    setEmail('roysalgado86@yahoo.com');
-    setCustomerName('Roy Salgado');
-    setProductName('Blue Dream Budder 8oz');
-    setProductPrice('45.36');
-    setQuantity('1');
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -109,12 +100,6 @@ export const CustomAbandonedCartManager = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex gap-2">
-          <Button onClick={fillRoyData} variant="outline" size="sm">
-            Quick Fill: Roy's Order
-          </Button>
-        </div>
-
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
