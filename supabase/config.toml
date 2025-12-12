@@ -161,3 +161,11 @@ verify_jwt = false
 [[functions]]
 name = "backfill-paid-orders"
 verify_jwt = true
+
+[[functions]]
+name = "send-mass-email"
+verify_jwt = true
+
+[[functions]]
+name = "handle-unsubscribe"
+verify_jwt = false
