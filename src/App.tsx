@@ -38,6 +38,7 @@ import ArtistOnboarding from "./pages/ArtistOnboarding";
 import ArtistClientsPage from "./pages/ArtistClientsPage";
 import ArtistAlertsPage from "./pages/ArtistAlertsPage";
 import ArtistChatPage from "./pages/ArtistChatPage";
+import Unsubscribe from "./pages/Unsubscribe";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const App = () => (
@@ -109,6 +110,7 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

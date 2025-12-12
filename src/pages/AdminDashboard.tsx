@@ -39,6 +39,7 @@ import { OrderBackfillManager } from '@/components/OrderBackfillManager';
 import { CustomAbandonedCartManager } from '@/components/CustomAbandonedCartManager';
 import { InvoicePreview } from '@/components/InvoicePreview';
 import { WebhookHealthMonitor } from '@/components/WebhookHealthMonitor';
+import EmailCampaignManager from '@/components/EmailCampaignManager';
 
 interface SiteContent {
   id: string;
@@ -163,21 +164,25 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 h-auto">
+          <TabsList className="grid w-full grid-cols-8 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="email" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Email Marketing</span>
+              <span className="sm:hidden">Email</span>
             </TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Users</span>
               <span className="sm:hidden">Users</span>
             </TabsTrigger>
             <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Content Management</span>
+              <span className="hidden sm:inline">Content</span>
               <span className="sm:hidden">Content</span>
             </TabsTrigger>
             <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Product Management</span>
+              <span className="hidden sm:inline">Products</span>
               <span className="sm:hidden">Products</span>
             </TabsTrigger>
             <TabsTrigger value="shipping" className="text-xs sm:text-sm px-2 sm:px-4">
@@ -213,6 +218,10 @@ const AdminDashboard = () => {
             <AbandonedCartsManager />
             <AnalyticsDashboard />
             <AdminAnalyticsManager />
+          </TabsContent>
+
+          <TabsContent value="email" className="space-y-6">
+            <EmailCampaignManager />
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
