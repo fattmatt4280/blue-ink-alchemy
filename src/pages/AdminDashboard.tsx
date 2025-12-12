@@ -18,7 +18,7 @@ import SocialLinksEditor from '@/components/SocialLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { AdminAnalyticsManager } from '@/components/AdminAnalyticsManager';
-import { PushNotificationManager } from '@/components/PushNotificationManager';
+
 import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
 import StripeProductSync from '@/components/StripeProductSync';
@@ -210,7 +210,6 @@ const AdminDashboard = () => {
             </div>
             <WebhookHealthMonitor />
             <InvoicePreview />
-            <PushNotificationManager />
             <div id="order-backfill">
               <OrderBackfillManager />
             </div>

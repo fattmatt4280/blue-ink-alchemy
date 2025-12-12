@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, TrendingUp, Users, ShoppingCart, Eye, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import ConversionFunnelChart from './ConversionFunnelChart';
+
 import DemographicsChart from './DemographicsChart';
 import RevenueChart from './RevenueChart';
 import WebsiteMetricsChart from './WebsiteMetricsChart';
@@ -240,17 +240,12 @@ const AnalyticsDashboard = () => {
       </div>
 
       {/* Charts */}
-      <Tabs defaultValue="funnel" className="space-y-4">
+      <Tabs defaultValue="revenue" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="funnel">Conversion Funnel</TabsTrigger>
           <TabsTrigger value="revenue">Revenue</TabsTrigger>
           <TabsTrigger value="traffic">Website Traffic</TabsTrigger>
           <TabsTrigger value="demographics">Demographics</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="funnel">
-          <ConversionFunnelChart timeRange={timeRange} />
-        </TabsContent>
         
         <TabsContent value="revenue">
           <RevenueChart timeRange={timeRange} />
