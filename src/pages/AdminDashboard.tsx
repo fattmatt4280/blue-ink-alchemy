@@ -38,6 +38,7 @@ import { TTSSettingsEditor } from '@/components/TTSSettingsEditor';
 import { OrderBackfillManager } from '@/components/OrderBackfillManager';
 import { CustomAbandonedCartManager } from '@/components/CustomAbandonedCartManager';
 import { InvoicePreview } from '@/components/InvoicePreview';
+import { WebhookHealthMonitor } from '@/components/WebhookHealthMonitor';
 
 interface SiteContent {
   id: string;
@@ -202,9 +203,12 @@ const AdminDashboard = () => {
                 Manage Heal-AId Activation Codes
               </Button>
             </div>
+            <WebhookHealthMonitor />
             <InvoicePreview />
             <PushNotificationManager />
-            <OrderBackfillManager />
+            <div id="order-backfill">
+              <OrderBackfillManager />
+            </div>
             <CustomAbandonedCartManager />
             <AbandonedCartsManager />
             <AnalyticsDashboard />
