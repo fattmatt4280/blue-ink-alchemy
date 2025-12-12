@@ -1,4 +1,3 @@
-
 project_id = "vozstxchkgpxzetwdzow"
 
 [api]
@@ -153,4 +152,12 @@ verify_jwt = false
 
 [[functions]]
 name = "send-custom-abandoned-cart"
+verify_jwt = true
+
+[[functions]]
+name = "check-webhook-health"
+verify_jwt = false
+
+[[functions]]
+name = "backfill-paid-orders"
 verify_jwt = true

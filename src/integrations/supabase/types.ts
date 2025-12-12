@@ -1996,6 +1996,42 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_webhook_events: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          processed_at: string | null
+          processing_time_ms: number | null
+          status: string | null
+          stripe_event_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          processing_time_ms?: number | null
+          status?: string | null
+          stripe_event_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          processing_time_ms?: number | null
+          status?: string | null
+          stripe_event_id?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -2165,6 +2201,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      webhook_health_checks: {
+        Row: {
+          check_type: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          last_webhook_received: string | null
+          orders_without_webhook: number | null
+          status: string | null
+        }
+        Insert: {
+          check_type: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          last_webhook_received?: string | null
+          orders_without_webhook?: number | null
+          status?: string | null
+        }
+        Update: {
+          check_type?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          last_webhook_received?: string | null
+          orders_without_webhook?: number | null
+          status?: string | null
+        }
+        Relationships: []
       }
       website_metrics: {
         Row: {

@@ -16,6 +16,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  const startTime = Date.now();
   logStep("Request started", { method: req.method, url: req.url });
 
   if (req.method === "OPTIONS") {
@@ -23,10 +24,71 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  
+  // Create Supabase client for logging
+  let supabaseClient: ReturnType<typeof createClient> | null = null;
+  if (supabaseUrl && supabaseServiceKey) {
+    supabaseClient = createClient(supabaseUrl, supabaseServiceKey, { 
+      auth: { persistSession: false } 
+    });
+  }
+
+  // Helper function to log webhook event to database
+  const logWebhookEvent = async (
+    stripeEventId: string, 
+    eventType: string, 
+    status: 'received' | 'processed' | 'failed',
+    payload?: any,
+    errorMessage?: string
+  ) => {
+    if (!supabaseClient) return;
+    
+    try {
+      const processingTimeMs = Date.now() - startTime;
+      
+      // Check if event already exists
+      const { data: existing } = await supabaseClient
+        .from('stripe_webhook_events')
+        .select('id')
+        .eq('stripe_event_id', stripeEventId)
+        .single();
+
+      if (existing) {
+        // Update existing event
+        await supabaseClient
+          .from('stripe_webhook_events')
+          .update({
+            status,
+            error_message: errorMessage,
+            processing_time_ms: processingTimeMs,
+            processed_at: status !== 'received' ? new Date().toISOString() : null
+          })
+          .eq('stripe_event_id', stripeEventId);
+      } else {
+        // Insert new event
+        await supabaseClient
+          .from('stripe_webhook_events')
+          .insert({
+            stripe_event_id: stripeEventId,
+            event_type: eventType,
+            status,
+            payload: payload ? { type: eventType, id: stripeEventId } : null, // Store minimal payload
+            error_message: errorMessage,
+            processing_time_ms: processingTimeMs,
+            processed_at: status !== 'received' ? new Date().toISOString() : null
+          });
+      }
+      
+      logStep("Webhook event logged to database", { stripeEventId, status });
+    } catch (logError) {
+      logStep("ERROR: Failed to log webhook event", { error: logError instanceof Error ? logError.message : String(logError) });
+    }
+  };
+
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     logStep("Environment variables check", { 
       hasStripeKey: !!stripeKey, 
@@ -73,6 +135,10 @@ serve(async (req) => {
         id: event.id,
         created: event.created 
       });
+      
+      // Log event received
+      await logWebhookEvent(event.id, event.type, 'received');
+      
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       logStep("ERROR: Webhook signature verification failed", { error: errorMessage });
@@ -100,22 +166,18 @@ serve(async (req) => {
     };
 
     // Handle the event
-    switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object;
-        logStep("Processing checkout session", { 
-          sessionId: session.id, 
-          paymentStatus: session.payment_status,
-          customerEmail: session.customer_email,
-          amountTotal: session.amount_total
-        });
-        
-        if (supabaseUrl && supabaseServiceKey) {
-          try {
-            const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, { 
-              auth: { persistSession: false } 
-            });
-
+    try {
+      switch (event.type) {
+        case 'checkout.session.completed':
+          const session = event.data.object;
+          logStep("Processing checkout session", { 
+            sessionId: session.id, 
+            paymentStatus: session.payment_status,
+            customerEmail: session.customer_email,
+            amountTotal: session.amount_total
+          });
+          
+          if (supabaseUrl && supabaseServiceKey && supabaseClient) {
             // First, find the order by session ID
             const { data: existingOrder, error: findError } = await supabaseClient
               .from("orders")
@@ -128,6 +190,7 @@ serve(async (req) => {
                 sessionId: session.id, 
                 error: findError.message 
               });
+              await logWebhookEvent(event.id, event.type, 'failed', null, `Order not found: ${findError.message}`);
             } else {
               logStep("Found existing order", { 
                 orderId: existingOrder.id, 
@@ -149,6 +212,7 @@ serve(async (req) => {
                   sessionId: session.id, 
                   error: updateError.message 
                 });
+                await logWebhookEvent(event.id, event.type, 'failed', null, `Failed to update order: ${updateError.message}`);
               } else {
                 logStep("Order updated successfully", { 
                   orderId: existingOrder.id, 
@@ -340,31 +404,38 @@ serve(async (req) => {
                     }
                   }, 3000);
                 }
+                
+                // Mark webhook as processed
+                await logWebhookEvent(event.id, event.type, 'processed');
               }
             }
-        } catch (dbError) {
-            const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
-            logStep("ERROR: Database error", { error: errorMessage });
+          } else {
+            logStep("ERROR: Missing Supabase configuration", { 
+              hasUrl: !!supabaseUrl, 
+              hasServiceKey: !!supabaseServiceKey 
+            });
+            await logWebhookEvent(event.id, event.type, 'failed', null, 'Missing Supabase configuration');
           }
-        } else {
-          logStep("ERROR: Missing Supabase configuration", { 
-            hasUrl: !!supabaseUrl, 
-            hasServiceKey: !!supabaseServiceKey 
+          break;
+        
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object;
+          logStep("Payment intent succeeded", { 
+            paymentIntentId: paymentIntent.id,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency
           });
-        }
-        break;
-      
-      case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object;
-        logStep("Payment intent succeeded", { 
-          paymentIntentId: paymentIntent.id,
-          amount: paymentIntent.amount,
-          currency: paymentIntent.currency
-        });
-        break;
-      
-      default:
-        logStep("Unhandled event type", { type: event.type });
+          await logWebhookEvent(event.id, event.type, 'processed');
+          break;
+        
+        default:
+          logStep("Unhandled event type", { type: event.type });
+          await logWebhookEvent(event.id, event.type, 'processed');
+      }
+    } catch (processingError) {
+      const errorMessage = processingError instanceof Error ? processingError.message : String(processingError);
+      logStep("ERROR: Event processing failed", { error: errorMessage });
+      await logWebhookEvent(event.id, event.type, 'failed', null, errorMessage);
     }
 
     return new Response(JSON.stringify({ received: true }), {
