@@ -40,6 +40,7 @@ import ArtistAlertsPage from "./pages/ArtistAlertsPage";
 import ArtistChatPage from "./pages/ArtistChatPage";
 import Unsubscribe from "./pages/Unsubscribe";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
   <TooltipProvider>
@@ -111,6 +112,11 @@ const App = () => (
               } />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
+              
+              {/* Dynamic CMS Pages - must be before catch-all */}
+              <Route path="/:parentSlug" element={<DynamicPageHandler />} />
+              <Route path="/:parentSlug/:childSlug" element={<DynamicPageHandler />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
