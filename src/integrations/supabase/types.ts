@@ -555,6 +555,77 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_pages: {
+        Row: {
+          canonical_url: string
+          content_markdown: string
+          created_at: string | null
+          created_by: string | null
+          display_order: number | null
+          excerpt: string | null
+          featured_image: string | null
+          featured_image_alt: string | null
+          id: string
+          meta_description: string
+          meta_title: string | null
+          parent_id: string | null
+          publish_date: string
+          publish_status: string
+          show_in_nav: boolean | null
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          canonical_url: string
+          content_markdown?: string
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          excerpt?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
+          id?: string
+          meta_description?: string
+          meta_title?: string | null
+          parent_id?: string | null
+          publish_date?: string
+          publish_status?: string
+          show_in_nav?: boolean | null
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          canonical_url?: string
+          content_markdown?: string
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          excerpt?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
+          id?: string
+          meta_description?: string
+          meta_title?: string | null
+          parent_id?: string | null
+          publish_date?: string
+          publish_status?: string
+          show_in_nav?: boolean | null
+          slug?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_pages_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cms_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_submissions: {
         Row: {
           created_at: string

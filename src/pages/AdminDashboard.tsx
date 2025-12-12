@@ -40,6 +40,7 @@ import { CustomAbandonedCartManager } from '@/components/CustomAbandonedCartMana
 import { InvoicePreview } from '@/components/InvoicePreview';
 import { WebhookHealthMonitor } from '@/components/WebhookHealthMonitor';
 import EmailCampaignManager from '@/components/EmailCampaignManager';
+import { PageManager } from '@/components/PageManager';
 
 interface SiteContent {
   id: string;
@@ -164,18 +165,22 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 h-auto">
+          <TabsList className="grid w-full grid-cols-9 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
             </TabsTrigger>
             <TabsTrigger value="email" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Email Marketing</span>
+              <span className="hidden sm:inline">Email</span>
               <span className="sm:hidden">Email</span>
             </TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Users</span>
               <span className="sm:hidden">Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="pages" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Pages</span>
+              <span className="sm:hidden">Pages</span>
             </TabsTrigger>
             <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Content</span>
@@ -194,7 +199,7 @@ const AdminDashboard = () => {
               <span className="sm:hidden">Blog</span>
             </TabsTrigger>
             <TabsTrigger value="ai-training" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">AI Training</span>
+              <span className="hidden sm:inline">AI</span>
               <span className="sm:hidden">AI</span>
             </TabsTrigger>
           </TabsList>
@@ -225,6 +230,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="users" className="space-y-6">
             <UserBaseManager />
+          </TabsContent>
+
+          <TabsContent value="pages" className="space-y-6">
+            <PageManager />
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">
