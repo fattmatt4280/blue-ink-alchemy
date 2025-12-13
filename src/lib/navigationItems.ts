@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound, Users, Bell, MessageSquare, Gift, LogIn, LogOut, Sparkles } from "lucide-react";
+import { Home, ShoppingBag, Heart, BookOpen, Package, Star, LayoutDashboard, History, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, KeyRound, Users, Bell, MessageSquare, Gift, LogIn, LogOut, Sparkles, Bandage } from "lucide-react";
 
 // Upgrade plan nav item
 export const upgradeNavItem = { label: 'Upgrade Plan', path: '/plans', icon: Sparkles };
@@ -7,6 +7,7 @@ export const mainNavItems = [
   { label: 'Home', path: '/', icon: Home },
   { label: 'Shop', path: '/shop', icon: ShoppingBag },
   { label: 'Heal-AId', path: '/heal-aid', icon: Heart },
+  { label: 'Tattoo Aftercare Guide', path: '/tattoo-aftercare-guide', icon: Bandage },
   { label: 'Blog', path: '/blog', icon: BookOpen },
   { label: 'Reviews', path: '/reviews', icon: Star },
 ];
