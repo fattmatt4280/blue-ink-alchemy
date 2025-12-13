@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const [isArtist, setIsArtist] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [lastActivity, setLastActivity] = useState(Date.now());
+  const lastActivityRef = useRef(Date.now());
 
   // Session timeout: 30 minutes of inactivity
   const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
@@ -202,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const checkActivity = () => {
       const now = Date.now();
-      const timeSinceLastActivity = now - lastActivity;
+      const timeSinceLastActivity = now - lastActivityRef.current;
 
       if (timeSinceLastActivity > SESSION_TIMEOUT) {
         console.log('[AuthContext] Session timeout - signing out due to inactivity');
@@ -216,8 +216,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const interval = setInterval(checkActivity, 60000); // Check every minute
 
-    // Track user activity
-    const resetActivity = () => setLastActivity(Date.now());
+    // Track user activity - update ref instead of state to avoid re-renders
+    const resetActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
     events.forEach(event => window.addEventListener(event, resetActivity));
 
@@ -225,7 +227,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearInterval(interval);
       events.forEach(event => window.removeEventListener(event, resetActivity));
     };
-  }, [session, user, lastActivity]);
+  }, [session, user]);
 
   const signIn = async (email: string, password: string) => {
     try {
