@@ -47,8 +47,26 @@ export const PackingSlipDialog = ({ order, shippingAddress, shipment, trigger }:
     day: 'numeric'
   });
 
+  // Normalize address fields to handle both formats (DB format vs interface format)
+  const normalizeAddress = (info: any): ShippingAddress | null => {
+    if (!info) return null;
+    return {
+      name: info.name || `${info.firstName || ''} ${info.lastName || ''}`.trim() || 'Customer',
+      company: info.company,
+      street1: info.street1 || info.address || '',
+      street2: info.street2,
+      city: info.city || '',
+      state: info.state || '',
+      zip: info.zip || info.zipCode || '',
+      country: info.country || 'US',
+      phone: info.phone,
+    };
+  };
+
   // Use shipping_info from order if shippingAddress not provided
-  const address = shippingAddress || order.shipping_info;
+  const rawAddress = shippingAddress || order.shipping_info;
+  const address = normalizeAddress(rawAddress);
+  const customerEmail = order.email;
 
   const handlePrint = () => {
     const printContent = document.getElementById('packing-slip-content');
@@ -234,15 +252,16 @@ export const PackingSlipDialog = ({ order, shippingAddress, shipment, trigger }:
           <div class="address-box">
             <h3>Ship To</h3>
             ${address ? `
-              <p><strong>${address.name || 'Customer'}</strong></p>
+              <p><strong>${address.name}</strong></p>
               ${address.company ? `<p>${address.company}</p>` : ''}
-              <p>${address.street1 || ''}</p>
+              <p>${address.street1}</p>
               ${address.street2 ? `<p>${address.street2}</p>` : ''}
-              <p>${address.city || ''}, ${address.state || ''} ${address.zip || ''}</p>
-              <p>${address.country || 'US'}</p>
+              <p>${address.city}, ${address.state} ${address.zip}</p>
+              <p>${address.country}</p>
               ${address.phone ? `<p>Phone: ${address.phone}</p>` : ''}
+              <p>Email: ${customerEmail}</p>
             ` : `
-              <p>${order.email}</p>
+              <p>${customerEmail}</p>
               <p><em>Shipping address not available</em></p>
             `}
           </div>
@@ -352,16 +371,18 @@ export const PackingSlipDialog = ({ order, shippingAddress, shipment, trigger }:
               <h3 className="font-semibold text-sm border-b pb-2 mb-2 uppercase tracking-wide">Ship To</h3>
               {address ? (
                 <>
-                  <p className="font-medium">{address.name || 'Customer'}</p>
+                  <p className="font-medium">{address.name}</p>
                   {address.company && <p className="text-sm text-muted-foreground">{address.company}</p>}
                   <p className="text-sm text-muted-foreground">{address.street1}</p>
                   {address.street2 && <p className="text-sm text-muted-foreground">{address.street2}</p>}
                   <p className="text-sm text-muted-foreground">{address.city}, {address.state} {address.zip}</p>
-                  <p className="text-sm text-muted-foreground">{address.country || 'US'}</p>
+                  <p className="text-sm text-muted-foreground">{address.country}</p>
+                  {address.phone && <p className="text-sm text-muted-foreground">Phone: {address.phone}</p>}
+                  <p className="text-sm text-muted-foreground">Email: {customerEmail}</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm">{order.email}</p>
+                  <p className="text-sm">{customerEmail}</p>
                   <p className="text-sm text-muted-foreground italic">Shipping address not available</p>
                 </>
               )}

@@ -224,7 +224,9 @@ export default function ShippingQueueManager() {
 
   const formatAddress = (info: any) => {
     if (!info) return 'No address';
-    return `${info.name}, ${info.city}, ${info.state} ${info.zip}`;
+    const name = info.name || `${info.firstName || ''} ${info.lastName || ''}`.trim() || 'Customer';
+    const zip = info.zip || info.zipCode || '';
+    return `${name}, ${info.city || ''}, ${info.state || ''} ${zip}`;
   };
 
   const handleOpenDetail = (item: ShippingQueueItem) => {
@@ -341,7 +343,11 @@ export default function ShippingQueueManager() {
                       <CardTitle className="text-sm">Customer</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm">
-                      <p className="font-medium">{selectedItem.orders.shipping_info?.name}</p>
+                      <p className="font-medium">
+                        {selectedItem.orders.shipping_info?.name || 
+                         `${selectedItem.orders.shipping_info?.firstName || ''} ${selectedItem.orders.shipping_info?.lastName || ''}`.trim() || 
+                         'Customer'}
+                      </p>
                       <p className="text-muted-foreground">{selectedItem.orders.email}</p>
                     </CardContent>
                   </Card>
@@ -350,8 +356,11 @@ export default function ShippingQueueManager() {
                       <CardTitle className="text-sm">Ship To</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm">
-                      <p>{selectedItem.orders.shipping_info?.address}</p>
-                      <p>{selectedItem.orders.shipping_info?.city}, {selectedItem.orders.shipping_info?.state} {selectedItem.orders.shipping_info?.zip}</p>
+                      <p>{selectedItem.orders.shipping_info?.street1 || selectedItem.orders.shipping_info?.address}</p>
+                      <p>
+                        {selectedItem.orders.shipping_info?.city}, {selectedItem.orders.shipping_info?.state} {selectedItem.orders.shipping_info?.zip || selectedItem.orders.shipping_info?.zipCode}
+                      </p>
+                      <p className="text-muted-foreground">{selectedItem.orders.shipping_info?.country || 'US'}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -438,14 +447,21 @@ export default function ShippingQueueManager() {
 
                 {/* Approved Info */}
                 {selectedItem.status === 'approved' && selectedItem.label_url && (
-                  <Card className="border-green-500/30">
+                  <Card className="border-green-500/30 bg-green-500/5">
                     <CardHeader>
                       <CardTitle className="text-sm text-green-400 flex items-center gap-2">
                         <Check className="h-4 w-4" />
-                        Label Created
+                        Label Purchased & Paid
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center justify-between bg-green-500/10 p-2 rounded">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          Amount Charged:
+                        </span>
+                        <span className="font-semibold text-green-400">${selectedItem.selected_amount?.toFixed(2)}</span>
+                      </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Tracking:</span>
                         <span className="font-mono">{selectedItem.tracking_number}</span>
@@ -453,10 +469,6 @@ export default function ShippingQueueManager() {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Carrier:</span>
                         <span>{selectedItem.selected_carrier} - {selectedItem.selected_service}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Cost:</span>
-                        <span>${selectedItem.selected_amount?.toFixed(2)}</span>
                       </div>
                       <div className="pt-2 flex gap-2">
                         <Button asChild>
