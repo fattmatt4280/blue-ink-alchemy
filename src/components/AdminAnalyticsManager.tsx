@@ -9,7 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package, CheckCircle, Clock, XCircle, FileText } from "lucide-react";
+import { PackingSlipDialog } from "./PackingSlipDialog";
 import { format } from "date-fns";
 
 interface Order {
@@ -730,6 +731,21 @@ export const AdminAnalyticsManager = () => {
                          >
                            📧 Send Update
                          </Button>
+                         <PackingSlipDialog 
+                           order={selectedOrder}
+                           shippingAddress={shippingAddress}
+                           shipment={shipment}
+                           trigger={
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               className="bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
+                             >
+                               <FileText className="h-4 w-4 mr-1" />
+                               Packing Slip
+                             </Button>
+                           }
+                         />
                          <Button
                            variant="outline"
                            size="sm"
