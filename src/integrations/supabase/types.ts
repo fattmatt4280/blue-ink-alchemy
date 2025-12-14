@@ -2154,6 +2154,74 @@ export type Database = {
           },
         ]
       }
+      shipping_queue: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          error_message: string | null
+          fetched_rates: Json | null
+          id: string
+          label_url: string | null
+          notes: string | null
+          order_id: string
+          selected_amount: number | null
+          selected_carrier: string | null
+          selected_rate_id: string | null
+          selected_service: string | null
+          shippo_shipment_id: string | null
+          status: string
+          tracking_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          error_message?: string | null
+          fetched_rates?: Json | null
+          id?: string
+          label_url?: string | null
+          notes?: string | null
+          order_id: string
+          selected_amount?: number | null
+          selected_carrier?: string | null
+          selected_rate_id?: string | null
+          selected_service?: string | null
+          shippo_shipment_id?: string | null
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          error_message?: string | null
+          fetched_rates?: Json | null
+          id?: string
+          label_url?: string | null
+          notes?: string | null
+          order_id?: string
+          selected_amount?: number | null
+          selected_carrier?: string | null
+          selected_rate_id?: string | null
+          selected_service?: string | null
+          shippo_shipment_id?: string | null
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_queue_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipping_rates: {
         Row: {
           amount: number

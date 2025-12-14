@@ -9,8 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package, CheckCircle, Clock, XCircle, FileText } from "lucide-react";
+import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package, CheckCircle, Clock, XCircle, FileText, Truck } from "lucide-react";
 import { PackingSlipDialog } from "./PackingSlipDialog";
+import ShippingQueueManager from "./ShippingQueueManager";
 import { format } from "date-fns";
 
 interface Order {
@@ -458,8 +459,16 @@ export const AdminAnalyticsManager = () => {
       <Tabs defaultValue="orders" className="space-y-4">
         <TabsList>
           <TabsTrigger value="orders">Orders & Transactions</TabsTrigger>
+          <TabsTrigger value="shipping" className="flex items-center gap-2">
+            <Truck className="h-4 w-4" />
+            Shipping Queue
+          </TabsTrigger>
           <TabsTrigger value="events">Analytics Events</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="shipping">
+          <ShippingQueueManager />
+        </TabsContent>
 
         <TabsContent value="orders" className="space-y-4">
           {orders.length > 0 && (
