@@ -379,25 +379,32 @@ serve(async (req) => {
                   }
                 }, 2000);
 
-                // Auto-create shipping label if shipping info exists
+                // Add to shipping queue for admin review instead of auto-creating labels
                 if (existingOrder.shipping_info) {
                   setTimeout(async () => {
                     try {
-                      await fetch(`${supabaseUrl}/functions/v1/order-automation-workflow`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${supabaseServiceKey}`,
-                        },
-                        body: JSON.stringify({ 
-                          orderId: existingOrder.id,
-                          triggerStep: 'shipping'
-                        }),
-                      });
-                      logStep("Shipping automation triggered", { orderId: existingOrder.id });
-                    } catch (shippingError) {
-                      const errorMessage = shippingError instanceof Error ? shippingError.message : String(shippingError);
-                      logStep("ERROR: Shipping automation failed", { 
+                      // Check if already in queue
+                      const { data: existingQueue } = await supabaseClient
+                        .from('shipping_queue')
+                        .select('id')
+                        .eq('order_id', existingOrder.id)
+                        .maybeSingle();
+
+                      if (!existingQueue) {
+                        // Add to shipping queue for admin review
+                        await supabaseClient
+                          .from('shipping_queue')
+                          .insert({
+                            order_id: existingOrder.id,
+                            status: 'pending_rates'
+                          });
+                        logStep("Order added to shipping queue", { orderId: existingOrder.id });
+                      } else {
+                        logStep("Order already in shipping queue", { orderId: existingOrder.id });
+                      }
+                    } catch (queueError) {
+                      const errorMessage = queueError instanceof Error ? queueError.message : String(queueError);
+                      logStep("ERROR: Failed to add to shipping queue", { 
                         orderId: existingOrder.id, 
                         error: errorMessage
                       });

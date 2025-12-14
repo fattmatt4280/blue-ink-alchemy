@@ -169,3 +169,7 @@ verify_jwt = true
 [[functions]]
 name = "handle-unsubscribe"
 verify_jwt = false
+
+[[functions]]
+name = "approve-shipping-label"
+verify_jwt = true
