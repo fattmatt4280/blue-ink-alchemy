@@ -82,6 +82,7 @@ export const AdminAnalyticsManager = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [deletingSelected, setDeletingSelected] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -356,6 +357,7 @@ export const AdminAnalyticsManager = () => {
       case 'paid': return 'default';
       case 'pending': return 'secondary';
       case 'failed': return 'destructive';
+      case 'cancelled': return 'destructive';
       case 'shipped': return 'default';
       case 'delivered': return 'default';
       default: return 'outline';
@@ -367,15 +369,49 @@ export const AdminAnalyticsManager = () => {
       case 'paid': return <CheckCircle className="h-3 w-3" />;
       case 'pending': return <Clock className="h-3 w-3" />;
       case 'failed': return <XCircle className="h-3 w-3" />;
+      case 'cancelled': return <XCircle className="h-3 w-3" />;
       case 'shipped': return <Package className="h-3 w-3" />;
       case 'delivered': return <CheckCircle className="h-3 w-3" />;
       default: return null;
     }
   };
 
-  // Separate orders by status
-  const pendingOrders = orders.filter(o => o.status === 'pending');
-  const completedOrders = orders.filter(o => o.status !== 'pending');
+  const getOrderBorderClass = (status: string) => {
+    switch (status) {
+      case 'paid': return 'border-green-300 bg-green-50/50';
+      case 'shipped': return 'border-blue-300 bg-blue-50/50';
+      case 'delivered': return 'border-emerald-300 bg-emerald-50/50';
+      case 'pending': return 'border-orange-300 bg-orange-50/50';
+      case 'failed': return 'border-red-300 bg-red-50/50';
+      case 'cancelled': return 'border-gray-300 bg-gray-50/50';
+      default: return 'border-muted';
+    }
+  };
+
+  // Order stats
+  const orderStats = {
+    total: orders.length,
+    paid: orders.filter(o => o.status === 'paid').length,
+    shipped: orders.filter(o => o.status === 'shipped').length,
+    delivered: orders.filter(o => o.status === 'delivered').length,
+    pending: orders.filter(o => o.status === 'pending').length,
+    cancelled: orders.filter(o => o.status === 'cancelled' || o.status === 'failed').length,
+    revenue: orders.filter(o => ['paid', 'shipped', 'delivered'].includes(o.status))
+      .reduce((sum, o) => sum + o.amount, 0) / 100,
+  };
+
+  // Filter orders based on selected filter
+  const getFilteredOrders = () => {
+    switch (statusFilter) {
+      case 'paid': return orders.filter(o => o.status === 'paid');
+      case 'shipped': return orders.filter(o => o.status === 'shipped' || o.status === 'delivered');
+      case 'pending': return orders.filter(o => o.status === 'pending');
+      case 'cancelled': return orders.filter(o => o.status === 'cancelled' || o.status === 'failed');
+      default: return orders;
+    }
+  };
+
+  const filteredOrders = getFilteredOrders();
 
   if (loading) {
     return (
@@ -471,168 +507,136 @@ export const AdminAnalyticsManager = () => {
         </TabsContent>
 
         <TabsContent value="orders" className="space-y-4">
-          {orders.length > 0 && (
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Launch Preparation</AlertTitle>
-              <AlertDescription>
-                You have {orders.length} transaction(s) in your database. 
-                Consider clearing all test data before launch using the "Clear All Data" button above.
-              </AlertDescription>
-            </Alert>
-          )}
+          {/* Order Stats Summary */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <Card className="p-3">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{orderStats.total}</p>
+                <p className="text-xs text-muted-foreground">Total Orders</p>
+              </div>
+            </Card>
+            <Card className="p-3 border-green-200">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-600">{orderStats.paid}</p>
+                <p className="text-xs text-muted-foreground">Paid</p>
+              </div>
+            </Card>
+            <Card className="p-3 border-blue-200">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-600">{orderStats.shipped}</p>
+                <p className="text-xs text-muted-foreground">Shipped</p>
+              </div>
+            </Card>
+            <Card className="p-3 border-emerald-200">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-emerald-600">{orderStats.delivered}</p>
+                <p className="text-xs text-muted-foreground">Delivered</p>
+              </div>
+            </Card>
+            <Card className="p-3 border-gray-200">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-500">{orderStats.cancelled}</p>
+                <p className="text-xs text-muted-foreground">Cancelled</p>
+              </div>
+            </Card>
+            <Card className="p-3 border-primary/20">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">${orderStats.revenue.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Revenue</p>
+              </div>
+            </Card>
+          </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Orders List */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    Orders ({orders.length})
-                    {pendingOrders.length > 0 && (
-                      <Badge variant="secondary">
-                        {pendingOrders.length} pending
-                      </Badge>
-                    )}
-                    {completedOrders.length > 0 && (
-                      <Badge variant="default">
-                        {completedOrders.length} completed
-                      </Badge>
+                    Orders ({filteredOrders.length})
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-36 h-8">
+                        <SelectValue placeholder="Filter" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Orders</SelectItem>
+                        <SelectItem value="paid">Paid</SelectItem>
+                        <SelectItem value="shipped">Shipped/Delivered</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="cancelled">Cancelled/Failed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {orders.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          checked={selectedOrders.size === orders.length && orders.length > 0}
+                          onCheckedChange={handleSelectAll}
+                          aria-label="Select all orders"
+                        />
+                        <span className="text-sm text-muted-foreground">All</span>
+                      </div>
                     )}
                   </div>
-                  {orders.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={selectedOrders.size === orders.length}
-                        onCheckedChange={handleSelectAll}
-                        aria-label="Select all orders"
-                      />
-                      <span className="text-sm text-muted-foreground">Select All</span>
-                    </div>
-                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {orders.length === 0 ? (
+                {filteredOrders.length === 0 ? (
                   <Alert>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      No orders found. This might indicate an issue with payment processing.
+                      {orders.length === 0 
+                        ? "No orders found." 
+                        : "No orders match the selected filter."}
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <div className="space-y-4">
-                    {/* Pending Orders Section */}
-                    {pendingOrders.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Pending Orders ({pendingOrders.length})
-                        </h4>
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
-                          {pendingOrders.map((order) => (
-                            <div
-                              key={order.id}
-                              className={`p-3 border rounded-lg transition-colors border-orange-200 bg-orange-50/50 ${
-                                selectedOrder?.id === order.id ? 'bg-accent' : 'hover:bg-muted/50'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <Checkbox
-                                  checked={selectedOrders.has(order.id)}
-                                  onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  aria-label={`Select order ${order.id}`}
-                                />
-                                <div 
-                                  className="flex-1 cursor-pointer"
-                                  onClick={() => handleOrderSelect(order)}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <p className="font-medium">{order.email}</p>
-                                      <p className="text-sm text-muted-foreground">
-                                        ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
-                                      </p>
-                                      <p className="text-xs text-muted-foreground">
-                                        {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
-                                      </p>
-                                    </div>
-                                    <div className="text-right">
-                                      <Badge variant={getStatusBadgeVariant(order.status)} className="flex items-center gap-1">
-                                        {getStatusIcon(order.status)}
-                                        {order.status}
-                                      </Badge>
-                                      {order.stripe_session_id && (
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                          Stripe: {order.stripe_session_id.slice(-8)}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {filteredOrders.map((order) => (
+                      <div
+                        key={order.id}
+                        className={`p-3 border rounded-lg transition-colors ${getOrderBorderClass(order.status)} ${
+                          selectedOrder?.id === order.id ? 'ring-2 ring-primary' : 'hover:opacity-80'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={selectedOrders.has(order.id)}
+                            onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Select order ${order.id}`}
+                          />
+                          <div 
+                            className="flex-1 cursor-pointer"
+                            onClick={() => handleOrderSelect(order)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{order.email}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <Badge variant={getStatusBadgeVariant(order.status)} className="flex items-center gap-1">
+                                  {getStatusIcon(order.status)}
+                                  {order.status}
+                                </Badge>
+                                {order.stripe_session_id && (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Stripe: {order.stripe_session_id.slice(-8)}
+                                  </p>
+                                )}
                               </div>
                             </div>
-                          ))}
+                          </div>
                         </div>
                       </div>
-                    )}
-
-                    {/* Completed Orders Section */}
-                    {completedOrders.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4" />
-                          Completed Orders ({completedOrders.length})
-                        </h4>
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
-                          {completedOrders.map((order) => (
-                            <div
-                              key={order.id}
-                              className={`p-3 border rounded-lg transition-colors border-green-200 bg-green-50/50 ${
-                                selectedOrder?.id === order.id ? 'bg-accent' : 'hover:bg-muted/50'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <Checkbox
-                                  checked={selectedOrders.has(order.id)}
-                                  onCheckedChange={(checked) => handleOrderCheckbox(order.id, checked as boolean)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  aria-label={`Select order ${order.id}`}
-                                />
-                                <div 
-                                  className="flex-1 cursor-pointer"
-                                  onClick={() => handleOrderSelect(order)}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <p className="font-medium">{order.email}</p>
-                                      <p className="text-sm text-muted-foreground">
-                                        ${(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
-                                      </p>
-                                      <p className="text-xs text-muted-foreground">
-                                        {format(new Date(order.created_at), 'MMM dd, yyyy HH:mm')}
-                                      </p>
-                                    </div>
-                                    <div className="text-right">
-                                      <Badge variant={getStatusBadgeVariant(order.status)} className="flex items-center gap-1">
-                                        {getStatusIcon(order.status)}
-                                        {order.status}
-                                      </Badge>
-                                      {order.stripe_session_id && (
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                          Stripe: {order.stripe_session_id.slice(-8)}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 )}
               </CardContent>
