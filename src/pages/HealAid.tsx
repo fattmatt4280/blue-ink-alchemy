@@ -73,7 +73,7 @@ const HealAid = () => {
   return (
     <>
       <Helmet>
-        <title>Heal-AId™ - AI Tattoo Healing Tracker | Expert Analysis in Seconds</title>
+        <title>Heal-AId™ (Patent Pending) - AI Tattoo Healing Tracker | Expert Analysis in Seconds</title>
         <meta name="description" content="Get instant AI-powered tattoo healing analysis. Upload a photo, get expert recommendations. Free 3-day trial included with every purchase." />
         <meta name="keywords" content="tattoo healing, AI tattoo analysis, tattoo aftercare tracker, healing progress" />
       </Helmet>
@@ -101,6 +101,7 @@ const HealAid = () => {
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">
                 <span className="font-rajdhani">Heal-AId™</span>
+                <span className="block text-sm font-normal text-gray-400 mt-2">Patent Pending</span>
               </h1>
               
               <p className="text-2xl md:text-3xl font-semibold mb-4">
@@ -196,7 +197,7 @@ const HealAid = () => {
             
             <div className="max-w-3xl mx-auto text-center">
               <p className="text-xl md:text-2xl font-semibold text-foreground">
-                <span className="font-rajdhani">Heal-AId</span> uses advanced AI trained on thousands of tattoo healing cases to give you instant, expert-level guidance
+                <span className="font-rajdhani">Heal-AId™</span> (Patent Pending) uses advanced AI trained on thousands of tattoo healing cases to give you instant, expert-level guidance
               </p>
             </div>
           </div>

@@ -88,7 +88,7 @@ export const ActivationDialog = ({ open, onOpenChange, prefilledCode = "" }: Act
             <DialogTitle>Activate Your Code</DialogTitle>
           </div>
           <DialogDescription>
-            Enter your activation code and email to start your Heal-AId subscription.
+            Enter your activation code and email to start your Heal-AId™ (Patent Pending) subscription.
           </DialogDescription>
         </DialogHeader>
 
