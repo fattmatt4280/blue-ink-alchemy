@@ -52,7 +52,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Dream Tattoo Company <noreply@updates.bluedreambudder.com>",
       to: [email],
-      subject: `Your Heal-AId Activation Code - ${tierName}`,
+      subject: `Your Heal-AId™ (Patent Pending) Activation Code - ${tierName}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -78,14 +78,14 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1>🎨 Heal-AId Activated!</h1>
+                <h1>🎨 Heal-AId™ (Patent Pending) Activated!</h1>
                 <p style="margin: 10px 0 0 0; font-size: 18px;">Your ${tierName}</p>
               </div>
               
               <div class="content">
                 <p>Hi${customerName ? ` ${customerName}` : ''},</p>
                 
-                <p>Thank you for choosing Heal-AId AI, powered by Blue Dream Budder! You're about to experience the most advanced tattoo healing guidance available.</p>
+                <p>Thank you for choosing Heal-AId™ (Patent Pending), powered by Blue Dream Budder! You're about to experience the most advanced tattoo healing guidance available.</p>
                 
                 <div class="code-box">
                   <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">Your Activation Code</p>
@@ -124,7 +124,8 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="footer">
                 <p>This email was sent to ${email}</p>
                 <p>Dream Tattoo Company | Powered by Blue Dream Budder</p>
-                <p style="font-size: 12px; margin-top: 10px;">If you didn't request this activation code, you can safely ignore this email.</p>
+                <p style="font-size: 12px; margin-top: 10px;">Heal-AId™ is a patent-pending AI technology by Dream Tattoo Company.</p>
+                <p style="font-size: 12px; margin-top: 5px;">If you didn't request this activation code, you can safely ignore this email.</p>
               </div>
             </div>
           </body>

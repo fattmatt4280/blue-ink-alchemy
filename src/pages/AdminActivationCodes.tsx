@@ -160,7 +160,7 @@ const AdminActivationCodes = () => {
       
       <div className="container mx-auto p-4 md:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Heal-AId Activation Codes</h1>
+          <h1 className="text-3xl font-bold mb-2">Heal-AId™ (Patent Pending) Activation Codes</h1>
           <p className="text-muted-foreground">Generate and manage activation codes</p>
         </div>
 

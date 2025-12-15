@@ -63,7 +63,7 @@ const HealAidSubscriptionStatus = () => {
       <Alert className="mb-4">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Activate Heal-AId to get expert AI guidance on your tattoo healing journey.{" "}
+          Activate Heal-AId™ (Patent Pending) to get expert AI guidance on your tattoo healing journey.{" "}
           <Button 
             variant="link" 
             className="p-0 h-auto" 
@@ -82,7 +82,7 @@ const HealAidSubscriptionStatus = () => {
       <Alert variant="destructive" className="mb-4">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Your Heal-AId access has expired.{" "}
+          Your Heal-AId™ (Patent Pending) access has expired.{" "}
           <Button 
             variant="link" 
             className="p-0 h-auto text-destructive" 
@@ -129,7 +129,7 @@ const HealAidSubscriptionStatus = () => {
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
           <span>
-            Heal-AId {subscription.tier.replace('_', ' ')} • {daysRemaining} days remaining
+            Heal-AId™ (Patent Pending) {subscription.tier.replace('_', ' ')} • {daysRemaining} days remaining
           </span>
         </div>
       </CardContent>

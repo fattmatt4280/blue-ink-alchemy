@@ -24,7 +24,7 @@ export const DashboardWelcomeDialog = ({
               <Sparkles className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <DialogTitle className="text-2xl text-center">Welcome to Heal-AId!</DialogTitle>
+          <DialogTitle className="text-2xl text-center">Welcome to Heal-AId™ (Patent Pending)!</DialogTitle>
           <DialogDescription className="text-center">
             Start your healing journey with a free 24-hour trial
           </DialogDescription>

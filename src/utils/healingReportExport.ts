@@ -236,7 +236,7 @@ export const generateSingleEntryReport = (entry: HealingHistoryEntry): string =>
     ` : ''}
 
     <div class="footer">
-      <p>This report was generated from your HealAid healing tracker.</p>
+      <p>This report was generated from your Heal-AId™ (Patent Pending) healing tracker.</p>
       <p>For medical concerns, please consult a healthcare professional.</p>
     </div>
   </div>
@@ -471,7 +471,7 @@ export const generateCompleteReport = (entries: HealingHistoryEntry[]): string =
     ${entriesHtml}
 
     <div class="footer">
-      <p>This complete report was generated from your HealAid healing tracker.</p>
+      <p>This complete report was generated from your Heal-AId™ (Patent Pending) healing tracker.</p>
       <p>For medical concerns, please consult a healthcare professional.</p>
     </div>
   </div>
