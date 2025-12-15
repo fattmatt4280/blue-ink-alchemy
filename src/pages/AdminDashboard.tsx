@@ -17,7 +17,6 @@ import FooterLinksEditor from '@/components/FooterLinksEditor';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
-import { AdminAnalyticsManager } from '@/components/AdminAnalyticsManager';
 
 import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
@@ -32,7 +31,6 @@ import HealAidContentEditor from '@/components/HealAidContentEditor';
 import HealingTrackerContentEditor from '@/components/HealingTrackerContentEditor';
 import { UserBaseManager } from '@/components/UserBaseManager';
 import AbandonedCartsManager from '@/components/AbandonedCartsManager';
-import ShipmentReminderManager from '@/components/ShipmentReminderManager';
 import ReminderSettingsPanel from '@/components/ReminderSettingsPanel';
 import { TTSSettingsEditor } from '@/components/TTSSettingsEditor';
 import { OrderBackfillManager } from '@/components/OrderBackfillManager';
@@ -41,6 +39,7 @@ import { InvoicePreview } from '@/components/InvoicePreview';
 import { WebhookHealthMonitor } from '@/components/WebhookHealthMonitor';
 import EmailCampaignManager from '@/components/EmailCampaignManager';
 import { PageManager } from '@/components/PageManager';
+import { OrdersManager } from '@/components/OrdersManager';
 
 interface SiteContent {
   id: string;
@@ -165,10 +164,14 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9 h-auto">
+          <TabsList className="grid w-full grid-cols-10 h-auto">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Orders</span>
+              <span className="sm:hidden">Orders</span>
             </TabsTrigger>
             <TabsTrigger value="email" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Email</span>
@@ -190,9 +193,9 @@ const AdminDashboard = () => {
               <span className="hidden sm:inline">Products</span>
               <span className="sm:hidden">Products</span>
             </TabsTrigger>
-            <TabsTrigger value="shipping" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Shipping</span>
-              <span className="sm:hidden">Ship</span>
+            <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 sm:px-4">
+              <span className="hidden sm:inline">Settings</span>
+              <span className="sm:hidden">Settings</span>
             </TabsTrigger>
             <TabsTrigger value="blog" className="text-xs sm:text-sm px-2 sm:px-4">
               <span className="hidden sm:inline">Blog</span>
@@ -221,7 +224,10 @@ const AdminDashboard = () => {
             <CustomAbandonedCartManager />
             <AbandonedCartsManager />
             <AnalyticsDashboard />
-            <AdminAnalyticsManager />
+          </TabsContent>
+
+          <TabsContent value="orders" className="space-y-6">
+            <OrdersManager />
           </TabsContent>
 
           <TabsContent value="email" className="space-y-6">
@@ -321,21 +327,8 @@ const AdminDashboard = () => {
             <AffiliateProductManager />
           </TabsContent>
 
-          <TabsContent value="shipping" className="space-y-6">
-            <Tabs defaultValue="reminders" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="reminders">Shipment Reminders</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="reminders">
-                <ShipmentReminderManager />
-              </TabsContent>
-
-              <TabsContent value="settings">
-                <ReminderSettingsPanel />
-              </TabsContent>
-            </Tabs>
+          <TabsContent value="settings" className="space-y-6">
+            <ReminderSettingsPanel />
           </TabsContent>
 
           <TabsContent value="blog" className="space-y-6">
