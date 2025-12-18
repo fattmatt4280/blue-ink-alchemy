@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, RefreshCw, Eye, AlertTriangle, Trash2, Package, CheckCircle, Clock, XCircle, FileText, Truck, ShoppingCart } from "lucide-react";
 import { PackingSlipDialog } from "./PackingSlipDialog";
+import { InvoiceDialog } from "./InvoiceDialog";
 import ShippingQueueManager from "./ShippingQueueManager";
 import ShipmentReminderManager from "./ShipmentReminderManager";
 import { format } from "date-fns";
@@ -714,6 +715,21 @@ export const OrdersManager = () => {
                             >
                               <FileText className="h-4 w-4 mr-1" />
                               Packing Slip
+                            </Button>
+                          }
+                        />
+                        <InvoiceDialog 
+                          order={selectedOrder}
+                          shippingAddress={shippingAddress}
+                          shipment={shipment}
+                          trigger={
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
+                            >
+                              <FileText className="h-4 w-4 mr-1" />
+                              View Invoice
                             </Button>
                           }
                         />
