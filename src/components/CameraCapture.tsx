@@ -4,6 +4,7 @@ import { CameraModeSelector } from "./CameraModeSelector";
 import { Button } from "./ui/button";
 import { Camera, RotateCw, Zap, ZapOff, Image as ImageIcon, X, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
+import healaidShield from "@/assets/healaid-shield-logo.jpeg";
 
 interface CameraCaptureProps {
   onPhotosCapture: (photos: CapturedPhoto[], mode: CameraMode) => void;
@@ -103,8 +104,22 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
           />
         )}
 
+        {/* Heal-AId Branding Header */}
+        <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-center py-3 bg-gradient-to-b from-black/80 via-black/60 to-transparent">
+          <div className="flex items-center gap-2">
+            <img 
+              src={healaidShield} 
+              alt="Heal-AId" 
+              className="w-8 h-8 rounded-lg opacity-90 shadow-[0_0_15px_rgba(0,255,255,0.5)]"
+            />
+            <span className="text-lg font-rajdhani font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">
+              Heal-AId
+            </span>
+          </div>
+        </div>
+
         {/* Top Controls */}
-        <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
+        <div className="absolute top-12 left-0 right-0 p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -137,8 +152,17 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
           </Button>
         </div>
 
+        {/* Watermark Overlay */}
+        <div className="absolute bottom-44 left-4 z-10 opacity-30">
+          <img 
+            src={healaidShield} 
+            alt="" 
+            className="w-10 h-10 rounded-lg shadow-[0_0_20px_rgba(0,255,255,0.3)]"
+          />
+        </div>
+
         {/* Mode Indicator */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2">
           <div className="px-4 py-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
             <p className="text-white text-sm font-medium">
               {selectedMode === 'progress' && '📊 Progress Tracking'}
