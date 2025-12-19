@@ -278,7 +278,7 @@ const HealingHistory = () => {
                     {entries[0].analysis_result?.personalGreeting && (
                       <Card className="neon-card bg-cyan-500/5">
                         <CardContent className="pt-6">
-                          <p className="text-sm leading-relaxed text-foreground/80">{entries[0].analysis_result.personalGreeting}</p>
+                          <p className="text-sm leading-relaxed text-white/90">{entries[0].analysis_result.personalGreeting}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -290,7 +290,7 @@ const HealingHistory = () => {
                           <CardTitle className="text-base font-rajdhani text-cyan-400">Your Tattoo</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-sm leading-relaxed text-foreground/80">{entries[0].analysis_result.tattooDescription}</p>
+                          <p className="text-sm leading-relaxed text-white/90">{entries[0].analysis_result.tattooDescription}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -321,7 +321,7 @@ const HealingHistory = () => {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-sm leading-relaxed text-foreground/80">{entries[0].analysis_result.summary}</p>
+                          <p className="text-sm leading-relaxed text-white/90">{entries[0].analysis_result.summary}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -336,7 +336,7 @@ const HealingHistory = () => {
                           {entries[0].analysis_result.visualAssessment.colorAssessment && (
                             <div>
                               <div className="font-medium text-sm mb-1 text-blue-400">Color Assessment</div>
-                              <p className="text-sm text-foreground/70 leading-relaxed">
+                              <p className="text-sm text-white/85 leading-relaxed">
                                 {entries[0].analysis_result.visualAssessment.colorAssessment}
                               </p>
                             </div>
@@ -344,7 +344,7 @@ const HealingHistory = () => {
                           {entries[0].analysis_result.visualAssessment.textureAssessment && (
                             <div>
                               <div className="font-medium text-sm mb-1 text-blue-400">Texture Assessment</div>
-                              <p className="text-sm text-foreground/70 leading-relaxed">
+                              <p className="text-sm text-white/85 leading-relaxed">
                                 {entries[0].analysis_result.visualAssessment.textureAssessment}
                               </p>
                             </div>
@@ -352,7 +352,7 @@ const HealingHistory = () => {
                           {entries[0].analysis_result.visualAssessment.overallCondition && (
                             <div>
                               <div className="font-medium text-sm mb-1 text-blue-400">Overall Condition</div>
-                              <p className="text-sm text-foreground/70 leading-relaxed">
+                              <p className="text-sm text-white/85 leading-relaxed">
                                 {entries[0].analysis_result.visualAssessment.overallCondition}
                               </p>
                             </div>
@@ -370,7 +370,7 @@ const HealingHistory = () => {
                         <CardContent>
                           <ul className="list-disc list-inside space-y-2">
                             {entries[0].recommendations.map((rec: string, idx: number) => (
-                              <li key={idx} className="text-sm leading-relaxed text-foreground/80">{rec}</li>
+                              <li key={idx} className="text-sm leading-relaxed text-white/90">{rec}</li>
                             ))}
                           </ul>
                         </CardContent>
@@ -393,10 +393,10 @@ const HealingHistory = () => {
                               <h4 className="font-semibold text-sm text-orange-300">{risk.concern}</h4>
                               {risk.symptoms && risk.symptoms.length > 0 && (
                                 <div>
-                                  <p className="text-xs font-medium text-foreground/60 mb-1">Observed Symptoms:</p>
+                                  <p className="text-xs font-medium text-white/70 mb-1">Observed Symptoms:</p>
                                   <ul className="list-disc list-inside space-y-1">
                                     {risk.symptoms.map((symptom: string, sIdx: number) => (
-                                      <li key={sIdx} className="text-sm text-foreground/80">{symptom}</li>
+                                      <li key={sIdx} className="text-sm text-white/90">{symptom}</li>
                                     ))}
                                   </ul>
                                 </div>
@@ -404,9 +404,9 @@ const HealingHistory = () => {
                               {risk.medicalReference && (
                                 <div className="mt-3 p-3 bg-black/30 rounded-lg border border-cyan-500/20 space-y-2">
                                   <p className="text-xs font-semibold text-cyan-400">Medical Reference:</p>
-                                  <p className="text-sm font-medium text-foreground/80">{risk.medicalReference.source}</p>
+                                  <p className="text-sm font-medium text-white/90">{risk.medicalReference.source}</p>
                                   {risk.medicalReference.keyQuote && (
-                                    <blockquote className="text-sm italic border-l-2 border-cyan-500 pl-3 text-foreground/70">
+                                    <blockquote className="text-sm italic border-l-2 border-cyan-500 pl-3 text-white/85">
                                       "{risk.medicalReference.keyQuote}"
                                     </blockquote>
                                   )}
@@ -438,7 +438,7 @@ const HealingHistory = () => {
                         <CardContent>
                           <ul className="list-disc list-inside space-y-2">
                             {entries[0].analysis_result.productRecommendations.map((product: string, idx: number) => (
-                              <li key={idx} className="text-sm leading-relaxed text-foreground/80">{product}</li>
+                              <li key={idx} className="text-sm leading-relaxed text-white/90">{product}</li>
                             ))}
                           </ul>
                         </CardContent>
@@ -497,7 +497,7 @@ const HealingHistory = () => {
         <DialogContent className="sm:max-w-md bg-slate-900/95 border-cyan-500/30 shadow-[0_0_30px_rgba(0,245,255,0.15)]">
           <DialogHeader>
             <DialogTitle className="font-rajdhani text-cyan-400">Export Healing Report</DialogTitle>
-            <DialogDescription className="text-foreground/60">
+            <DialogDescription className="text-white/70">
               Choose what you'd like to export. Reports are downloaded as HTML files that can be viewed in your browser or saved as PDF.
             </DialogDescription>
           </DialogHeader>
