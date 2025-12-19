@@ -164,46 +164,37 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-10 h-auto">
-            <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-4">
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1 sm:grid sm:grid-cols-10">
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm px-3 py-2">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
             </TabsTrigger>
-            <TabsTrigger value="orders" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Orders</span>
-              <span className="sm:hidden">Orders</span>
+            <TabsTrigger value="orders" className="text-xs sm:text-sm px-3 py-2">
+              Orders
             </TabsTrigger>
-            <TabsTrigger value="email" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Email</span>
-              <span className="sm:hidden">Email</span>
+            <TabsTrigger value="email" className="text-xs sm:text-sm px-3 py-2">
+              Email
             </TabsTrigger>
-            <TabsTrigger value="users" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Users</span>
-              <span className="sm:hidden">Users</span>
+            <TabsTrigger value="users" className="text-xs sm:text-sm px-3 py-2">
+              Users
             </TabsTrigger>
-            <TabsTrigger value="pages" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Pages</span>
-              <span className="sm:hidden">Pages</span>
+            <TabsTrigger value="pages" className="text-xs sm:text-sm px-3 py-2">
+              Pages
             </TabsTrigger>
-            <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Content</span>
-              <span className="sm:hidden">Content</span>
+            <TabsTrigger value="content" className="text-xs sm:text-sm px-3 py-2">
+              Content
             </TabsTrigger>
-            <TabsTrigger value="products" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Products</span>
-              <span className="sm:hidden">Products</span>
+            <TabsTrigger value="products" className="text-xs sm:text-sm px-3 py-2">
+              Products
             </TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Settings</span>
-              <span className="sm:hidden">Settings</span>
+            <TabsTrigger value="settings" className="text-xs sm:text-sm px-3 py-2">
+              Settings
             </TabsTrigger>
-            <TabsTrigger value="blog" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">Blog</span>
-              <span className="sm:hidden">Blog</span>
+            <TabsTrigger value="blog" className="text-xs sm:text-sm px-3 py-2">
+              Blog
             </TabsTrigger>
-            <TabsTrigger value="ai-training" className="text-xs sm:text-sm px-2 sm:px-4">
-              <span className="hidden sm:inline">AI</span>
-              <span className="sm:hidden">AI</span>
+            <TabsTrigger value="ai-training" className="text-xs sm:text-sm px-3 py-2">
+              AI
             </TabsTrigger>
           </TabsList>
 
