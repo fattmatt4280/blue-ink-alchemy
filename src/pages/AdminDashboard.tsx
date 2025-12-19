@@ -40,6 +40,7 @@ import { WebhookHealthMonitor } from '@/components/WebhookHealthMonitor';
 import EmailCampaignManager from '@/components/EmailCampaignManager';
 import { PageManager } from '@/components/PageManager';
 import { OrdersManager } from '@/components/OrdersManager';
+import { ActivationCodesPanel } from '@/components/ActivationCodesPanel';
 
 interface SiteContent {
   id: string;
@@ -164,7 +165,7 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="flex flex-wrap h-auto gap-1 p-1 sm:grid sm:grid-cols-10">
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1 sm:grid sm:grid-cols-11">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-3 py-2">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
@@ -196,17 +197,12 @@ const AdminDashboard = () => {
             <TabsTrigger value="ai-training" className="text-xs sm:text-sm px-3 py-2">
               AI
             </TabsTrigger>
+            <TabsTrigger value="codes" className="text-xs sm:text-sm px-3 py-2">
+              Codes
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-6">
-            <div className="mb-4">
-              <Button 
-                onClick={() => window.location.href = '/admin/activation-codes'}
-                variant="outline"
-              >
-                Manage Heal-AId Activation Codes
-              </Button>
-            </div>
             <WebhookHealthMonitor />
             <InvoicePreview />
             <div id="order-backfill">
@@ -333,6 +329,10 @@ const AdminDashboard = () => {
                 <HealingAssessmentReviewer />
                 <ExpertKnowledgeEditor />
               </TabsContent>
+
+          <TabsContent value="codes" className="space-y-6">
+            <ActivationCodesPanel />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
