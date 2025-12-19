@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import { HealingHistoryEntry } from "@/hooks/useHealingHistory";
 import { X, ZoomIn, ZoomOut, Move } from "lucide-react";
 
+const NEON_CYAN = "#00f5ff";
+
 interface HealingPhotoComparisonProps {
   entries: HealingHistoryEntry[];
   onClose: () => void;
@@ -29,11 +31,16 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full neon-card">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Photo Comparison Tool</CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <CardTitle className="font-rajdhani text-cyan-400">Photo Comparison Tool</CardTitle>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="hover:bg-cyan-500/10 text-cyan-400"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -41,7 +48,7 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
       <CardContent className="space-y-6">
         {/* Photo Selection */}
         <div>
-          <h3 className="text-sm font-medium mb-3">Select Photos to Compare (2-4)</h3>
+          <h3 className="text-sm font-medium mb-3 text-cyan-300/80">Select Photos to Compare (2-4)</h3>
           <div className="grid grid-cols-4 gap-2">
             {entries.map((entry) => (
               <button
@@ -49,8 +56,8 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                 onClick={() => togglePhotoSelection(entry)}
                 className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                   selectedPhotos.find(p => p.id === entry.id)
-                    ? "border-primary shadow-lg"
-                    : "border-border hover:border-primary/50"
+                    ? "border-cyan-400 shadow-[0_0_15px_rgba(0,245,255,0.4)]"
+                    : "border-cyan-500/20 hover:border-cyan-500/50"
                 }`}
               >
                 <img
@@ -59,8 +66,10 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                   className="w-full h-full object-cover"
                 />
                 {selectedPhotos.find(p => p.id === entry.id) && (
-                  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                    <Badge variant="default">Selected</Badge>
+                  <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center">
+                    <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_10px_rgba(0,245,255,0.4)]">
+                      Selected
+                    </Badge>
                   </div>
                 )}
               </button>
@@ -74,6 +83,10 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
             variant={viewMode === "side-by-side" ? "default" : "outline"}
             onClick={() => setViewMode("side-by-side")}
             size="sm"
+            className={viewMode === "side-by-side" 
+              ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 shadow-[0_0_15px_rgba(0,245,255,0.3)]" 
+              : "border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-cyan-400"
+            }
           >
             Side by Side
           </Button>
@@ -82,6 +95,10 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
             onClick={() => setViewMode("overlay")}
             size="sm"
             disabled={selectedPhotos.length !== 2}
+            className={viewMode === "overlay" 
+              ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0 shadow-[0_0_15px_rgba(0,245,255,0.3)]" 
+              : "border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-cyan-400 disabled:opacity-50"
+            }
           >
             Overlay
           </Button>
@@ -92,8 +109,8 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Opacity</label>
-                <span className="text-sm text-muted-foreground">{opacity[0]}%</span>
+                <label className="text-sm font-medium text-cyan-300/80">Opacity</label>
+                <span className="text-sm text-cyan-400">{opacity[0]}%</span>
               </div>
               <Slider
                 value={opacity}
@@ -101,13 +118,14 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                 min={0}
                 max={100}
                 step={1}
+                className="[&_[role=slider]]:bg-cyan-400 [&_[role=slider]]:border-cyan-400 [&_[role=slider]]:shadow-[0_0_8px_rgba(0,245,255,0.5)] [&>.bg-primary]:bg-cyan-500"
               />
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Zoom</label>
-                <span className="text-sm text-muted-foreground">{zoom[0]}%</span>
+                <label className="text-sm font-medium text-cyan-300/80">Zoom</label>
+                <span className="text-sm text-cyan-400">{zoom[0]}%</span>
               </div>
               <Slider
                 value={zoom}
@@ -115,6 +133,7 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                 min={50}
                 max={200}
                 step={10}
+                className="[&_[role=slider]]:bg-cyan-400 [&_[role=slider]]:border-cyan-400 [&_[role=slider]]:shadow-[0_0_8px_rgba(0,245,255,0.5)] [&>.bg-primary]:bg-cyan-500"
               />
             </div>
           </div>
@@ -131,7 +150,7 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
               }`}>
                 {selectedPhotos.map((entry) => (
                   <div key={entry.id} className="space-y-2">
-                    <div className="relative aspect-square rounded-lg overflow-hidden border border-border">
+                    <div className="relative aspect-square rounded-lg overflow-hidden border border-cyan-500/30 shadow-[0_0_15px_rgba(0,245,255,0.15)]">
                       <img
                         src={entry.photo_url}
                         alt={`Progress on ${format(new Date(entry.created_at), "MMM dd")}`}
@@ -139,11 +158,13 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                       />
                     </div>
                     <div className="text-center space-y-1">
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium text-cyan-300">
                         {format(new Date(entry.created_at), "MMM dd, yyyy")}
                       </p>
-                      <Badge variant="outline">{entry.healing_stage}</Badge>
-                      <p className="text-xs text-muted-foreground">
+                      <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
+                        {entry.healing_stage}
+                      </Badge>
+                      <p className="text-xs text-cyan-300/50">
                         Score: {entry.progress_score}/100
                       </p>
                     </div>
@@ -151,7 +172,7 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                 ))}
               </div>
             ) : (
-              <div className="relative aspect-square rounded-lg overflow-hidden border border-border">
+              <div className="relative aspect-square rounded-lg overflow-hidden border border-cyan-500/30 shadow-[0_0_20px_rgba(0,245,255,0.2)]">
                 <img
                   src={selectedPhotos[0].photo_url}
                   alt="Base"
@@ -168,10 +189,10 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
                   }}
                 />
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between">
-                  <Badge variant="default">
+                  <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_10px_rgba(0,245,255,0.4)]">
                     {format(new Date(selectedPhotos[0].created_at), "MMM dd")}
                   </Badge>
-                  <Badge variant="secondary">
+                  <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-[0_0_10px_rgba(139,92,246,0.4)]">
                     {format(new Date(selectedPhotos[1].created_at), "MMM dd")}
                   </Badge>
                 </div>
@@ -181,7 +202,7 @@ export const HealingPhotoComparison = ({ entries, onClose }: HealingPhotoCompari
         )}
 
         {selectedPhotos.length < 2 && (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-cyan-300/50">
             <p>Select at least 2 photos to compare</p>
           </div>
         )}
