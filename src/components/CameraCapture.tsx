@@ -164,7 +164,7 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
         </div>
 
         {/* Capture Button & Gallery */}
-        <div className="absolute bottom-24 left-0 right-0 z-20 flex items-center justify-center gap-6 px-6">
+        <div className="absolute bottom-4 left-0 right-0 z-20 flex items-center justify-center gap-6 px-6">
           {/* Gallery Button */}
           <div className="relative">
             <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center hover:bg-white/30 transition-colors">
@@ -209,7 +209,7 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
 
         {/* Photo Preview Strip */}
         {capturedPhotos.length > 0 && (
-          <div className="absolute bottom-36 left-0 right-0 px-4">
+          <div className="absolute bottom-28 left-0 right-0 px-4">
             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               {capturedPhotos.map((photo) => (
                 <div key={photo.id} className="relative flex-shrink-0">
