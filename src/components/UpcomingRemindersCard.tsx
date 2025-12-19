@@ -8,15 +8,22 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Neon colors
+const NEON_CYAN = "#00f5ff";
+const NEON_BLUE = "#3b82f6";
+const NEON_PURPLE = "#8b5cf6";
+const NEON_GREEN = "#22c55e";
+const NEON_AMBER = "#fbbf24";
+
 interface UpcomingRemindersCardProps {
   userId: string;
 }
 
 const REMINDER_ICONS: Record<string, React.ReactNode> = {
-  clean: <Droplets className="w-4 h-4 text-blue-500" />,
-  moisturize: <Droplets className="w-4 h-4 text-green-500" />,
-  upload_photo: <Camera className="w-4 h-4 text-purple-500" />,
-  check_symptoms: <AlertTriangle className="w-4 h-4 text-amber-500" />,
+  clean: <Droplets className="w-4 h-4" style={{ color: NEON_BLUE }} />,
+  moisturize: <Droplets className="w-4 h-4" style={{ color: NEON_GREEN }} />,
+  upload_photo: <Camera className="w-4 h-4" style={{ color: NEON_PURPLE }} />,
+  check_symptoms: <AlertTriangle className="w-4 h-4" style={{ color: NEON_AMBER }} />,
 };
 
 export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
@@ -63,17 +70,17 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="neon-card bg-slate-900/80 border-cyan-500/30">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-base text-cyan-300">
+            <Bell className="w-5 h-5" style={{ color: NEON_CYAN }} />
             Upcoming Reminders
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-12 bg-muted rounded" />
-            <div className="h-12 bg-muted rounded" />
+          <div className="space-y-3">
+            <div className="h-12 bg-slate-800/50 animate-pulse rounded-lg border border-cyan-500/10" />
+            <div className="h-12 bg-slate-800/50 animate-pulse rounded-lg border border-cyan-500/10" />
           </div>
         </CardContent>
       </Card>
@@ -83,11 +90,11 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
   const displayReminders = upcomingReminders.slice(0, 5);
 
   return (
-    <Card>
+    <Card className="neon-card bg-slate-900/80 border-cyan-500/30">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-base text-cyan-300">
+            <Bell className="w-5 h-5" style={{ color: NEON_CYAN }} />
             Upcoming Reminders
           </CardTitle>
           <div className="flex items-center gap-1">
@@ -97,12 +104,12 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
                 size="sm"
                 onClick={handleTestReminder}
                 disabled={isTesting}
-                className="text-xs"
+                className="text-xs bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400/50"
               >
                 {isTesting ? (
-                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" style={{ color: NEON_CYAN }} />
                 ) : (
-                  <Play className="w-3 h-3 mr-1" />
+                  <Play className="w-3 h-3 mr-1" style={{ color: NEON_CYAN }} />
                 )}
                 Test
               </Button>
@@ -111,18 +118,19 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/dashboard?tab=reminders")}
+              className="text-cyan-300 hover:bg-cyan-500/20"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4" style={{ color: NEON_CYAN }} />
             </Button>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         {displayReminders.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground">
-            <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No upcoming reminders</p>
-            <p className="text-xs mt-1">
+          <div className="text-center py-6">
+            <Bell className="w-8 h-8 mx-auto mb-2" style={{ color: `${NEON_CYAN}50` }} />
+            <p className="text-sm text-cyan-300/70">No upcoming reminders</p>
+            <p className="text-xs mt-1 text-cyan-300/50">
               Complete a healing analysis to set up reminders
             </p>
           </div>
@@ -131,17 +139,24 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
             {displayReminders.map((reminder) => (
               <div
                 key={reminder.id}
-                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-cyan-500/20"
+                style={{ boxShadow: `0 0 10px ${NEON_CYAN}08` }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-background">
+                  <div 
+                    className="p-2 rounded-full border"
+                    style={{ 
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      borderColor: `${NEON_CYAN}30`
+                    }}
+                  >
                     {REMINDER_ICONS[reminder.reminder_type] || (
-                      <Bell className="w-4 h-4" />
+                      <Bell className="w-4 h-4" style={{ color: NEON_CYAN }} />
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{reminder.title}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <p className="text-sm font-medium text-cyan-100">{reminder.title}</p>
+                    <p className="text-xs flex items-center gap-1 text-cyan-300/60">
                       <Clock className="w-3 h-3" />
                       {formatDistanceToNow(new Date(reminder.scheduled_for), {
                         addSuffix: true,
@@ -153,19 +168,19 @@ export function UpcomingRemindersCard({ userId }: UpcomingRemindersCardProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 hover:bg-green-500/20"
                     onClick={() => completeReminder(reminder.id)}
                     disabled={isCompleting}
                   >
-                    <Check className="w-4 h-4 text-green-500" />
+                    <Check className="w-4 h-4" style={{ color: NEON_GREEN }} />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 hover:bg-red-500/20"
                     onClick={() => cancelReminder(reminder.id)}
                   >
-                    <X className="w-4 h-4 text-muted-foreground" />
+                    <X className="w-4 h-4 text-cyan-300/50" />
                   </Button>
                 </div>
               </div>
