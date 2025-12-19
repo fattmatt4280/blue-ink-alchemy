@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { generateTimelapse, uploadTimelapse } from "@/utils/timelapseGenerator";
 import { supabase } from "@/integrations/supabase/client";
 
+const NEON_CYAN = "#00f5ff";
+
 interface HealingPhotoTimelineProps {
   entries: HealingHistoryEntry[];
 }
@@ -71,51 +73,52 @@ export const HealingPhotoTimeline = ({ entries }: HealingPhotoTimelineProps) => 
   };
 
   return (
-    <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Photo Timeline</CardTitle>
-            <Button
-              onClick={handleGenerateTimelapse}
-              disabled={isGenerating || entries.length < 2}
-              size="sm"
-              variant="outline"
+    <Card className="neon-card">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-rajdhani text-cyan-400">Photo Timeline</CardTitle>
+          <Button
+            onClick={handleGenerateTimelapse}
+            disabled={isGenerating || entries.length < 2}
+            size="sm"
+            variant="outline"
+            className="border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10 text-cyan-400"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Video className="h-4 w-4 mr-2" style={{ filter: `drop-shadow(0 0 4px ${NEON_CYAN})` }} />
+                Create Time-Lapse
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {entries.map((entry) => (
+            <div
+              key={entry.id}
+              className="relative group"
             >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Video className="h-4 w-4 mr-2" />
-                  Create Time-Lapse
-                </>
-              )}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {entries.map((entry) => (
-              <div
-                key={entry.id}
-                className="relative group"
-              >
-                <img
-                  src={entry.photo_url}
-                  alt={`Progress on ${format(new Date(entry.created_at), "MMM dd")}`}
-                  className="w-full aspect-square object-cover rounded-lg"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-lg flex items-end justify-center pb-2">
-                  <Badge className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {format(new Date(entry.created_at), "MMM dd")}
-                  </Badge>
-                </div>
+              <img
+                src={entry.photo_url}
+                alt={`Progress on ${format(new Date(entry.created_at), "MMM dd")}`}
+                className="w-full aspect-square object-cover rounded-lg border border-cyan-500/30 transition-all duration-300 group-hover:border-cyan-400/60 group-hover:shadow-[0_0_20px_rgba(0,245,255,0.25)]"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-lg flex items-end justify-center pb-2">
+                <Badge className="opacity-0 group-hover:opacity-100 transition-opacity bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_10px_rgba(0,245,255,0.3)]">
+                  {format(new Date(entry.created_at), "MMM dd")}
+                </Badge>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
