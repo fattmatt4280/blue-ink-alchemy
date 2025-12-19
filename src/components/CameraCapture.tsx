@@ -104,22 +104,29 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
           />
         )}
 
-        {/* Heal-AId Branding Header */}
-        <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-center py-3 bg-gradient-to-b from-black/80 via-black/60 to-transparent">
-          <div className="flex items-center gap-2">
+        {/* Heal-AId Branding Header - Full Width */}
+        <div className="absolute top-0 left-0 right-0 z-30 bg-gradient-to-b from-black via-black/90 to-transparent pb-4">
+          <div className="flex items-center justify-center gap-4 py-4 px-6">
             <img 
               src={healaidShield} 
               alt="Heal-AId" 
-              className="w-8 h-8 rounded-lg opacity-90 shadow-[0_0_15px_rgba(0,255,255,0.5)]"
+              className="w-14 h-14 rounded-xl shadow-[0_0_25px_rgba(0,255,255,0.6)] border-2 border-cyan-400/50"
             />
-            <span className="text-lg font-rajdhani font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">
-              Heal-AId
-            </span>
+            <div className="flex flex-col">
+              <span className="text-3xl font-rajdhani font-bold tracking-wider bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(0,255,255,0.7)]">
+                HEAL-AId
+              </span>
+              <span className="text-xs text-cyan-300/80 tracking-[0.3em] uppercase">
+                Tattoo Healing Monitor
+              </span>
+            </div>
           </div>
+          {/* Neon accent line */}
+          <div className="h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_rgba(0,255,255,0.5)]" />
         </div>
 
         {/* Top Controls */}
-        <div className="absolute top-12 left-0 right-0 p-4 flex items-center justify-between">
+        <div className="absolute top-24 left-0 right-0 p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -153,7 +160,7 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
         </div>
 
         {/* Mode Indicator */}
-        <div className="absolute top-16 left-1/2 -translate-x-1/2">
+        <div className="absolute top-28 left-1/2 -translate-x-1/2">
           <div className="px-4 py-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
             <p className="text-white text-sm font-medium">
               {selectedMode === 'progress' && '📊 Progress Tracking'}
