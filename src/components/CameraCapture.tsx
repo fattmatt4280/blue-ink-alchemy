@@ -152,15 +152,6 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
           </Button>
         </div>
 
-        {/* Watermark Overlay */}
-        <div className="absolute bottom-44 left-4 z-10 opacity-30">
-          <img 
-            src={healaidShield} 
-            alt="" 
-            className="w-10 h-10 rounded-lg shadow-[0_0_20px_rgba(0,255,255,0.3)]"
-          />
-        </div>
-
         {/* Mode Indicator */}
         <div className="absolute top-16 left-1/2 -translate-x-1/2">
           <div className="px-4 py-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
@@ -190,14 +181,18 @@ export const CameraCapture = ({ onPhotosCapture, onCancel, maxPhotos = 5 }: Came
             />
           </div>
 
-          {/* Capture Button */}
+          {/* Capture Button - Heal-AId Branded */}
           <button
             onClick={handleCapture}
             disabled={!canCaptureMore || isInitializing}
-            className="relative w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
+            className="relative w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-[0_0_25px_rgba(0,255,255,0.6)] disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
           >
-            <div className="w-16 h-16 rounded-full border-4 border-black flex items-center justify-center">
-              <Camera className="h-8 w-8 text-black" />
+            <div className="w-16 h-16 rounded-full border-2 border-white/50 overflow-hidden">
+              <img 
+                src={healaidShield} 
+                alt="Capture" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </button>
 
