@@ -53,31 +53,37 @@ export const HealingAssessmentResults = ({
     const calculated = calculateMetrics(analysisData, formData);
     setMetrics(calculated);
 
-    // Animate values
-    const duration = 1000;
-    const steps = 30;
-    const interval = duration / steps;
-    let currentStep = 0;
+    // Animate values using requestAnimationFrame for smooth 60fps animation
+    const duration = 800;
+    let startTime: number | null = null;
+    let animationId: number;
 
-    const timer = setInterval(() => {
-      currentStep++;
-      const progress = currentStep / steps;
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing function for smoother animation
+      const easeOutQuad = (t: number) => t * (2 - t);
+      const easedProgress = easeOutQuad(progress);
 
       setAnimatedMetrics({
-        inflammation: Math.round(calculated.inflammation * progress),
-        infectionRisk: Math.round(calculated.infectionRisk * progress),
-        healingProgress: Math.round(calculated.healingProgress * progress),
-        colorSaturation: Math.round(calculated.colorSaturation * progress),
-        textureQuality: Math.round(calculated.textureQuality * progress),
-        overallHealth: Math.round(calculated.overallHealth * progress),
+        inflammation: Math.round(calculated.inflammation * easedProgress),
+        infectionRisk: Math.round(calculated.infectionRisk * easedProgress),
+        healingProgress: Math.round(calculated.healingProgress * easedProgress),
+        colorSaturation: Math.round(calculated.colorSaturation * easedProgress),
+        textureQuality: Math.round(calculated.textureQuality * easedProgress),
+        overallHealth: Math.round(calculated.overallHealth * easedProgress),
       });
 
-      if (currentStep >= steps) {
-        clearInterval(timer);
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
       }
-    }, interval);
+    };
 
-    return () => clearInterval(timer);
+    animationId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationId);
   }, [analysisData, formData]);
 
   const calculateMetrics = (analysis: any, data: HealingQuestionData): Metrics => {
