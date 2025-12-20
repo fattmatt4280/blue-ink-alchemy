@@ -42,12 +42,15 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
   };
 
   const getPageUrl = (p: CmsPage) => {
-    if (p.parent_id && parentPage) {
-      return `/${parentPage.slug}/${p.slug}`;
-    }
+    // When viewing a child page, parentPage is provided
     if (parentPage) {
       return `/${parentPage.slug}/${p.slug}`;
     }
+    // When viewing a parent page, children should link to parent/child
+    if (p.parent_id) {
+      return `/${page.slug}/${p.slug}`;
+    }
+    // Top-level page
     return `/${p.slug}`;
   };
 
