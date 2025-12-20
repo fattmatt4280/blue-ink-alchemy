@@ -48,6 +48,7 @@ const BlogManager = () => {
   const [saving, setSaving] = useState(false);
   const [manualUploadContent, setManualUploadContent] = useState('');
   const [showManualUpload, setShowManualUpload] = useState(false);
+  const [manualUploadImage, setManualUploadImage] = useState('');
 
   const initialFormData: BlogPost = {
     title: '',
@@ -256,6 +257,11 @@ const BlogManager = () => {
         parsedData = JSON.parse(manualUploadContent);
       }
 
+      // Use uploaded image if available, otherwise use from parsed data
+      if (manualUploadImage) {
+        parsedData.featured_image = manualUploadImage;
+      }
+
       // Validate required fields
       const required = ['title', 'slug', 'author', 'excerpt', 'meta_description', 'canonical_url', 'publish_status', 'publish_date', 'featured_image'];
       const missing = required.filter(field => !parsedData[field]);
@@ -275,6 +281,8 @@ const BlogManager = () => {
       });
       
       setShowManualUpload(false);
+      setManualUploadImage('');
+      setManualUploadContent('');
       setShowForm(true);
       toast.success('Content parsed successfully');
     } catch (error) {
@@ -302,23 +310,41 @@ const BlogManager = () => {
                 Manual Upload
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Manual Upload</DialogTitle>
                 <DialogDescription>
-                  Paste YAML front matter + Markdown, or JSON content
+                  Upload a featured image and paste your YAML/JSON content
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
+                <ImageUpload
+                  title="Featured Image"
+                  description="Upload an image first - the URL will be used automatically"
+                  currentImage={manualUploadImage}
+                  onImageUploaded={(url) => setManualUploadImage(url)}
+                />
+                
+                {manualUploadImage && (
+                  <div className="p-3 bg-muted rounded-md">
+                    <Label className="text-sm font-medium">Image URL (for reference):</Label>
+                    <code className="block mt-1 text-xs break-all text-muted-foreground">{manualUploadImage}</code>
+                  </div>
+                )}
+
                 <Textarea
                   value={manualUploadContent}
                   onChange={(e) => setManualUploadContent(e.target.value)}
-                  placeholder="---&#10;title: 'Your Post Title'&#10;slug: 'your-post-slug'&#10;author: 'Author Name'&#10;excerpt: 'Brief description...'&#10;meta_description: 'SEO description between 120-160 characters...'&#10;canonical_url: 'https://bluedreambudder.com/blog/your-post-slug'&#10;publish_status: 'draft'&#10;publish_date: '2024-01-01T10:00:00Z'&#10;featured_image: 'https://example.com/image.jpg'&#10;featured_image_alt: 'Alt text'&#10;categories: ['tattoo-care']&#10;tags: ['healing', 'aftercare']&#10;---&#10;&#10;Your markdown content here..."
-                  className="min-h-[400px] font-mono text-sm"
+                  placeholder="---&#10;title: 'Your Post Title'&#10;slug: 'your-post-slug'&#10;author: 'Author Name'&#10;excerpt: 'Brief description...'&#10;meta_description: 'SEO description between 120-160 characters...'&#10;canonical_url: 'https://bluedreambudder.com/blog/your-post-slug'&#10;publish_status: 'draft'&#10;publish_date: '2024-01-01T10:00:00Z'&#10;featured_image: '(optional if uploaded above)'&#10;featured_image_alt: 'Alt text'&#10;categories: ['tattoo-care']&#10;tags: ['healing', 'aftercare']&#10;---&#10;&#10;Your markdown content here..."
+                  className="min-h-[300px] font-mono text-sm"
                 />
                 <div className="flex gap-2">
                   <Button onClick={parseManualUpload}>Parse & Preview</Button>
-                  <Button variant="outline" onClick={() => setShowManualUpload(false)}>Cancel</Button>
+                  <Button variant="outline" onClick={() => {
+                    setShowManualUpload(false);
+                    setManualUploadImage('');
+                    setManualUploadContent('');
+                  }}>Cancel</Button>
                 </div>
               </div>
             </DialogContent>
