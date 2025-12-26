@@ -99,7 +99,8 @@ export const PageManager = () => {
   };
 
   const generateCanonicalUrl = (slug: string, parentId: string | null) => {
-    const baseUrl = window.location.origin;
+    // Always use production URL for canonical - no trailing slash
+    const baseUrl = 'https://bluedreambudder.com';
     if (parentId) {
       const parent = pages.find(p => p.id === parentId);
       if (parent) {

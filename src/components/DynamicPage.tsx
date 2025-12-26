@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Calendar, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 interface CmsPage {
   id: string;
@@ -41,6 +38,21 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
     });
   };
 
+  // Normalize canonical URL - ensure no trailing slash except for homepage
+  const normalizeCanonicalUrl = (url: string) => {
+    if (!url) return url;
+    // Remove trailing slash unless it's just the domain root
+    const parsed = url.replace(/\/$/, '');
+    // If it's just the domain, keep trailing slash
+    if (parsed.match(/^https?:\/\/[^\/]+$/)) {
+      return url.endsWith('/') ? url : url + '/';
+    }
+    return parsed;
+  };
+
+  const canonicalUrl = normalizeCanonicalUrl(page.canonical_url);
+
+  // Generate URL for internal links - always without trailing slash
   const getPageUrl = (p: CmsPage) => {
     // When viewing a child page, parentPage is provided
     if (parentPage) {
@@ -48,9 +60,10 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
     }
     // When viewing a parent page, children should link to parent/child
     if (p.parent_id) {
+      // We're on the parent page, so use the current page's slug as parent
       return `/${page.slug}/${p.slug}`;
     }
-    // Top-level page
+    // Top-level page - no trailing slash
     return `/${p.slug}`;
   };
 
@@ -59,11 +72,12 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
       <Helmet>
         <title>{page.meta_title || page.title} | Blue Dream Budder</title>
         <meta name="description" content={page.meta_description} />
-        <link rel="canonical" href={page.canonical_url} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta name="robots" content="index, follow" />
         <meta property="og:title" content={page.meta_title || page.title} />
         <meta property="og:description" content={page.meta_description} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={page.canonical_url} />
+        <meta property="og:url" content={canonicalUrl} />
         {page.featured_image && (
           <meta property="og:image" content={page.featured_image} />
         )}
@@ -77,7 +91,7 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
             "dateModified": page.updated_at,
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": page.canonical_url
+              "@id": canonicalUrl
             },
             ...(page.featured_image && {
               "image": page.featured_image
@@ -88,7 +102,7 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
 
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-8 max-w-4xl">
-          {/* Breadcrumbs */}
+          {/* Breadcrumbs - links without trailing slashes */}
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
             <Link to="/" className="hover:text-foreground transition-colors">
               Home
@@ -144,7 +158,7 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
             <ReactMarkdown>{page.content_markdown}</ReactMarkdown>
           </article>
 
-          {/* Child Pages (Sub-pages) */}
+          {/* Child Pages (Sub-pages) - Related Articles */}
           {childPages.length > 0 && (
             <section className="mt-12">
               <h2 className="text-2xl font-bold text-foreground mb-6">Related Articles</h2>
@@ -178,7 +192,7 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
             </section>
           )}
 
-          {/* Back to Parent */}
+          {/* Back to Parent - link without trailing slash */}
           {parentPage && (
             <div className="mt-12 pt-8 border-t border-border">
               <Link 

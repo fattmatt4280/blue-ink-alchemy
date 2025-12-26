@@ -41,6 +41,7 @@ import EmailCampaignManager from '@/components/EmailCampaignManager';
 import { PageManager } from '@/components/PageManager';
 import { OrdersManager } from '@/components/OrdersManager';
 import { ActivationCodesPanel } from '@/components/ActivationCodesPanel';
+import SEOChecklist from '@/components/SEOChecklist';
 
 interface SiteContent {
   id: string;
@@ -226,6 +227,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="pages" className="space-y-6">
+            <SEOChecklist />
             <PageManager />
           </TabsContent>
 
