@@ -76,7 +76,7 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
               className="border-2 border-emerald-400 text-emerald-400 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-emerald-400 hover:text-black transition-all duration-300 bg-transparent"
               onClick={() => navigate('/best-tattoo-aftercare')}
             >
-              Aftercare Guide
+              Best Tattoo Aftercare
             </button>
           </div>
         </div>
