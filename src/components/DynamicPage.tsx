@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Calendar, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -154,8 +155,46 @@ export const DynamicPage = ({ page, parentPage, childPages = [] }: DynamicPagePr
           </header>
 
           {/* Page Content */}
-          <article className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-a:text-primary prose-strong:text-foreground prose-li:text-foreground/90">
-            <ReactMarkdown>{page.content_markdown}</ReactMarkdown>
+          <article className="prose prose-lg max-w-none dark:prose-invert">
+            <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({ children }) => <h1 className="text-3xl font-bold mt-8 mb-4 text-foreground">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-2xl font-semibold mt-8 mb-4 text-foreground">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-xl font-medium mt-6 mb-3 text-foreground">{children}</h3>,
+                h4: ({ children }) => <h4 className="text-lg font-medium mt-4 mb-2 text-foreground">{children}</h4>,
+                p: ({ children }) => <p className="mb-4 leading-relaxed text-foreground/90">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-inside mb-6 space-y-2 ml-4">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside mb-6 space-y-2 ml-4">{children}</ol>,
+                li: ({ children }) => <li className="text-foreground/90">{children}</li>,
+                a: ({ href, children }) => (
+                  <a 
+                    href={href} 
+                    className="text-primary hover:text-primary/80 underline" 
+                    target={href?.startsWith('http') ? "_blank" : undefined}
+                    rel={href?.startsWith('http') ? "noopener noreferrer" : undefined}
+                  >
+                    {children}
+                  </a>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-primary pl-4 italic my-6 text-muted-foreground">
+                    {children}
+                  </blockquote>
+                ),
+                hr: () => <hr className="my-8 border-border" />,
+                strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                code: ({ children }) => (
+                  <code className="bg-muted px-2 py-1 rounded font-mono text-sm">{children}</code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>
+                ),
+              }}
+            >
+              {page.content_markdown}
+            </ReactMarkdown>
           </article>
 
           {/* Child Pages (Sub-pages) - Related Articles */}
