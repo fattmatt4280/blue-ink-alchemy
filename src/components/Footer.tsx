@@ -110,7 +110,7 @@ const Footer = () => {
             <div className="text-sm text-white/80 text-center md:text-right">
               <p className="mb-1">© 2025 Dream Tattoo Company LLC. All rights reserved.</p>
               <p className="text-xs">
-                Blue Dream Budder™ and Heal-AId™ are trademarks of Dream Tattoo Company LLC.
+                Blue Dream Budder™ is a trademark of Dream Tattoo Company LLC.
               </p>
               <p className="text-xs">
                 All product names, logos, and brands are property of their respective owners.
