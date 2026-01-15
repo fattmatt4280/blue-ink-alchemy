@@ -18,8 +18,6 @@ interface UserData {
   last_activity?: string;
   total_events?: number;
   orders_count?: number;
-  healing_sessions?: number;
-  has_subscription?: boolean;
 }
 
 interface UserStats {
@@ -94,23 +92,11 @@ export const UserBaseManager = () => {
         .from('orders')
         .select('user_id');
 
-      // Fetch healing sessions
-      const { data: healingSessions, error: healingError } = await supabase
-        .from('healing_progress')
-        .select('user_id');
-
-      // Fetch subscriptions
-      const { data: subscriptions, error: subsError } = await supabase
-        .from('healaid_subscriptions')
-        .select('user_id, is_active');
-
       // Combine all data
       const enrichedUsers: UserData[] = profiles?.map(profile => {
         const userRole = roles?.find(r => r.user_id === profile.id);
         const userActivities = activities?.filter(a => a.user_id === profile.id) || [];
         const userOrders = orders?.filter(o => o.user_id === profile.id) || [];
-        const userHealing = healingSessions?.filter(h => h.user_id === profile.id) || [];
-        const userSub = subscriptions?.find(s => s.user_id === profile.id && s.is_active);
         
         const lastActivity = userActivities.length > 0
           ? userActivities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
@@ -123,9 +109,7 @@ export const UserBaseManager = () => {
           created_at: profile.created_at,
           last_activity: lastActivity,
           total_events: userActivities.length,
-          orders_count: userOrders.length,
-          healing_sessions: userHealing.length,
-          has_subscription: !!userSub
+          orders_count: userOrders.length
         };
       }) || [];
 
@@ -240,18 +224,17 @@ export const UserBaseManager = () => {
                   <TableHead>Last Activity</TableHead>
                   <TableHead>Events</TableHead>
                   <TableHead>Orders</TableHead>
-                  <TableHead>Subscription</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">Loading users...</TableCell>
+                    <TableCell colSpan={7} className="text-center">Loading users...</TableCell>
                   </TableRow>
                 ) : users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">No users found</TableCell>
+                    <TableCell colSpan={7} className="text-center">No users found</TableCell>
                   </TableRow>
                 ) : (
                   users.map((user) => (
@@ -274,11 +257,6 @@ export const UserBaseManager = () => {
                           <TableCell>{user.total_events || 0}</TableCell>
                           <TableCell>{user.orders_count || 0}</TableCell>
                           <TableCell>
-                            <Badge variant={user.has_subscription ? 'default' : 'outline'}>
-                              {user.has_subscription ? 'Active' : 'None'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
                             <CollapsibleTrigger asChild>
                               <Button
                                 variant="ghost"
@@ -293,7 +271,7 @@ export const UserBaseManager = () => {
                         </TableRow>
                         <CollapsibleContent asChild>
                           <TableRow>
-                            <TableCell colSpan={8} className="bg-muted/50">
+                            <TableCell colSpan={7} className="bg-muted/50">
                               <div className="p-4">
                                 <h4 className="font-semibold mb-3">Recent Activity</h4>
                                 <ScrollArea className="h-[200px]">

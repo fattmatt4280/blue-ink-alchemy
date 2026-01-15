@@ -15,7 +15,6 @@ interface CartContextType {
   customerEmail: string | null;
   setEmail: (email: string) => void;
   addToCart: (product: { id: string; name: string; price: number; image_url: string | null }) => void;
-  addToCartWithFreeTrial: (product: { id: string; name: string; price: number; image_url: string | null }, freeTrialProduct?: { id: string; name: string; price: number; image_url: string | null }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -161,35 +160,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     }
   };
 
-  const addToCartWithFreeTrial = (product: { id: string; name: string; price: number; image_url: string | null }, freeTrialProduct?: { id: string; name: string; price: number; image_url: string | null }) => {
-    try {
-      setItems(prevItems => {
-        // Check if product already exists
-        let newItems = [...prevItems];
-        const existingItem = newItems.find(item => item.id === product.id);
-        
-        if (existingItem) {
-          newItems = newItems.map(item =>
-            item.id === product.id 
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          );
-        } else {
-          newItems.push({ ...product, quantity: 1 });
-        }
-        
-        // Add free trial only if provided AND not already in cart (cap at 1)
-        if (freeTrialProduct && !newItems.some(item => item.id === freeTrialProduct.id)) {
-          newItems.push({ ...freeTrialProduct, quantity: 1 });
-        }
-        
-        return newItems;
-      });
-    } catch (error) {
-      console.error('Error adding to cart with free trial:', error);
-    }
-  };
-
   const removeFromCart = (id: string) => {
     try {
       setItems(prevItems => prevItems.filter(item => item.id !== id));
@@ -207,11 +177,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       setItems(prevItems =>
         prevItems.map(item => {
           if (item.id === id) {
-            // Cap free trial quantity at 1
-            const isFreeTrialItem = item.name.toLowerCase().includes('free trial') || 
-                                     item.name.toLowerCase().includes('3-day');
-            const newQuantity = isFreeTrialItem ? 1 : quantity;
-            return { ...item, quantity: newQuantity };
+            return { ...item, quantity };
           }
           return item;
         })
@@ -253,7 +219,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       customerEmail,
       setEmail,
       addToCart,
-      addToCartWithFreeTrial,
       removeFromCart,
       updateQuantity,
       clearCart,

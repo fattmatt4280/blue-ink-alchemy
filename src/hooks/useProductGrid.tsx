@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/components/AnalyticsTracker';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
-import { useFreeTrialEligibility } from '@/hooks/useFreeTrialEligibility';
 
 interface Product {
   id: string;
@@ -25,27 +24,8 @@ export const useProductGrid = () => {
   const [loading, setLoading] = useState(true);
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
   const [selectedProductName, setSelectedProductName] = useState('');
-  const { addToCart, addToCartWithFreeTrial, customerEmail } = useCart();
+  const { addToCart } = useCart();
   const { toast } = useToast();
-  const { checkEligibility } = useFreeTrialEligibility();
-
-  // Map Stripe Price IDs to tier keys for Heal-AId subscriptions
-  const HEALAID_TIER_MAP: Record<string, string> = {
-    'price_1SGrFSDiBqghYX9irfq6njZE': 'basic_weekly',
-    'price_1SGrKsDiBqghYX9i23HgSW8Y': 'basic_monthly',
-    'price_1SGrOkDiBqghYX9is1wTdLvS': 'pro_weekly',
-    'price_1SGrQhDiBqghYX9iJG7w6iFa': 'pro_monthly',
-    'price_1SGrcoDiBqghYX9iyO1XH8tq': 'shop_monthly',
-  };
-
-  // Identify subscription products
-  const freeTrialProduct = products.find(p => 
-    p.name.toLowerCase().includes('free trial') || 
-    p.name.toLowerCase().includes('3-day')
-  );
-  const isPhysicalProduct = (product: Product) => !product.name.toLowerCase().includes('heal-aid');
-  const isHealAidPlan = (product: Product) => 
-    product.stripe_price_id && HEALAID_TIER_MAP[product.stripe_price_id];
 
   useEffect(() => {
     fetchProducts();
@@ -74,120 +54,17 @@ export const useProductGrid = () => {
   };
 
   const handleAddToCart = async (product: Product) => {
-    // Check if this is a Heal-AId subscription plan
-    if (isHealAidPlan(product)) {
-      const tier = HEALAID_TIER_MAP[product.stripe_price_id!];
-      
-      // Track subscription click
-      await trackEvent('healaid_upgrade_click', {
-        tier,
-        product_id: product.id,
-        product_name: product.name,
-        price: product.price,
-        stripe_price_id: product.stripe_price_id,
-      });
-
-      try {
-        // Call the create-healaid-upgrade edge function
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-          toast({
-            title: "Sign in required",
-            description: "Please sign in to subscribe to Heal-AId",
-          });
-          window.location.href = '/auth';
-          return;
-        }
-
-        const { data, error } = await supabase.functions.invoke('create-healaid-upgrade', {
-          body: { tier },
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-
-        if (error) {
-          if (error.message?.includes('No active Heal-AId subscription found')) {
-            toast({
-              title: "Activate Heal-AId First",
-              description: "Please activate your free trial before upgrading",
-            });
-            window.location.href = '/activate';
-          } else {
-            throw error;
-          }
-          return;
-        }
-
-        if (data?.url) {
-          window.location.href = data.url;
-        }
-      } catch (error) {
-        console.error('Error starting subscription:', error);
-        toast({
-          title: "Error",
-          description: "Failed to start subscription. Please try again.",
-          variant: "destructive",
-        });
-      }
-      return;
-    }
-
-    // Handle free trial and physical products
-    const isFreeTrialProduct = product.name.includes('3-Day Free Trial');
-
-    // Check eligibility for manual free trial addition
-    if (isFreeTrialProduct && customerEmail) {
-      try {
-        const result = await checkEligibility(customerEmail);
-        if (!result.eligible) {
-          toast({
-            title: "Free trial already used",
-            description: "Add a budder product to get another free trial!",
-            variant: "destructive",
-          });
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking eligibility:', error);
-      }
-    }
-
-    // Check if this is a physical product and auto-add free trial
-    if (isPhysicalProduct(product) && freeTrialProduct) {
-      addToCartWithFreeTrial(
-        {
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image_url: product.image_url || null,
-        },
-        {
-          id: freeTrialProduct.id,
-          name: freeTrialProduct.name,
-          price: freeTrialProduct.price,
-          image_url: freeTrialProduct.image_url || null,
-        }
-      );
-      
-      toast({
-        title: "Added to cart!",
-        description: `${product.name} + FREE 3-day Heal-AId trial 🎁`,
-      });
-    } else {
-      addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image_url: product.image_url || null,
-      });
-      
-      toast({
-        title: "Added to cart!",
-        description: product.name,
-      });
-    }
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image_url: product.image_url || null,
+    });
+    
+    toast({
+      title: "Added to cart!",
+      description: product.name,
+    });
 
     // Track add to cart event
     await trackEvent('add_to_cart', {
