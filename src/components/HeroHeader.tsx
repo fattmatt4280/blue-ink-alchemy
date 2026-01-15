@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Menu, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
@@ -12,21 +11,15 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   mainNavItems, 
-  userNavItems, 
   footerNavItems, 
   footerNavItemsCondensed,
-  healingTrackerNavItem,
-  activateCodeNavItem,
   getFreeCreditsNavItem,
-  upgradeNavItem,
   signInIcon,
   signOutIcon
 } from "@/lib/navigationItems";
-import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
 
 const HeroHeader = () => {
   const { user, isAdmin, signOut } = useAuth();
-  const subscription = useHealAidSubscription();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -68,9 +61,6 @@ const HeroHeader = () => {
           >
             View Benefits
           </button>
-          <Link to="/heal-aid" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
-            Heal-AId
-          </Link>
           {isAdmin && (
             <Link to="/admin" className="text-white hover:text-cyan-400 transition-colors duration-200 text-lg font-medium">
               Admin
@@ -103,40 +93,17 @@ const HeroHeader = () => {
             <SheetContent side="right" className="w-80 bg-slate-900 border-slate-800">
               <ScrollArea className="h-[calc(100vh-4rem)] pr-4">
                 <nav className="flex flex-col space-y-6 mt-8">
-                  {/* ACCOUNT Section - Now First */}
+                  {/* ACCOUNT Section */}
                   <div>
                     <h3 className="text-xs font-semibold text-slate-400 mb-3 px-3">ACCOUNT</h3>
                     <div className="space-y-1">
                       {user ? (
                         <>
-                          {/* Welcome Card with Healing Tracker inside */}
-                          <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mx-3 mb-2 flex flex-col gap-3">
+                          {/* Welcome Card */}
+                          <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mx-3 mb-2">
                             <span className="text-cyan-400 font-medium">
                               Welcome back, {getUserDisplayName()}
                             </span>
-                            
-                            {/* Healing Tracker inside the welcome card */}
-                            {subscription.isActive && subscription.daysRemaining > 0 && (
-                              <Link
-                                to={healingTrackerNavItem.path}
-                                className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
-                              >
-                                <healingTrackerNavItem.icon className="w-5 h-5 text-white" />
-                                <span className="text-white">{healingTrackerNavItem.label}</span>
-                                <Badge variant="secondary" className="ml-auto bg-cyan-500/30 text-cyan-400">
-                                  {subscription.daysRemaining}d
-                                </Badge>
-                              </Link>
-                            )}
-                            
-                            {/* Upgrade Plan inside the welcome card */}
-                            <Link
-                              to={upgradeNavItem.path}
-                              className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
-                            >
-                              <upgradeNavItem.icon className="w-5 h-5 text-amber-400" />
-                              <span className="text-amber-400">{upgradeNavItem.label}</span>
-                            </Link>
                           </div>
                           
                           {/* Get free credits */}
@@ -146,27 +113,6 @@ const HeroHeader = () => {
                           >
                             <getFreeCreditsNavItem.icon className="w-5 h-5" />
                             <span>{getFreeCreditsNavItem.label}</span>
-                          </Link>
-                          
-                          {/* User nav items (Dashboard, Healing History) */}
-                          {userNavItems.map((item) => (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                            >
-                              <item.icon className="w-5 h-5" />
-                              <span>{item.label}</span>
-                            </Link>
-                          ))}
-                          
-                          {/* Activate Code (moved from Navigation) */}
-                          <Link
-                            to={activateCodeNavItem.path}
-                            className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                          >
-                            <activateCodeNavItem.icon className="w-5 h-5" />
-                            <span>{activateCodeNavItem.label}</span>
                           </Link>
                           
                           {/* Sign Out */}
@@ -223,17 +169,6 @@ const HeroHeader = () => {
                           </Link>
                         );
                       })}
-                      
-                      {/* Activate Code only shows in Navigation for logged-out users */}
-                      {!user && (
-                        <Link
-                          to={activateCodeNavItem.path}
-                          className="flex items-center gap-3 px-3 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                        >
-                          <activateCodeNavItem.icon className="w-5 h-5" />
-                          <span>{activateCodeNavItem.label}</span>
-                        </Link>
-                      )}
                     </div>
                   </div>
 
