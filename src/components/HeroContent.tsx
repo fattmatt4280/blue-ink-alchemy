@@ -2,9 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { useNavigate } from "react-router-dom";
-import { ActivationDialog } from "@/components/ActivationDialog";
-import { useState } from "react";
-import { Activity } from "lucide-react";
 
 interface HeroContentProps {
   onShopNowClick: () => void;
@@ -14,14 +11,8 @@ interface HeroContentProps {
 const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
   const { content } = useSiteContent();
   const navigate = useNavigate();
-  const [showActivationDialog, setShowActivationDialog] = useState(false);
 
   return (
-    <>
-      <ActivationDialog 
-        open={showActivationDialog} 
-        onOpenChange={setShowActivationDialog} 
-      />
     <div className="container mx-auto px-6 relative z-10 pt-24">
       <div className="flex items-center justify-start min-h-[80vh]">
         {/* Left-aligned content */}
@@ -60,19 +51,6 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
               View Benefits
             </button>
             <button 
-              className="border-2 border-cyan-400 text-cyan-400 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-cyan-400 hover:text-black transition-all duration-300 bg-transparent flex items-center gap-2"
-              onClick={() => navigate('/heal-aid')}
-            >
-              <Activity className="h-5 w-5" />
-              Track Healing
-            </button>
-            <button 
-              className="border-2 border-purple-400 text-purple-400 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-purple-400 hover:text-black transition-all duration-300 bg-transparent"
-              onClick={() => setShowActivationDialog(true)}
-            >
-              Have a Code?
-            </button>
-            <button 
               className="border-2 border-emerald-400 text-emerald-400 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-emerald-400 hover:text-black transition-all duration-300 bg-transparent"
               onClick={() => navigate('/best-tattoo-aftercare')}
             >
@@ -82,7 +60,6 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

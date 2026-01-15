@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AdminHeader from '@/components/AdminHeader';
-import { AIServiceMonitor } from '@/components/AIServiceMonitor';
+
 import { SecurityAlertsWidget } from '@/components/SecurityAlertsWidget';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateSecurityScore, SecurityMetrics } from '@/utils/securityScoreCalculator';
@@ -246,7 +246,12 @@ export default function AdminSecurity() {
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-4">
-            <AIServiceMonitor />
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Security Monitoring</CardTitle>
+                <CardDescription>AI service monitoring has been removed</CardDescription>
+              </CardHeader>
+            </Card>
           </TabsContent>
 
           <TabsContent value="pii" className="space-y-4">
