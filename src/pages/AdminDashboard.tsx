@@ -17,22 +17,12 @@ import FooterLinksEditor from '@/components/FooterLinksEditor';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import CustomerReviewsManager from '@/components/CustomerReviewsManager';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
-
 import BlogManager from '@/components/BlogManager';
 import AccessDenied from '@/components/AccessDenied';
 import StripeProductSync from '@/components/StripeProductSync';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { HealingAssessmentReviewer } from '@/components/HealingAssessmentReviewer';
-import { ExpertKnowledgeEditor } from '@/components/ExpertKnowledgeEditor';
-import { AITrainingAnalytics } from '@/components/AITrainingAnalytics';
-import { AIInstructionsEditor } from '@/components/AIInstructionsEditor';
-import HealAidContentEditor from '@/components/HealAidContentEditor';
-import HealingTrackerContentEditor from '@/components/HealingTrackerContentEditor';
 import { UserBaseManager } from '@/components/UserBaseManager';
 import AbandonedCartsManager from '@/components/AbandonedCartsManager';
-import ReminderSettingsPanel from '@/components/ReminderSettingsPanel';
-import { TTSSettingsEditor } from '@/components/TTSSettingsEditor';
 import { OrderBackfillManager } from '@/components/OrderBackfillManager';
 import { CustomAbandonedCartManager } from '@/components/CustomAbandonedCartManager';
 import { InvoicePreview } from '@/components/InvoicePreview';
@@ -40,7 +30,6 @@ import { WebhookHealthMonitor } from '@/components/WebhookHealthMonitor';
 import EmailCampaignManager from '@/components/EmailCampaignManager';
 import { PageManager } from '@/components/PageManager';
 import { OrdersManager } from '@/components/OrdersManager';
-import { ActivationCodesPanel } from '@/components/ActivationCodesPanel';
 import SEOChecklist from '@/components/SEOChecklist';
 
 interface SiteContent {
@@ -139,8 +128,6 @@ const AdminDashboard = () => {
     !item.key.startsWith('testimonial_') &&
     !item.key.startsWith('quick_link') &&
     !item.key.startsWith('support_') &&
-    !item.key.startsWith('healaid_') &&
-    !item.key.startsWith('tracker_') &&
     item.key !== 'ingredients_title' &&
     item.key !== 'ingredients_subtitle'
   );
@@ -156,8 +143,6 @@ const AdminDashboard = () => {
     item.key.startsWith('support_') ||
     item.key === 'quick_links_title'
   );
-  const healAidContent = content.filter(item => item.key.startsWith('healaid_'));
-  const trackerContent = content.filter(item => item.key.startsWith('tracker_'));
 
   return (
     <MFAEnforcementGate requireMFA={true}>
@@ -166,7 +151,7 @@ const AdminDashboard = () => {
           <AdminHeader onSignOut={handleSignOut} />
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="flex flex-wrap h-auto gap-1 p-1 sm:grid sm:grid-cols-11">
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1 sm:grid sm:grid-cols-9">
             <TabsTrigger value="analytics" className="text-xs sm:text-sm px-3 py-2">
               <span className="hidden sm:inline">Analytics</span>
               <span className="sm:hidden">Stats</span>
@@ -189,17 +174,8 @@ const AdminDashboard = () => {
             <TabsTrigger value="products" className="text-xs sm:text-sm px-3 py-2">
               Products
             </TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm px-3 py-2">
-              Settings
-            </TabsTrigger>
             <TabsTrigger value="blog" className="text-xs sm:text-sm px-3 py-2">
               Blog
-            </TabsTrigger>
-            <TabsTrigger value="ai-training" className="text-xs sm:text-sm px-3 py-2">
-              AI
-            </TabsTrigger>
-            <TabsTrigger value="codes" className="text-xs sm:text-sm px-3 py-2">
-              Codes
             </TabsTrigger>
           </TabsList>
 
@@ -232,74 +208,41 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="content" className="space-y-6">
-            <Tabs defaultValue="home" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="home">Home Page</TabsTrigger>
-                <TabsTrigger value="healaid">Heal-AId Page</TabsTrigger>
-                <TabsTrigger value="tracker">Healing Tracker</TabsTrigger>
-                <TabsTrigger value="sitewide">Site-Wide</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="home" className="space-y-6">
-                <IngredientsEditor
-                  content={ingredientsContent}
-                  onContentUpdate={setContent}
-                  onSave={updateContent}
-                  saving={saving}
-                />
-                <TestimonialsEditor
-                  content={testimonialsContent}
-                  onContentUpdate={setContent}
-                  onSave={updateContent}
-                  saving={saving}
-                />
-                {imageContent.map((item) => (
-                  <ImageUpload
-                    key={item.id}
-                    title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
-                    currentImage={item.value}
-                    onImageUploaded={(url) => handleImageUpload(url, item.id)}
-                  />
-                ))}
-                <TextContentEditor
-                  content={textContent}
-                  onContentUpdate={setContent}
-                  onSave={updateContent}
-                  saving={saving}
-                />
-              </TabsContent>
-
-              <TabsContent value="healaid" className="space-y-6">
-                <HealAidContentEditor
-                  content={healAidContent}
-                  onContentUpdate={setContent}
-                  onSave={updateContent}
-                  saving={saving}
-                  onImageUpload={handleImageUpload}
-                />
-              </TabsContent>
-
-              <TabsContent value="tracker" className="space-y-6">
-                <HealingTrackerContentEditor
-                  content={trackerContent}
-                  onContentUpdate={setContent}
-                  onSave={updateContent}
-                  saving={saving}
-                />
-              </TabsContent>
-
-              <TabsContent value="sitewide" className="space-y-6">
-                <FooterLinksEditor
-                  content={footerLinksContent}
-                  onContentUpdate={setContent}
-                  onSave={updateContent}
-                  saving={saving}
-                />
-                <SocialLinksEditor />
-                <CustomerReviewsManager />
-              </TabsContent>
-            </Tabs>
+            <IngredientsEditor
+              content={ingredientsContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+            <TestimonialsEditor
+              content={testimonialsContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+            {imageContent.map((item) => (
+              <ImageUpload
+                key={item.id}
+                title={item.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                description={`Upload a new ${item.key.replace(/_/g, ' ').toLowerCase()}`}
+                currentImage={item.value}
+                onImageUploaded={(url) => handleImageUpload(url, item.id)}
+              />
+            ))}
+            <TextContentEditor
+              content={textContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+            <FooterLinksEditor
+              content={footerLinksContent}
+              onContentUpdate={setContent}
+              onSave={updateContent}
+              saving={saving}
+            />
+            <SocialLinksEditor />
+            <CustomerReviewsManager />
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6">
@@ -316,24 +259,8 @@ const AdminDashboard = () => {
             <AffiliateProductManager />
           </TabsContent>
 
-          <TabsContent value="settings" className="space-y-6">
-            <ReminderSettingsPanel />
-          </TabsContent>
-
           <TabsContent value="blog" className="space-y-6">
             <BlogManager />
-          </TabsContent>
-
-              <TabsContent value="ai-training" className="space-y-6">
-                <TTSSettingsEditor />
-                <AITrainingAnalytics />
-                <AIInstructionsEditor />
-                <HealingAssessmentReviewer />
-                <ExpertKnowledgeEditor />
-              </TabsContent>
-
-          <TabsContent value="codes" className="space-y-6">
-            <ActivationCodesPanel />
           </TabsContent>
         </Tabs>
       </div>

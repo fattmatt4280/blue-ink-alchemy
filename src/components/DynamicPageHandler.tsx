@@ -26,12 +26,10 @@ interface CmsPage {
 
 // List of static routes that should not be handled by the CMS
 const STATIC_ROUTES = [
-  'shop', 'auth', 'dashboard', 'admin', 'checkout', 'contact', 'reviews',
-  'blog', 'tracking', 'healaid', 'healing-tracker', 'healing-history',
-  'plans', 'activate', 'referrals', 'privacy-policy', 'terms-of-service',
+  'shop', 'auth', 'admin', 'checkout', 'contact', 'reviews',
+  'blog', 'tracking', 'referrals', 'privacy-policy', 'terms-of-service',
   'how-to-use', 'size-guide', 'tattoo-aftercare', 'wholesale', 'unsubscribe',
-  'product', 'artist-onboarding', 'artist-clients', 'artist-alerts', 'artist-chat',
-  'admin-activation-codes', 'admin-security'
+  'product', 'admin-security'
 ];
 
 export const DynamicPageHandler = () => {

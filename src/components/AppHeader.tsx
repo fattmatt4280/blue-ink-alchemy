@@ -11,19 +11,13 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   mainNavItems, 
-  userNavItems, 
   footerNavItems, 
   footerNavItemsCondensed,
-  healingTrackerNavItem,
-  activateCodeNavItem,
   getFreeCreditsNavItem,
-  upgradeNavItem,
   signInIcon,
   signOutIcon
 } from "@/lib/navigationItems";
 import { useState } from "react";
-import { useHealAidSubscription } from "@/hooks/useHealAidSubscription";
-import { Badge } from "@/components/ui/badge";
 
 interface AppHeaderProps {
   showBack?: boolean;
@@ -43,7 +37,6 @@ const AppHeader = ({
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const subscription = useHealAidSubscription();
 
   const handleBack = () => {
     if (backUrl) {
@@ -114,44 +107,17 @@ const AppHeader = ({
               <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-slate-900 text-white border-slate-800">
                 <ScrollArea className="h-[calc(100vh-4rem)] pr-4">
                   <nav className="flex flex-col gap-6 mt-8">
-                    {/* ACCOUNT Section - Now First */}
+                    {/* ACCOUNT Section */}
                     <div>
                       <h3 className="text-sm font-semibold text-slate-400 mb-3">ACCOUNT</h3>
                       <div className="flex flex-col gap-2">
                         {user ? (
                           <>
-                            {/* Welcome Card with Healing Tracker inside */}
-                            <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mb-2 flex flex-col gap-3">
+                            {/* Welcome Card */}
+                            <div className="bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-3 mb-2">
                               <span className="text-cyan-400 font-medium">
                                 Welcome back, {getUserDisplayName()}
                               </span>
-                              
-                              {/* Healing Tracker inside the welcome card */}
-                              {subscription.isActive && subscription.daysRemaining > 0 && (
-                                <Link
-                                  to={healingTrackerNavItem.path}
-                                  onClick={() => setIsOpen(false)}
-                                  className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
-                                >
-                                  <healingTrackerNavItem.icon className="w-5 h-5 text-white" />
-                                  <span className="text-white flex items-center gap-2">
-                                    {healingTrackerNavItem.label}
-                                    <Badge variant="secondary" className="text-xs bg-cyan-500/30 text-cyan-400">
-                                      {subscription.daysRemaining}d
-                                    </Badge>
-                                  </span>
-                                </Link>
-                              )}
-                              
-                              {/* Upgrade Plan inside the welcome card */}
-                              <Link
-                                to={upgradeNavItem.path}
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-3 py-2 px-2 rounded-lg bg-slate-900/50 hover:bg-slate-800 transition-colors"
-                              >
-                                <upgradeNavItem.icon className="w-5 h-5 text-amber-400" />
-                                <span className="text-amber-400">{upgradeNavItem.label}</span>
-                              </Link>
                             </div>
                             
                             {/* Get free credits */}
@@ -162,29 +128,6 @@ const AppHeader = ({
                             >
                               <getFreeCreditsNavItem.icon className="w-5 h-5" />
                               <span>{getFreeCreditsNavItem.label}</span>
-                            </Link>
-                            
-                            {/* User nav items (Dashboard, Healing History) */}
-                            {userNavItems.map((item) => (
-                              <Link
-                                key={item.path}
-                                to={item.path}
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors"
-                              >
-                                <item.icon className="w-5 h-5" />
-                                <span>{item.label}</span>
-                              </Link>
-                            ))}
-                            
-                            {/* Activate Code (moved from Navigation) */}
-                            <Link
-                              to={activateCodeNavItem.path}
-                              onClick={() => setIsOpen(false)}
-                              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors"
-                            >
-                              <activateCodeNavItem.icon className="w-5 h-5" />
-                              <span>{activateCodeNavItem.label}</span>
                             </Link>
                             
                             {/* Sign Out */}
@@ -239,18 +182,6 @@ const AppHeader = ({
                             <span>{item.label}</span>
                           </Link>
                         ))}
-                        
-                        {/* Activate Code only shows in Navigation for logged-out users */}
-                        {!user && (
-                          <Link
-                            to={activateCodeNavItem.path}
-                            onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors"
-                          >
-                            <activateCodeNavItem.icon className="w-5 h-5" />
-                            <span>{activateCodeNavItem.label}</span>
-                          </Link>
-                        )}
                       </div>
                     </div>
 

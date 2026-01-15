@@ -51,38 +51,6 @@ name = "send-admin-notification"
 verify_jwt = false
 
 [[functions]]
-name = "analyze-healing-progress"
-verify_jwt = true
-
-[[functions]]
-name = "healing-followup-qa"
-verify_jwt = true
-
-[[functions]]
-name = "activate-healaid"
-verify_jwt = false
-
-[[functions]]
-name = "create-healaid-upgrade"
-verify_jwt = true
-
-[[functions]]
-name = "generate-activation-codes"
-verify_jwt = true
-
-[[functions]]
-name = "send-activation-code-email"
-verify_jwt = false
-
-[[functions]]
-name = "start-free-trial"
-verify_jwt = false
-
-[[functions]]
-name = "check-free-trial-eligibility"
-verify_jwt = false
-
-[[functions]]
 name = "send-abandoned-cart-email"
 verify_jwt = false
 
@@ -127,30 +95,6 @@ name = "check-stalled-shipments"
 verify_jwt = false
 
 [[functions]]
-name = "generate-tts"
-verify_jwt = false
-
-[[functions]]
-name = "generate-healing-reminders"
-verify_jwt = false
-
-[[functions]]
-name = "send-healing-reminder"
-verify_jwt = false
-
-[[functions]]
-name = "process-healing-reminders"
-verify_jwt = false
-
-[[functions]]
-name = "generate-timelapse"
-verify_jwt = true
-
-[[functions]]
-name = "send-artist-alert"
-verify_jwt = false
-
-[[functions]]
 name = "send-custom-abandoned-cart"
 verify_jwt = true
 
@@ -173,3 +117,7 @@ verify_jwt = false
 [[functions]]
 name = "approve-shipping-label"
 verify_jwt = true
+
+[[functions]]
+name = "track-referral"
+verify_jwt = false

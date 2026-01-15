@@ -10,7 +10,6 @@ import AppHeader from "@/components/AppHeader";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ShippingRateSelector from "@/components/ShippingRateSelector";
-import SubscriptionUpgradeDialog from "@/components/SubscriptionUpgradeDialog";
 
 const Checkout = () => {
   const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart, addToCart, setEmail } = useCart();
@@ -35,12 +34,6 @@ const Checkout = () => {
     state: 'CA', // Default to CA
   });
   const [selectedShippingRate, setSelectedShippingRate] = useState<any>(null);
-  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
-  const [subscriptionProducts, setSubscriptionProducts] = useState<{
-    freeTrial: any | null;
-    sevenDay: any | null;
-    thirtyDay: any | null;
-  }>({ freeTrial: null, sevenDay: null, thirtyDay: null });
 
   // Restore cart from URL parameters
   useEffect(() => {
@@ -114,25 +107,6 @@ const Checkout = () => {
 
     restoreCart();
   }, [restoreCartId, cartRestored]);
-
-  // Fetch subscription products
-  useEffect(() => {
-    const fetchSubscriptionProducts = async () => {
-      const { data } = await supabase
-        .from('products')
-        .select('*')
-        .in('name', ['Heal-AId 3-Day Free Trial', 'Heal-AId 7-Day Upgrade', 'Heal-AId 30-Day Upgrade']);
-      
-      if (data) {
-        setSubscriptionProducts({
-          freeTrial: data.find(p => p.name.includes('3-Day')) || null,
-          sevenDay: data.find(p => p.name.includes('7-Day')) || null,
-          thirtyDay: data.find(p => p.name.includes('30-Day')) || null,
-        });
-      }
-    };
-    fetchSubscriptionProducts();
-  }, []);
 
   useEffect(() => {
     if (success === 'true') {
@@ -609,27 +583,6 @@ const Checkout = () => {
                  />
                )}
 
-               {/* Subscription Upgrade Section */}
-               {selectedShippingRate && items.some(item => item.name.includes('Heal-AId')) && (
-                 <Card className="border-primary/50 bg-primary/5">
-                   <CardHeader>
-                     <CardTitle className="text-lg">Heal-AId Subscription</CardTitle>
-                   </CardHeader>
-                   <CardContent>
-                     <p className="text-sm text-muted-foreground mb-4">
-                       Your order includes Heal-AId access. Want to extend your trial?
-                     </p>
-                     <Button 
-                       onClick={() => setUpgradeDialogOpen(true)}
-                       variant="outline"
-                       className="w-full"
-                     >
-                       View Upgrade Options
-                     </Button>
-                   </CardContent>
-                 </Card>
-               )}
-
                <Card>
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
@@ -745,14 +698,6 @@ const Checkout = () => {
         </div>
       </div>
 
-      {/* Subscription Upgrade Dialog */}
-      <SubscriptionUpgradeDialog
-        open={upgradeDialogOpen}
-        onOpenChange={setUpgradeDialogOpen}
-        freeTrialProduct={subscriptionProducts.freeTrial}
-        sevenDayProduct={subscriptionProducts.sevenDay}
-        thirtyDayProduct={subscriptionProducts.thirtyDay}
-      />
     </div>
   );
 };

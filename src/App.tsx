@@ -24,22 +24,10 @@ import Contact from "./pages/Contact";
 import SizeGuide from "./pages/SizeGuide";
 import Tracking from "./pages/Tracking";
 import TattooAftercare from "./pages/TattooAftercare";
-import HealingTracker from "./pages/HealingTracker";
-import HealingHistory from "./pages/HealingHistory";
-import Activate from "./pages/Activate";
-import Dashboard from "./pages/Dashboard";
-import AdminActivationCodes from "./pages/AdminActivationCodes";
 import NotFound from "./pages/NotFound";
-import HealAid from "./pages/HealAid";
 import ProductDetail from "./pages/ProductDetail";
 import Referrals from "./pages/Referrals";
-import Plans from "./pages/Plans";
-import ArtistOnboarding from "./pages/ArtistOnboarding";
-import ArtistClientsPage from "./pages/ArtistClientsPage";
-import ArtistAlertsPage from "./pages/ArtistAlertsPage";
-import ArtistChatPage from "./pages/ArtistChatPage";
 import Unsubscribe from "./pages/Unsubscribe";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
@@ -69,47 +57,8 @@ const App = () => (
                <Route path="/size-guide" element={<SizeGuide />} />
                <Route path="/tracking" element={<Tracking />} />
                <Route path="/tattoo-aftercare" element={<TattooAftercare />} />
-               <Route path="/healing-tracker" element={<HealingTracker />} />
-               <Route path="/healing-history" element={<HealingHistory />} />
-               <Route path="/activate" element={<Activate />} />
-               <Route path="/dashboard" element={<Dashboard />} />
-               <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
-              <Route path="/heal-aid" element={<HealAid />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/referrals" element={<Referrals />} />
-              <Route path="/plans" element={<Plans />} />
-              
-              {/* Artist routes */}
-              <Route path="/artist/onboarding" element={
-                <ProtectedRoute requireAuth>
-                  <ArtistOnboarding />
-                </ProtectedRoute>
-              } />
-              <Route path="/artist/dashboard" element={
-                <ProtectedRoute requireArtist>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/artist/clients" element={
-                <ProtectedRoute requireArtist>
-                  <ArtistClientsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/artist/clients/:clientId" element={
-                <ProtectedRoute requireArtist>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/artist/alerts" element={
-                <ProtectedRoute requireArtist>
-                  <ArtistAlertsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/artist/chat" element={
-                <ProtectedRoute requireArtist>
-                  <ArtistChatPage />
-                </ProtectedRoute>
-              } />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               
