@@ -153,13 +153,13 @@ const Checkout = () => {
 
     const code = discountCode.toUpperCase();
     
-    // Christmas 15% discount
-    if (code === 'XMAS15' || code === 'CHRISTMAS15') {
+    // Valentine's Day 15% discount
+    if (code === 'VDAY15' || code === 'VALENTINE15') {
       const discount = subtotal * 0.15;
       setDiscountAmount(discount);
       setDiscountPercent(15);
       setDiscountApplied(true);
-      toast.success('🎄 Christmas discount applied - 15% off!');
+      toast.success('💕 Valentine\'s Day discount applied - 15% off!');
       
       supabase.from('analytics_events').insert({
         event_type: 'discount_code_used',
