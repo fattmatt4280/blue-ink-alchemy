@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
 import Referrals from "./pages/Referrals";
 import Unsubscribe from "./pages/Unsubscribe";
+import BudderBuddy from "./pages/BudderBuddy";
 import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
@@ -59,6 +60,7 @@ const App = () => (
                <Route path="/tattoo-aftercare" element={<TattooAftercare />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/referrals" element={<Referrals />} />
+              <Route path="/budder-buddy" element={<BudderBuddy />} />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               
