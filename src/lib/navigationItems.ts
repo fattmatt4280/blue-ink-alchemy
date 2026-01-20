@@ -1,9 +1,10 @@
-import { Home, ShoppingBag, BookOpen, Star, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, Gift, LogIn, LogOut, Bandage } from "lucide-react";
+import { Home, ShoppingBag, BookOpen, Star, FileText, Ruler, Info, Mail, Building, Shield, FileText as Terms, Gift, LogIn, LogOut, Bandage, Smartphone } from "lucide-react";
 
 export const mainNavItems = [
   { label: 'Home', path: '/', icon: Home },
   { label: 'Shop', path: '/shop', icon: ShoppingBag },
   { label: 'Tattoo Aftercare Guide', path: '/tattoo-aftercare-guide', icon: Bandage },
+  { label: 'Budder Buddy', path: '/budder-buddy', icon: Smartphone },
   { label: 'Blog', path: '/blog', icon: BookOpen },
   { label: 'Reviews', path: '/reviews', icon: Star },
 ];
