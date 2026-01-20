@@ -5,28 +5,28 @@ const AnnouncementBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem('announcement-banner-dismissed');
+    const dismissed = localStorage.getItem('announcement-banner-vday-dismissed');
     if (dismissed) setIsVisible(false);
   }, []);
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('announcement-banner-dismissed', 'true');
+    localStorage.setItem('announcement-banner-vday-dismissed', 'true');
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="bg-gradient-to-r from-red-600 via-green-700 to-red-600 text-white py-2 relative overflow-hidden z-50">
+    <div className="bg-gradient-to-r from-pink-600 via-red-500 to-pink-600 text-white py-2 relative overflow-hidden z-50">
       <div className="animate-marquee whitespace-nowrap flex">
         {/* Repeated content for seamless loop */}
         {[...Array(4)].map((_, i) => (
           <span key={i} className="mx-8 flex items-center gap-2 text-sm md:text-base">
-            <span>🎄 Use code <strong className="font-bold text-yellow-300">XMAS15</strong> for 15% OFF</span>
+            <span>💕 Use code <strong className="font-bold text-yellow-300">VDAY15</strong> for 15% OFF</span>
             <span className="mx-4">•</span>
-            <span>🎁 Free shipping on orders over $50</span>
+            <span>💝 Free shipping on orders over $50</span>
             <span className="mx-4">•</span>
-            <span>❄️ Limited time holiday special</span>
+            <span>❤️ Valentine's Day special</span>
           </span>
         ))}
       </div>
