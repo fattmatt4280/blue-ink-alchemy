@@ -7,8 +7,7 @@ import { Loader2 } from "lucide-react";
 const BudderBuddy = () => {
   const [isLoading, setIsLoading] = useState(true);
 
-  // TODO: Replace with your actual Budder Buddy app URL
-  const appUrl = "https://your-budder-buddy-app-url.com";
+  const appUrl = "https://budderbuddy.lovable.app";
 
   return (
     <>
@@ -37,10 +36,9 @@ const BudderBuddy = () => {
           <iframe
             src={appUrl}
             title="Budder Buddy App"
-            className="w-full h-[calc(100vh-140px)] border-0"
+            className="w-full h-screen border-0 rounded-xl"
             onLoad={() => setIsLoading(false)}
-            allow="camera; microphone; geolocation"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+            allow="camera; geolocation; notifications"
           />
         </main>
 
