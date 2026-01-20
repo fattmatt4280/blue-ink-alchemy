@@ -24,8 +24,8 @@ const BudderBuddy = () => {
     },
     {
       icon: Sparkles,
-      title: "AI Insights",
-      description: "Get intelligent healing assessments powered by advanced AI"
+      title: "Smart Insights",
+      description: "Get intelligent healing assessments to track your progress"
     }
   ];
 
