@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Apple, Camera, Bell, Clock, Sparkles } from "lucide-react";
-import budderBuddyIcon from "@/assets/budder-buddy-icon.jpeg";
 
 const BudderBuddy = () => {
   const features = [
@@ -56,7 +55,7 @@ const BudderBuddy = () => {
                 <div className="relative mb-8">
                   <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
                   <img
-                    src={budderBuddyIcon}
+                    src="/images/budder-buddy-icon.jpeg"
                     alt="Budder Buddy App Icon"
                     className="relative w-40 h-40 md:w-56 md:h-56 rounded-[2rem] shadow-2xl border-4 border-background"
                   />
