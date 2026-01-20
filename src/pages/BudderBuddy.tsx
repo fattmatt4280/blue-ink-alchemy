@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
+import AnimatedBackground from "@/components/AnimatedBackground";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Apple, Camera, Bell, Clock, Sparkles } from "lucide-react";
@@ -40,15 +41,13 @@ const BudderBuddy = () => {
         <link rel="canonical" href="https://bluedreambudder.com/budder-buddy" />
       </Helmet>
 
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col futuristic-bg">
+        <AnimatedBackground />
         <AppHeader showCart={false} />
 
-        <main className="flex-1">
+        <main className="flex-1 relative z-10">
           {/* Hero Section */}
           <section className="relative py-16 md:py-24 overflow-hidden">
-            {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background to-background" />
-            
             <div className="container relative z-10 mx-auto px-4">
               <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
                 {/* App Icon */}
@@ -57,17 +56,17 @@ const BudderBuddy = () => {
                   <img
                     src="/images/budder-buddy-icon.jpeg"
                     alt="Budder Buddy App Icon"
-                    className="relative w-40 h-40 md:w-56 md:h-56 rounded-[2rem] shadow-2xl border-4 border-background"
+                    className="relative w-40 h-40 md:w-56 md:h-56 rounded-[2rem] shadow-2xl border-4 border-white/10"
                   />
                 </div>
 
                 {/* Title */}
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                   Budder Buddy
                 </h1>
                 
                 {/* Tagline */}
-                <p className="text-xl md:text-2xl text-muted-foreground mb-8">
+                <p className="text-xl md:text-2xl text-gray-300 mb-8">
                   Your tattoo aftercare companion
                 </p>
 
@@ -75,7 +74,7 @@ const BudderBuddy = () => {
                 <Button
                   size="lg"
                   disabled
-                  className="bg-foreground text-background hover:bg-foreground/90 h-14 px-8 text-lg rounded-xl opacity-90 cursor-not-allowed"
+                  className="bg-white text-black hover:bg-white/90 h-14 px-8 text-lg rounded-xl opacity-90 cursor-not-allowed"
                 >
                   <Apple className="w-6 h-6 mr-2" />
                   Download on the App Store
@@ -84,7 +83,7 @@ const BudderBuddy = () => {
                   </Badge>
                 </Button>
 
-                <p className="text-sm text-muted-foreground mt-4">
+                <p className="text-sm text-gray-400 mt-4">
                   Available for iPhone and iPad
                 </p>
               </div>
@@ -92,9 +91,9 @@ const BudderBuddy = () => {
           </section>
 
           {/* Features Section */}
-          <section className="py-16 bg-muted/30">
+          <section className="py-16 relative z-10">
             <div className="container mx-auto px-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold text-center text-white mb-12">
                 Everything you need for perfect healing
               </h2>
               
@@ -102,15 +101,15 @@ const BudderBuddy = () => {
                 {features.map((feature, index) => (
                   <div
                     key={index}
-                    className="bg-background rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
+                    className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors"
                   >
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                       <feature.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                    <h3 className="text-lg font-semibold text-white mb-2">
                       {feature.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-gray-400 text-sm">
                       {feature.description}
                     </p>
                   </div>
@@ -120,9 +119,9 @@ const BudderBuddy = () => {
           </section>
 
           {/* CTA Section */}
-          <section className="py-16">
+          <section className="py-16 relative z-10">
             <div className="container mx-auto px-4 text-center">
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-lg text-gray-300 mb-6">
                 In the meantime, explore our premium tattoo aftercare products
               </p>
               <Button asChild size="lg" className="rounded-xl">
