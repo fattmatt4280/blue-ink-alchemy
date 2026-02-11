@@ -35,6 +35,10 @@ const Checkout = () => {
   });
   const [selectedShippingRate, setSelectedShippingRate] = useState<any>(null);
 
+  // Detect free-budder promo
+  const isFreeBudderPromo = items.some(item => (item as any).promoType === 'free-budder');
+  const FLAT_SHIPPING = 10.20;
+
   // Restore cart from URL parameters
   useEffect(() => {
     const restoreCart = async () => {
@@ -202,7 +206,7 @@ const Checkout = () => {
   };
 
   const subtotal = getTotalPrice();
-  const shipping = selectedShippingRate ? selectedShippingRate.amount : 0;
+  const shipping = isFreeBudderPromo ? FLAT_SHIPPING : (selectedShippingRate ? selectedShippingRate.amount : 0);
   const total = subtotal + shipping - discountAmount;
 
   const handleCompleteOrder = async () => {
@@ -239,11 +243,30 @@ const Checkout = () => {
       console.log("Items to send:", items);
       console.log("Shipping info:", shippingInfo);
 
-      // Validate shipping rate is selected
-      if (!selectedShippingRate) {
+      // Validate shipping rate is selected (skip for free-budder promo)
+      if (!isFreeBudderPromo && !selectedShippingRate) {
         toast.error("Please select a shipping option");
         return;
       }
+
+      // Build shipping rate for the payload
+      const shippingRatePayload = isFreeBudderPromo
+        ? {
+            id: 'flat-promo',
+            carrier: 'Flat Rate',
+            service_level: 'Standard',
+            amount: FLAT_SHIPPING,
+            currency: 'USD',
+            estimated_days: 7
+          }
+        : {
+            id: selectedShippingRate.id,
+            carrier: selectedShippingRate.carrier,
+            service_level: selectedShippingRate.service_level,
+            amount: selectedShippingRate.amount,
+            currency: selectedShippingRate.currency,
+            estimated_days: selectedShippingRate.estimated_days
+          };
 
       // Prepare the payload
       const payload = {
@@ -252,7 +275,8 @@ const Checkout = () => {
           name: item.name,
           price: Number(item.price) || 0,
           quantity: Number(item.quantity) || 1,
-          image_url: item.image_url || null
+          image_url: item.image_url || null,
+          promoType: (item as any).promoType || undefined
         })),
         shippingInfo: {
           firstName: String(shippingInfo.firstName).trim(),
@@ -263,14 +287,8 @@ const Checkout = () => {
           zipCode: String(shippingInfo.zipCode).trim(),
           state: String(shippingInfo.state).trim()
         },
-        shippingRate: {
-          id: selectedShippingRate.id,
-          carrier: selectedShippingRate.carrier,
-          service_level: selectedShippingRate.service_level,
-          amount: selectedShippingRate.amount,
-          currency: selectedShippingRate.currency,
-          estimated_days: selectedShippingRate.estimated_days
-        }
+        shippingRate: shippingRatePayload,
+        promoType: isFreeBudderPromo ? 'free-budder' : undefined
       };
 
       console.log("=== CALLING CREATE-PAYMENT FUNCTION ===");
@@ -418,36 +436,45 @@ const Checkout = () => {
                       />
                       <div className="flex-1">
                         <h3 className="font-medium">{item.name}</h3>
-                        <p className="text-lg font-bold text-blue-600">${item.price}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                          <span className="w-8 text-center">{item.quantity}</span>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="ml-2 text-red-600 hover:text-red-700"
-                            onClick={() => removeFromCart(item.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
+                        {isFreeBudderPromo ? (
+                          <div>
+                            <p className="text-lg font-bold text-green-600">FREE</p>
+                            <p className="text-sm text-gray-500">+ $10.20 shipping</p>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-lg font-bold text-blue-600">${item.price}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-8 text-center">{item.quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="ml-2 text-red-600 hover:text-red-700"
+                                onClick={() => removeFromCart(item.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {isFreeBudderPromo ? '$0.00' : `$${(item.price * item.quantity).toFixed(2)}`}
                         </p>
                       </div>
                     </div>
@@ -564,8 +591,8 @@ const Checkout = () => {
                 </CardContent>
                </Card>
 
-               {/* Shipping Rate Selector */}
-               {shippingInfo.firstName && shippingInfo.lastName && shippingInfo.address && 
+               {/* Shipping Rate Selector - hide for free budder promo */}
+               {!isFreeBudderPromo && shippingInfo.firstName && shippingInfo.lastName && shippingInfo.address && 
                 shippingInfo.city && shippingInfo.state && shippingInfo.zipCode && (
                  <ShippingRateSelector
                    cartItems={items}
@@ -583,49 +610,65 @@ const Checkout = () => {
                  />
                )}
 
+               {isFreeBudderPromo && (
+                 <Card>
+                   <CardContent className="p-4">
+                     <div className="flex justify-between items-center">
+                       <div>
+                         <p className="font-medium">Flat Rate Shipping</p>
+                         <p className="text-sm text-gray-500">Standard delivery (3-7 business days)</p>
+                       </div>
+                       <p className="font-bold text-lg">$10.20</p>
+                     </div>
+                   </CardContent>
+                 </Card>
+               )}
+
                <Card>
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Discount Code Section */}
-                  <div className="border-b pb-4">
-                    <label className="text-sm font-medium mb-2 block">Discount Code</label>
-                    {!discountApplied ? (
-                      <div className="flex gap-2">
-                        <Input 
-                          placeholder="Enter code (e.g., CART10)" 
-                          value={discountCode}
-                          onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
-                          className="uppercase"
-                        />
-                        <Button 
-                          onClick={applyDiscountCode}
-                          variant="secondary"
-                          disabled={!discountCode}
-                        >
-                          Apply
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          <span className="text-sm font-medium text-green-800">
-                            {discountCode} Applied ({discountPercent}% off)
-                          </span>
-                        </div>
-                        <Button 
-                          onClick={removeDiscount}
-                          variant="ghost"
-                          size="sm"
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                  {/* Discount Code Section - hide for free budder promo */}
+                  {!isFreeBudderPromo && (
+                   <div className="border-b pb-4">
+                     <label className="text-sm font-medium mb-2 block">Discount Code</label>
+                     {!discountApplied ? (
+                       <div className="flex gap-2">
+                         <Input 
+                           placeholder="Enter code (e.g., CART10)" 
+                           value={discountCode}
+                           onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                           className="uppercase"
+                         />
+                         <Button 
+                           onClick={applyDiscountCode}
+                           variant="secondary"
+                           disabled={!discountCode}
+                         >
+                           Apply
+                         </Button>
+                       </div>
+                     ) : (
+                       <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-3">
+                         <div className="flex items-center gap-2">
+                           <CheckCircle className="w-4 h-4 text-green-600" />
+                           <span className="text-sm font-medium text-green-800">
+                             {discountCode} Applied ({discountPercent}% off)
+                           </span>
+                         </div>
+                         <Button 
+                           onClick={removeDiscount}
+                           variant="ghost"
+                           size="sm"
+                           className="text-green-600 hover:text-green-700"
+                         >
+                           Remove
+                         </Button>
+                       </div>
+                     )}
+                   </div>
+                  )}
 
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
