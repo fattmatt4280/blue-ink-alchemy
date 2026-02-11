@@ -8,13 +8,14 @@ interface CartItem {
   price: number;
   image_url: string | null;
   quantity: number;
+  promoType?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
   customerEmail: string | null;
   setEmail: (email: string) => void;
-  addToCart: (product: { id: string; name: string; price: number; image_url: string | null }) => void;
+  addToCart: (product: { id: string; name: string; price: number; image_url: string | null; promoType?: string }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -137,7 +138,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     setCustomerEmail(email);
   };
 
-  const addToCart = (product: { id: string; name: string; price: number; image_url: string | null }) => {
+  const addToCart = (product: { id: string; name: string; price: number; image_url: string | null; promoType?: string }) => {
     try {
       setItems(prevItems => {
         try {
