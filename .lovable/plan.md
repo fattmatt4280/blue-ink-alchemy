@@ -1,26 +1,45 @@
 
 
-## Replace Product Image URL Field with Upload Button
+## Fix RLS Error on Free Budder Editor Save
 
-### What Changes
+### Problem
+The `site_content` table has an `ALL` policy for admins, but it lacks an explicit `WITH CHECK` expression. During an upsert (INSERT ... ON CONFLICT UPDATE), PostgreSQL requires both USING and WITH CHECK to pass. The missing WITH CHECK on the ALL policy can cause RLS violations on the INSERT portion.
 
-In the **Free Budder Landing Page** editor (admin Pages tab), the current "Product Image URL" text input will be replaced with a proper image upload component. You'll be able to drag-and-drop or click to upload a new product image directly, instead of having to manually paste a URL.
-
-### How It Works
-
-- The existing `ImageUpload` component (already used elsewhere in admin) will be embedded inline in the FreeBudderEditor
-- Uploading a new image will store it in the `product-images` storage bucket and automatically update the URL in the editor
-- The current image preview will still be shown
-- You can still save all changes with the existing Save button
+### Solution
+Add an explicit INSERT policy for admins on the `site_content` table with a proper `WITH CHECK` clause.
 
 ### Technical Details
 
-**File modified: `src/components/FreeBudderEditor.tsx`**
+**Database migration:**
+```sql
+CREATE POLICY "Admins can insert site content"
+ON public.site_content
+FOR INSERT
+TO authenticated
+WITH CHECK (is_admin());
+```
 
-- Import the existing `ImageUpload` component
-- Replace the "Product Image URL" text input (lines 172-178) with an `ImageUpload` instance configured with:
-  - `bucket="product-images"` (same bucket used for other product images)
-  - `currentImage` set to the current `free_budder_product_image` value
-  - `onImageUploaded` callback that calls `updateField('free_budder_product_image', url)` to update the state
-- Keep it visually compact by embedding it without the Card wrapper (using the upload zone directly) or by using the full `ImageUpload` component in its own section below the text fields
+Optionally, also add an explicit UPDATE policy to be safe:
+```sql
+CREATE POLICY "Admins can update site content"
+ON public.site_content
+FOR UPDATE
+TO authenticated
+USING (is_admin())
+WITH CHECK (is_admin());
+```
+
+Then drop the overly broad ALL policy and replace it with specific operation policies:
+```sql
+DROP POLICY IF EXISTS "Only admins can modify site content" ON public.site_content;
+```
+
+This gives clear, operation-specific policies:
+- SELECT: "Anyone can view site content" (already exists)
+- INSERT: "Admins can insert site content" (new)
+- UPDATE: "Admins can update site content" (new)
+- DELETE: covered by the admin check as well (optional, add if needed)
+
+### Files Changed
+- Database migration only (no frontend code changes needed)
 
