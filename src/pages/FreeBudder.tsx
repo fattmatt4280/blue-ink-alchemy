@@ -9,31 +9,24 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const DEFAULT_IMAGE = "https://vozstxchkgpxzetwdzow.supabase.co/storage/v1/object/public/product-images/products/1751239126214-cpzvrwo41ga.jpeg";
 
 const DEFAULT_FAQS = [
-  { q: "What does it smell like?", a: "Blue Dream Budder has a clean, luxurious scent — think fresh botanicals with a hint of sweetness. Nothing medicinal, nothing chemical. People genuinely compliment the smell." },
-  { q: "Is it safe for fresh tattoos?", a: "Absolutely. It's made with organic, skin-safe ingredients — no petroleum, no parabens, no synthetic fragrances. Designed specifically for healing tattoos." },
-  { q: "Will it irritate sensitive skin?", a: "Our formula is gentle enough for sensitive skin. No harsh chemicals, no artificial dyes. Just clean, organic botanicals that soothe rather than irritate." },
-  { q: "How long does shipping take?", a: "Orders ship within 1–2 business days. Standard delivery is typically 3–7 business days depending on your location." },
-  { q: "Is there a subscription or hidden fees?", a: "No. This is a one-time offer. No subscription, no auto-ship, no recurring charges. You just cover the $10.20 flat-rate shipping." },
-  { q: "Why are you giving it away for free?", a: "Because once you try it, you'll never go back. We're that confident. This is our way of letting you experience the difference firsthand." },
-];
-
-const DEFAULT_BULLETS = [
-  "Speeds up healing time with organic botanicals",
-  "Keeps colors vibrant during the healing process",
-  "Soothes irritation and reduces peeling",
+  { q: "Does it contain artificial fragrance?", a: "No. The scent profile comes from blended botanical essential oils." },
+  { q: "Why isn't it bright white?", a: "Because we don't use artificial dyes. The natural butters give it its tan tone." },
+  { q: "Is the scent strong?", a: "It's noticeable but not overpowering. Clean and balanced." },
+  { q: "Can I use it on fresh tattoos?", a: "Yes. It's formulated specifically for tattoo aftercare." },
+  { q: "How long does shipping take?", a: "Standard U.S. shipping times apply after order confirmation." },
 ];
 
 const DEFAULT_TESTIMONIALS = [
-  { quote: "I've tried every aftercare product out there. This is the first one that doesn't smell like a hospital. My clients love it.", author: "Jake M., Tattoo Artist", image: "" },
-  { quote: "Used it on my sleeve and the healing was noticeably faster. Plus it smells incredible — my girlfriend kept asking what it was.", author: "Chris R.", image: "" },
-  { quote: "Finally an aftercare balm that absorbs quickly and doesn't leave that gross greasy shine. This stuff is legit.", author: "Samantha T.", image: "" },
-  { quote: "I was skeptical about 'free' anything but this is genuinely the best tattoo balm I've used. Already ordered 3 more jars.", author: "Devon L.", image: "" },
+  { quote: "Finally something that doesn't smell fake.", author: "Verified Buyer", image: "" },
+  { quote: "It's subtle but addictive.", author: "Verified Buyer", image: "" },
+  { quote: "My tattoo feels moisturized without that heavy perfumey scent.", author: "Verified Buyer", image: "" },
+  { quote: "It actually smells natural.", author: "Verified Buyer", image: "" },
 ];
 
 const DEFAULTS: Record<string, string> = {
-  free_budder_headline: "Why Tattoo Artists Are Ditching Petroleum-Based Aftercare for This Clean, Addictive-Smelling Balm",
-  free_budder_subheading: "A new organic tattoo aftercare balm is changing how people heal their ink — and it starts with what you smell.",
-  free_budder_cta_text: "Claim My Free Jar",
+  free_budder_headline: "The Tattoo Aftercare Nobody Talks About… The Way It Smells",
+  free_budder_subheading: "Most people expect a tattoo to hurt. What they don't expect? Opening their aftercare jar and getting hit with a sharp, overly perfumed, artificial scent.",
+  free_budder_cta_text: "Claim Your Free Jar",
   free_budder_badge_text: "Limited Time Offer",
   free_budder_product_image: DEFAULT_IMAGE,
   free_budder_shipping_price: "10.20",
@@ -46,7 +39,6 @@ const FreeBudder = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [content, setContent] = useState(DEFAULTS);
   const [faqs, setFaqs] = useState(DEFAULT_FAQS);
-  const [bullets, setBullets] = useState(DEFAULT_BULLETS);
   const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
   const [loaded, setLoaded] = useState(false);
 
@@ -62,9 +54,6 @@ const FreeBudder = () => {
           if (row.key in merged) merged[row.key] = row.value;
           if (row.key === 'free_budder_faqs') {
             try { setFaqs(JSON.parse(row.value)); } catch {}
-          }
-          if (row.key === 'free_budder_bullet_points') {
-            try { setBullets(JSON.parse(row.value).map((b: any) => b.text || b)); } catch {}
           }
           if (row.key === 'free_budder_testimonials') {
             try { setTestimonials(JSON.parse(row.value)); } catch {}
@@ -115,7 +104,7 @@ const FreeBudder = () => {
 
       <article className="max-w-[680px] mx-auto px-5 pb-32 sm:pb-20">
 
-        {/* 1. Soft News-Style Headline */}
+        {/* 1. Headline */}
         <header className="pt-6 pb-8 text-center">
           <span className="inline-block text-amber-400/80 text-[11px] font-semibold uppercase tracking-[0.2em] mb-5">
             {content.free_budder_badge_text}
@@ -146,13 +135,19 @@ const FreeBudder = () => {
         {/* 4. Opening Story */}
         <section className="space-y-5 mb-12">
           <p className="text-[15px] leading-[1.85] text-white/70">
-            You just sat for three hours. The tattoo looks incredible. You're proud of it. Then your artist hands you a tiny packet of something that smells like a mechanic's garage.
+            Most people expect a tattoo to hurt.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            You slather it on, and instantly your fresh ink is coated in a shiny, greasy layer that sticks to your clothes, smells medicinal, and makes you wonder — <em>is this really the best option?</em>
+            What they don't expect?
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            For most people, it is. Because nobody told them there was something better.
+            Opening their aftercare jar and getting hit with a sharp, overly perfumed, artificial scent that lingers longer than the tattoo sting itself.
+          </p>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            And then there's the color.
+          </p>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            Bright white. Neon tint. Synthetic-looking creams that feel more cosmetic counter than skin recovery.
           </p>
         </section>
 
@@ -164,32 +159,52 @@ const FreeBudder = () => {
 
         {/* 5. Problem Agitation */}
         <section className="space-y-5 mb-12">
-          <h2 className="text-xl font-bold tracking-tight mb-4">Here's What Nobody Talks About</h2>
+          <h2 className="text-xl font-bold tracking-tight mb-4">The Hidden Problem With Most Tattoo Aftercare</h2>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            Most tattoo aftercare products are built on <strong className="text-white/90">petroleum jelly</strong>. That thick, suffocating layer that traps heat and moisture against your healing skin.
+            A lot of aftercare products rely on:
+          </p>
+          <ul className="space-y-2 pl-1">
+            {["Artificial fragrance blends", "Synthetic perfume compounds", 'Added dyes for "clean" white color', "Heavy fillers to create thickness"].map((item) => (
+              <li key={item} className="flex items-start gap-3 text-[15px] text-white/70">
+                <span className="text-amber-400/80 mt-1">•</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            They smell strong on purpose. They look bright on purpose. They feel thick on purpose.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            The <strong className="text-white/90">smell is the first red flag</strong>. If your aftercare smells like chemicals, it's because it <em>is</em> chemicals. Synthetic fragrances. Parabens. Preservatives your skin doesn't need while it's trying to heal.
+            But <strong className="text-white/90">strong doesn't mean better</strong>.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            Then there's the <strong className="text-white/90">greasy residue</strong>. It ruins your sheets. It transfers to your clothes. And it sits on top of your skin instead of absorbing into it.
+            And <strong className="text-white/90">bright white doesn't mean clean</strong>.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            Your tattoo deserves better. <em>You</em> deserve better.
+            When your skin is healing, the last thing it needs is harsh fragrance oils and unnecessary color additives sitting on open pores.
           </p>
         </section>
 
         {/* 6. Discovery / Turning Point */}
         <section className="space-y-5 mb-12">
-          <h2 className="text-xl font-bold tracking-tight mb-4">Then We Made Something Different</h2>
+          <h2 className="text-xl font-bold tracking-tight mb-4">We Took a Different Approach</h2>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            Blue Dream Budder started with a simple question: <em>why does tattoo aftercare have to smell bad and feel worse?</em>
+            Instead of building scent in a lab… we built it from botanicals.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            We developed an organic balm with a clean, addictive scent profile — not perfumey, not medicinal. Just fresh. The kind of scent people actually compliment you on.
+            Blue Dream Budder uses naturally derived essential oils blended intentionally to create a smooth, balanced scent profile.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            It absorbs in seconds. No greasy layer. No shine. Just soft, hydrated skin that lets your tattoo breathe and heal the way it's supposed to.
+            Not overpowering. Not artificial. Not perfume-counter aggressive.
+          </p>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            Just clean, layered botanicals that settle into the skin instead of sitting on top of it.
+          </p>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            And the color? No artificial dyes. What you see is the natural tone of the butters and oils themselves.
+          </p>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            A soft, creamy tan — because that's what <em>real ingredients</em> look like.
           </p>
         </section>
 
@@ -201,41 +216,44 @@ const FreeBudder = () => {
 
         {/* 7. Product Breakdown */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold tracking-tight mb-6">What Makes It Different</h2>
+          <h2 className="text-xl font-bold tracking-tight mb-6">What It Actually Feels Like</h2>
           <div className="space-y-3">
-            {[
-              { label: "Absorbs in seconds", desc: "No greasy residue, no transfer to clothes or sheets" },
-              { label: "Luxury scent profile", desc: "Clean, fresh, and genuinely addictive — not medicinal" },
-              { label: "100% organic ingredients", desc: "No petroleum, no parabens, no synthetic fragrances" },
-              { label: "Non-greasy formula", desc: "Lightweight texture that lets your skin breathe" },
-              { label: "Skin-safe for healing tattoos", desc: "Gentle enough for fresh ink and sensitive skin" },
-            ].map(({ label, desc }) => (
-              <div key={label} className="flex items-start gap-3 bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
-                <Check className="w-5 h-5 text-amber-400/80 mt-0.5 shrink-0" />
-                <div>
-                  <span className="text-sm font-semibold text-white/90">{label}</span>
-                  <p className="text-[13px] text-white/45 mt-0.5">{desc}</p>
-                </div>
-              </div>
-            ))}
-
-            {bullets.map((point) => (
+            {["Melts into skin", "Absorbs quickly", "No greasy shine", "No heavy residue", "No synthetic fragrance cloud"].map((point) => (
               <div key={point} className="flex items-start gap-3 bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
                 <Check className="w-5 h-5 text-amber-400/80 mt-0.5 shrink-0" />
                 <span className="text-sm text-white/70">{point}</span>
               </div>
             ))}
           </div>
+          <div className="mt-6 space-y-4">
+            <p className="text-[15px] leading-[1.85] text-white/70">
+              It's smooth. Balanced. Subtle but noticeable.
+            </p>
+            <p className="text-[15px] leading-[1.85] text-white/70">
+              You don't smell like a department store. You smell <em>clean</em>.
+            </p>
+          </div>
         </section>
 
         {/* 8. Ingredient Transparency */}
         <section className="mb-12 space-y-4">
-          <h2 className="text-xl font-bold tracking-tight mb-4">Clean Ingredients. Full Stop.</h2>
+          <h2 className="text-xl font-bold tracking-tight mb-4">Why Ingredient Integrity Matters</h2>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            Every jar of Blue Dream Budder is made with organic botanicals — nothing synthetic, nothing harsh. We don't hide behind "proprietary blends." What goes on your healing skin matters, and we treat it that way.
+            When skin is healing, it's vulnerable. That's why Blue Dream Budder is made with:
+          </p>
+          <ul className="space-y-2 pl-1">
+            {["Shea butter", "Mango butter", "Avocado butter", "Jojoba oil", "Hempseed oil", "Carefully blended essential oils"].map((item) => (
+              <li key={item} className="flex items-start gap-3 text-[15px] text-white/70">
+                <Check className="w-4 h-4 text-amber-400/80 mt-1 shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[15px] leading-[1.85] text-white/70">
+            No artificial dyes. No synthetic perfume blends. No harsh fillers.
           </p>
           <p className="text-[15px] leading-[1.85] text-white/70">
-            No petroleum. No parabens. No artificial fragrances. Just clean, effective ingredients that work <em>with</em> your skin, not against it.
+            Just botanicals doing what botanicals are meant to do.
           </p>
         </section>
 
@@ -247,13 +265,10 @@ const FreeBudder = () => {
 
         {/* 9. Social Proof */}
         <section className="mb-14">
-          <h2 className="text-xl font-bold tracking-tight text-center mb-2">What People Are Saying</h2>
-          <div className="flex items-center justify-center gap-1 mb-6">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-            ))}
-            <span className="text-xs text-white/40 ml-2">4.9/5 average rating</span>
-          </div>
+          <h2 className="text-xl font-bold tracking-tight text-center mb-2">What People Notice First</h2>
+          <p className="text-[15px] text-white/50 text-center mb-6">
+            It's not just how it feels. It's how different it smells.
+          </p>
           <div className="space-y-4">
             {testimonials.map((t, i) => (
               <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
@@ -283,15 +298,18 @@ const FreeBudder = () => {
         {/* 10. Offer Section */}
         <section className="mb-14">
           <div className="bg-gradient-to-b from-white/[0.05] to-white/[0.02] border border-white/[0.08] rounded-2xl p-6 sm:p-8 text-center">
-            <h2 className="text-2xl font-bold tracking-tight mb-2">Try It Free. Seriously.</h2>
+            <h2 className="text-2xl font-bold tracking-tight mb-2">And Right Now…</h2>
             <p className="text-[15px] text-white/50 mb-2 leading-relaxed">
-              Get a full-size jar of Baby Blue Dream Budder (10g) — the same product we sell for $6.99 — completely free.
+              We're giving away jars for <strong className="text-white/80">FREE</strong>.
+            </p>
+            <p className="text-[15px] text-white/50 mb-2 leading-relaxed">
+              You just cover <strong className="text-white/80">${content.free_budder_shipping_price} shipping</strong>.
             </p>
             <p className="text-[15px] text-white/50 mb-6 leading-relaxed">
-              Just cover <strong className="text-white/80">${content.free_budder_shipping_price} flat-rate shipping</strong>. No subscription. No hidden fees. One per customer.
+              No gimmicks. No subscriptions required. No inflated retail pricing.
             </p>
             <CtaButton />
-            <p className="text-xs text-white/30 mt-3">⏳ Limited quantities — this offer won't last forever</p>
+            <p className="text-xs text-white/30 mt-3">Just a chance to try it for yourself</p>
           </div>
         </section>
 
@@ -322,9 +340,9 @@ const FreeBudder = () => {
 
         {/* 12. Final CTA */}
         <section className="text-center mb-10">
-          <h2 className="text-2xl font-bold tracking-tight mb-3">Your Tattoo Deserves Better Than Petroleum.</h2>
+          <h2 className="text-2xl font-bold tracking-tight mb-3">Your tattoo deserves better than synthetic fragrance and artificial color.</h2>
           <p className="text-[15px] text-white/50 mb-6">
-            Try Blue Dream Budder free — just cover shipping.
+            Try it free. Just cover shipping.
           </p>
           <CtaButton />
         </section>
