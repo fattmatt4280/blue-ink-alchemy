@@ -125,7 +125,7 @@ const FreeBudder = () => {
             onClick={handleClaim}
             className="neon-button text-lg sm:text-xl px-10 py-7 rounded-xl w-full sm:w-auto"
           >
-            🔥 Claim Your Free Budder
+            🔥 {content.free_budder_cta_text}
           </Button>
           <p className="text-xs text-blue-300/50 mt-2">Limit 1 per customer · While supplies last</p>
         </section>
