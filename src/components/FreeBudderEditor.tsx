@@ -19,6 +19,12 @@ interface BulletPoint {
   text: string;
 }
 
+interface Testimonial {
+  quote: string;
+  author: string;
+  image: string;
+}
+
 const DEFAULTS: Record<string, string> = {
   free_budder_headline: 'Get Your FREE Baby Blue Dream Budder',
   free_budder_subheading: 'Premium tattoo aftercare — just pay $10.20 shipping',
