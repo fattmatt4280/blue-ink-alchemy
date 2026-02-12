@@ -103,7 +103,7 @@ const FreeBudder = () => {
             {content.free_budder_headline}
           </h1>
 
-          <p className="text-lg sm:text-xl text-blue-200/80 mb-6">
+          <p className="text-lg sm:text-xl text-blue-100 mb-6">
             {content.free_budder_subheading}
           </p>
 
