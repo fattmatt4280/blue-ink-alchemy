@@ -225,7 +225,7 @@ const FreeBudder = () => {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-white/10 py-6 text-center text-xs text-blue-300/40">
+        <footer className="border-t border-white/10 py-6 text-center text-xs text-blue-200/70">
           <div className="container mx-auto px-4 space-y-1">
             <p>© {new Date().getFullYear()} Blue Dream Budder. All rights reserved.</p>
             <div className="flex justify-center gap-4">

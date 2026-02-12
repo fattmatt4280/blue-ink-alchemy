@@ -119,7 +119,7 @@ const Auth = () => {
           navigate('/admin', { replace: true });
         } else {
           console.log('[Auth] User is authenticated, redirecting to dashboard');
-          navigate('/dashboard', { replace: true });
+          navigate('/', { replace: true });
         }
       }
     };
