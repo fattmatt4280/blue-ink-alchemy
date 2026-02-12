@@ -103,7 +103,7 @@ const FreeBudder = () => {
             {content.free_budder_headline}
           </h1>
 
-          <p className="text-lg sm:text-xl text-blue-200/80 mb-6">
+          <p className="text-lg sm:text-xl text-blue-100 mb-6">
             {content.free_budder_subheading}
           </p>
 
@@ -127,7 +127,7 @@ const FreeBudder = () => {
           >
             🔥 {content.free_budder_cta_text}
           </Button>
-          <p className="text-xs text-blue-300/50 mt-2">Limit 1 per customer · While supplies last</p>
+          <p className="text-xs text-blue-200/70 mt-2">Limit 1 per customer · While supplies last</p>
         </section>
 
         {/* Trust Badges */}
@@ -140,7 +140,7 @@ const FreeBudder = () => {
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white/5 border border-white/10">
                 <Icon className="w-6 h-6 text-blue-400" />
-                <span className="text-xs text-blue-200/70 font-medium">{label}</span>
+                <span className="text-xs text-blue-100 font-medium">{label}</span>
               </div>
             ))}
           </div>
@@ -153,7 +153,7 @@ const FreeBudder = () => {
             {bullets.map((point) => (
               <div key={point} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
                 <Star className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
-                <span className="text-sm text-blue-100/80">{point}</span>
+                <span className="text-sm text-white/90">{point}</span>
               </div>
             ))}
           </div>
@@ -166,12 +166,12 @@ const FreeBudder = () => {
               <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
             ))}
           </div>
-          <p className="text-sm text-blue-200/70">Rated 4.9/5 by tattoo artists & collectors</p>
+          <p className="text-sm text-blue-100">Rated 4.9/5 by tattoo artists & collectors</p>
           <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-4">
-            <p className="text-sm text-blue-100/80 italic">
+            <p className="text-sm text-white/90 italic">
               "{content.free_budder_testimonial_quote}"
             </p>
-            <p className="text-xs text-blue-300/50 mt-2">— {content.free_budder_testimonial_author}</p>
+            <p className="text-xs text-blue-200/70 mt-2">— {content.free_budder_testimonial_author}</p>
           </div>
         </section>
 
@@ -196,7 +196,7 @@ const FreeBudder = () => {
                   )}
                 </button>
                 {openFaq === i && (
-                  <div className="px-4 pb-4 text-sm text-blue-200/70">{faq.a}</div>
+                  <div className="px-4 pb-4 text-sm text-blue-100">{faq.a}</div>
                 )}
               </div>
             ))}
@@ -211,7 +211,7 @@ const FreeBudder = () => {
               <span className="text-sm font-medium text-yellow-400">While Supplies Last</span>
             </div>
             <h3 className="font-rajdhani text-2xl font-bold cyber-text mb-2">Don't Miss Out</h3>
-            <p className="text-sm text-blue-200/60 mb-4">
+            <p className="text-sm text-blue-100 mb-4">
               Try the #1 rated tattoo aftercare — completely free. Just cover shipping.
             </p>
             <Button
@@ -225,7 +225,7 @@ const FreeBudder = () => {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-white/10 py-6 text-center text-xs text-blue-300/40">
+        <footer className="border-t border-white/10 py-6 text-center text-xs text-blue-200/70">
           <div className="container mx-auto px-4 space-y-1">
             <p>© {new Date().getFullYear()} Blue Dream Budder. All rights reserved.</p>
             <div className="flex justify-center gap-4">

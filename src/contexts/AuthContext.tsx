@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(newSession?.user ?? null);
 
         if (event === 'SIGNED_IN' && newSession?.user) {
-          checkRoles(newSession.user.id);
+          await checkRoles(newSession.user.id);
         } else if (event === 'SIGNED_OUT') {
           setIsAdmin(false);
           setIsArtist(false);
