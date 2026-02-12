@@ -65,7 +65,7 @@ export const PushNotificationManager = () => {
   const checkSubscriptionStatus = async () => {
     try {
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      const subscription = await (registration as any).pushManager.getSubscription();
       
       if (subscription && user) {
         // Check if this subscription exists in our database
