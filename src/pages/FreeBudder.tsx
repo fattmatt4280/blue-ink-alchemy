@@ -127,7 +127,7 @@ const FreeBudder = () => {
           >
             🔥 {content.free_budder_cta_text}
           </Button>
-          <p className="text-xs text-blue-300/50 mt-2">Limit 1 per customer · While supplies last</p>
+          <p className="text-xs text-blue-200/70 mt-2">Limit 1 per customer · While supplies last</p>
         </section>
 
         {/* Trust Badges */}
