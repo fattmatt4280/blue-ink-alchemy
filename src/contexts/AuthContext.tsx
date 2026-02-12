@@ -53,14 +53,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let mounted = true;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
+      (event, newSession) => {
         if (!mounted) return;
 
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
         if (event === 'SIGNED_IN' && newSession?.user) {
-          await checkRoles(newSession.user.id);
+          setTimeout(() => checkRoles(newSession.user.id), 0);
         } else if (event === 'SIGNED_OUT') {
           setIsAdmin(false);
           setIsArtist(false);
