@@ -204,6 +204,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="pages" className="space-y-6">
+            <FreeBudderEditor />
             <SEOChecklist />
             <PageManager />
           </TabsContent>
