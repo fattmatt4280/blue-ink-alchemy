@@ -171,7 +171,7 @@ const FreeBudder = () => {
             <p className="text-sm text-white/90 italic">
               "{content.free_budder_testimonial_quote}"
             </p>
-            <p className="text-xs text-blue-300/50 mt-2">— {content.free_budder_testimonial_author}</p>
+            <p className="text-xs text-blue-200/70 mt-2">— {content.free_budder_testimonial_author}</p>
           </div>
         </section>
 
