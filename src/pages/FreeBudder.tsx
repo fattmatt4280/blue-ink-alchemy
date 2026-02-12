@@ -111,7 +111,7 @@ const FreeBudder = () => {
           <div className="relative mx-auto w-64 h-64 sm:w-72 sm:h-72 mb-6">
             <div className="absolute inset-0 rounded-2xl bg-blue-500/10 blur-2xl" />
             <img
-              src={BABY_BLUE_PRODUCT.image_url}
+              src={content.free_budder_product_image}
               alt="Baby Blue Dream Budder"
               className="relative w-full h-full object-cover rounded-2xl neon-image"
             />
