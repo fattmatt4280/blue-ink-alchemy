@@ -196,7 +196,7 @@ const FreeBudder = () => {
                   )}
                 </button>
                 {openFaq === i && (
-                  <div className="px-4 pb-4 text-sm text-blue-200/70">{faq.a}</div>
+                  <div className="px-4 pb-4 text-sm text-blue-100">{faq.a}</div>
                 )}
               </div>
             ))}
