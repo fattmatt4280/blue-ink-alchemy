@@ -211,7 +211,7 @@ const FreeBudder = () => {
               <span className="text-sm font-medium text-yellow-400">While Supplies Last</span>
             </div>
             <h3 className="font-rajdhani text-2xl font-bold cyber-text mb-2">Don't Miss Out</h3>
-            <p className="text-sm text-blue-200/60 mb-4">
+            <p className="text-sm text-blue-100 mb-4">
               Try the #1 rated tattoo aftercare — completely free. Just cover shipping.
             </p>
             <Button
