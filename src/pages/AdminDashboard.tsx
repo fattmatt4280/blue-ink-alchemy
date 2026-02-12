@@ -31,6 +31,7 @@ import EmailCampaignManager from '@/components/EmailCampaignManager';
 import { PageManager } from '@/components/PageManager';
 import { OrdersManager } from '@/components/OrdersManager';
 import SEOChecklist from '@/components/SEOChecklist';
+import { FreeBudderEditor } from '@/components/FreeBudderEditor';
 
 interface SiteContent {
   id: string;
@@ -203,6 +204,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="pages" className="space-y-6">
+            <FreeBudderEditor />
             <SEOChecklist />
             <PageManager />
           </TabsContent>
