@@ -1,38 +1,45 @@
 
 
-## Fix: Blank Screen After Login
+## Fix Blank Screen After Login + Make FreeBudder Text Legible
 
-### Root Cause
-A race condition in `AuthContext.tsx` where the `loading` state is set to `false` before the admin/artist role check finishes. This causes the app to briefly render with `isAdmin = false`, which triggers a redirect away from the admin dashboard (or shows a blank/access-denied screen). On refresh, everything loads in the correct order, so it works fine.
+### Two Issues to Fix
 
-### The Fix
-Consolidate the auth initialization so that `loading` is only set to `false` after **both** the session and the role check have completed. The admin/artist check will be moved inline rather than running in a separate `useEffect`.
+---
 
-### Changes: `src/contexts/AuthContext.tsx`
+### Issue 1: Blank Screen After Sign-In
 
-1. **Create a shared `checkRoles(userId)` function** that queries `is_admin` and `is_artist` RPCs and sets the corresponding state.
+**Root Cause Found:** Two problems working together:
 
-2. **Initial load (`initializeAuth`):**
-   - Call `getSession()`
-   - If a user exists, `await checkRoles(user.id)` before setting `loading = false`
-   - If no user, set `loading = false` immediately
+1. **Non-existent route:** In `Auth.tsx` (line 122), non-admin users are redirected to `/dashboard` after login -- but there is no `/dashboard` route in `App.tsx`. This hits the `DynamicPageHandler` catch-all, which shows a blank or "not found" page.
 
-3. **Ongoing auth changes (`onAuthStateChange`):**
-   - Update `session` and `user` state
-   - If user exists, fire `checkRoles(user.id)` (fire-and-forget, no need to block)
-   - If signed out, reset `isAdmin` and `isArtist` to `false`
-   - Do NOT touch the `loading` state here
+2. **Race condition for admins:** In `AuthContext.tsx`, the `onAuthStateChange` handler calls `checkRoles()` without `await`. So when `Auth.tsx`'s redirect logic runs, `isAdmin` is still `false`, sending admins to `/dashboard` (blank page) instead of `/admin`. On refresh, `initializeAuth` correctly `await`s role checks, so it works fine.
 
-4. **Remove the separate `useEffect` for admin checking** -- it's now handled inline during init and auth changes.
+**Fix:**
+- **`src/pages/Auth.tsx`**: Change the non-admin redirect from `/dashboard` to `/` (the homepage, which exists). Change admin redirect to stay as `/admin`.
+- **`src/contexts/AuthContext.tsx`**: Make `onAuthStateChange` await `checkRoles()` so that `isAdmin` is resolved before any redirect logic can fire.
 
-5. **Remove the `setTimeout` hack** that was setting `loading = false` after 100ms.
+---
 
-### What This Fixes
-- No more brief flash of "Access Denied" or blank screen after login
-- No more reliance on `setTimeout` for timing
-- Admin status is guaranteed to be resolved before the app renders protected routes
-- Refresh behavior stays the same (already works correctly)
+### Issue 2: Grey/Illegible Text on FreeBudder Page
+
+The landing page uses many low-opacity blue text colors that appear grey and hard to read on the dark background:
+
+| Current Class | Visibility | Replacement |
+|---|---|---|
+| `text-blue-200/80` | Dim | `text-blue-100` |
+| `text-blue-300/50` | Very dim | `text-blue-200/70` |
+| `text-blue-200/70` | Dim | `text-blue-100` |
+| `text-blue-100/80` | Slightly dim | `text-white/90` |
+| `text-blue-200/60` | Dim | `text-blue-100` |
+| `text-blue-300/40` | Nearly invisible | `text-blue-200/70` |
+
+**Fix in `src/pages/FreeBudder.tsx`:** Bump all text opacity/brightness values up so every piece of text is clearly legible white or near-white against the dark futuristic background.
+
+---
 
 ### Files Modified
-- `src/contexts/AuthContext.tsx` -- single file change
+
+1. **`src/contexts/AuthContext.tsx`** -- `await` the `checkRoles` call inside `onAuthStateChange` for `SIGNED_IN` events
+2. **`src/pages/Auth.tsx`** -- Change redirect target from `/dashboard` to `/`
+3. **`src/pages/FreeBudder.tsx`** -- Replace all dim grey/blue text classes with brighter, more legible alternatives
 
