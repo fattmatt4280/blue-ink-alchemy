@@ -121,7 +121,7 @@ export const PushNotificationManager = () => {
         throw new Error('VAPID public key not available');
       }
       
-      const subscription = await registration.pushManager.subscribe({
+      const subscription = await (registration as any).pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
