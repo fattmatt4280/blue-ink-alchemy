@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import DemographicsChart from './DemographicsChart';
 import RevenueChart from './RevenueChart';
 import WebsiteMetricsChart from './WebsiteMetricsChart';
+import TrafficSourcesChart from './TrafficSourcesChart';
 
 interface AnalyticsData {
   totalVisits: number;
@@ -244,6 +245,7 @@ const AnalyticsDashboard = () => {
         <TabsList>
           <TabsTrigger value="revenue">Revenue</TabsTrigger>
           <TabsTrigger value="traffic">Website Traffic</TabsTrigger>
+          <TabsTrigger value="sources">Traffic Sources</TabsTrigger>
           <TabsTrigger value="demographics">Demographics</TabsTrigger>
         </TabsList>
         
@@ -253,6 +255,10 @@ const AnalyticsDashboard = () => {
         
         <TabsContent value="traffic">
           <WebsiteMetricsChart timeRange={timeRange} />
+        </TabsContent>
+
+        <TabsContent value="sources">
+          <TrafficSourcesChart timeRange={timeRange} />
         </TabsContent>
         
         <TabsContent value="demographics">

@@ -10,6 +10,36 @@ declare global {
   }
 }
 
+// Helper: extract UTM params from current URL
+const getUTMParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  const utms: Record<string, string> = {};
+  utmKeys.forEach(key => {
+    const val = params.get(key);
+    if (val) utms[key] = val;
+  });
+  return utms;
+};
+
+// Helper: parse referrer domain
+const getReferrerDomain = () => {
+  try {
+    if (!document.referrer) return 'direct';
+    return new URL(document.referrer).hostname;
+  } catch {
+    return 'unknown';
+  }
+};
+
+// Helper: detect device type from user agent
+const getDeviceType = (): 'mobile' | 'tablet' | 'desktop' => {
+  const ua = navigator.userAgent;
+  if (/tablet|ipad|playbook|silk/i.test(ua)) return 'tablet';
+  if (/mobile|iphone|ipod|android.*mobile|windows phone|blackberry/i.test(ua)) return 'mobile';
+  return 'desktop';
+};
+
 const AnalyticsTracker = () => {
   const location = useLocation();
 
@@ -20,8 +50,7 @@ const AnalyticsTracker = () => {
       script.innerHTML = `
         !function (w, d, t) {
           w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=i;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript";o.async=!0;o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-          // Only initialize if we have a real pixel ID (not placeholder)
-          var pixelId = 'C9NJBLJC77U6A9H6KRG0'; // Replace with your actual TikTok Pixel ID
+          var pixelId = 'C9NJBLJC77U6A9H6KRG0';
           if (pixelId && pixelId !== 'YOUR_TIKTOK_PIXEL_ID') {
             ttq.load(pixelId);
             ttq.page();
@@ -42,7 +71,6 @@ const AnalyticsTracker = () => {
   }, []);
 
   useEffect(() => {
-    // Track page views
     trackPageView();
   }, [location]);
 
@@ -52,11 +80,21 @@ const AnalyticsTracker = () => {
       
       console.log('Tracking page view for:', location.pathname);
       
-      // Anonymize event data before storing
+      // Extract UTM params BEFORE anonymizing
+      const utmParams = getUTMParams();
+      const referrerDomain = getReferrerDomain();
+      const deviceType = getDeviceType();
+      
+      // Build enriched event data with traffic source info
       const eventData = {
         page: location.pathname,
         title: document.title,
         referrer: document.referrer,
+        // Traffic source fields
+        ...utmParams,
+        referrer_domain: referrerDomain,
+        device_type: deviceType,
+        landing_page: location.pathname,
       };
       const { anonymized } = anonymizeEventData(eventData);
 
