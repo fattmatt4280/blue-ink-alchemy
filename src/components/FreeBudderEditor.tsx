@@ -219,25 +219,37 @@ export const FreeBudderEditor = () => {
           <Button variant="outline" size="sm" onClick={addBullet}><Plus className="w-4 h-4 mr-1" /> Add Bullet</Button>
         </div>
 
-        {/* Testimonial */}
+        {/* Testimonials */}
         <div className="space-y-3">
-          <Label className="text-base font-semibold">Testimonial</Label>
-          <Textarea
-            value={fields.free_budder_testimonial_quote}
-            onChange={(e) => updateField('free_budder_testimonial_quote', e.target.value)}
-            rows={3}
-          />
-          <div className="space-y-2">
-            <Label>Author</Label>
-            <Input value={fields.free_budder_testimonial_author} onChange={(e) => updateField('free_budder_testimonial_author', e.target.value)} />
-          </div>
-          <ImageUpload
-            title="Author Profile Image"
-            description="Upload a profile photo for the testimonial author"
-            bucket="site-images"
-            currentImage={fields.free_budder_testimonial_image}
-            onImageUploaded={(url) => updateField('free_budder_testimonial_image', url)}
-          />
+          <Label className="text-base font-semibold">Testimonials</Label>
+          {parsedTestimonials.map((t, i) => (
+            <div key={i} className="border rounded-lg p-3 space-y-3">
+              <div className="flex gap-2 items-center">
+                <span className="text-sm font-medium text-muted-foreground">#{i + 1}</span>
+                <div className="flex-1" />
+                <Button variant="ghost" size="icon" onClick={() => removeTestimonial(i)}><Trash2 className="w-4 h-4" /></Button>
+              </div>
+              <Textarea
+                placeholder="Quote"
+                value={t.quote}
+                onChange={(e) => updateTestimonial(i, 'quote', e.target.value)}
+                rows={2}
+              />
+              <Input
+                placeholder="Author name / title"
+                value={t.author}
+                onChange={(e) => updateTestimonial(i, 'author', e.target.value)}
+              />
+              <ImageUpload
+                title="Author Image"
+                description="Upload a profile photo"
+                bucket="site-images"
+                currentImage={t.image}
+                onImageUploaded={(url) => updateTestimonial(i, 'image', url)}
+              />
+            </div>
+          ))}
+          <Button variant="outline" size="sm" onClick={addTestimonial}><Plus className="w-4 h-4 mr-1" /> Add Testimonial</Button>
         </div>
 
         {/* FAQs */}
