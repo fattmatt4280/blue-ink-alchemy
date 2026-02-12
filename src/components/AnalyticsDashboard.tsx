@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import DemographicsChart from './DemographicsChart';
 import RevenueChart from './RevenueChart';
 import WebsiteMetricsChart from './WebsiteMetricsChart';
+import TrafficSourcesChart from './TrafficSourcesChart';
 
 interface AnalyticsData {
   totalVisits: number;
