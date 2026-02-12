@@ -139,6 +139,25 @@ export const FreeBudderEditor = () => {
     updateField('free_budder_bullet_points', JSON.stringify(parsedBullets.filter((_, i) => i !== index)));
   };
 
+  // Testimonial helpers
+  const parsedTestimonials: Testimonial[] = (() => {
+    try { return JSON.parse(fields.free_budder_testimonials); } catch { return []; }
+  })();
+
+  const updateTestimonial = (index: number, field: keyof Testimonial, value: string) => {
+    const updated = [...parsedTestimonials];
+    updated[index] = { ...updated[index], [field]: value };
+    updateField('free_budder_testimonials', JSON.stringify(updated));
+  };
+
+  const addTestimonial = () => {
+    updateField('free_budder_testimonials', JSON.stringify([...parsedTestimonials, { quote: '', author: '', image: '' }]));
+  };
+
+  const removeTestimonial = (index: number) => {
+    updateField('free_budder_testimonials', JSON.stringify(parsedTestimonials.filter((_, i) => i !== index)));
+  };
+
   if (loading) return <div className="text-center py-8">Loading editor...</div>;
 
   return (
