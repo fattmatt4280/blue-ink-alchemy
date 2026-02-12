@@ -200,7 +200,7 @@ const BlogPost = () => {
           {/* Article Header */}
           <header className="mb-8">
             <div className="flex flex-wrap gap-2 mb-4">
-              {post.categories.map(category => (
+              {(post.categories || []).map(category => (
                 <Badge key={category} variant="secondary">
                   {category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </Badge>
@@ -302,11 +302,11 @@ const BlogPost = () => {
           </div>
 
           {/* Tags */}
-          {post.tags.length > 0 && (
+          {(post.tags || []).length > 0 && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {post.tags.map(tag => (
+                {(post.tags || []).map(tag => (
                   <Badge key={tag} variant="outline">
                     #{tag}
                   </Badge>
@@ -334,12 +334,12 @@ const BlogPost = () => {
           )}
 
           {/* Backlinks "As Seen On" */}
-          {post.backlink_sources.length > 0 && (
+          {(post.backlink_sources || []).length > 0 && (
             <Card className="mb-8">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-3">As Seen On</h3>
                 <div className="flex flex-wrap gap-2">
-                  {post.backlink_sources.map((url, index) => (
+                  {(post.backlink_sources || []).map((url, index) => (
                     <a
                       key={index}
                       href={url}
