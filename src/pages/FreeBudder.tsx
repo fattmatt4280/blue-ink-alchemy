@@ -22,6 +22,10 @@ const DEFAULT_BULLETS = [
   "Soothes irritation and reduces peeling",
 ];
 
+const DEFAULT_TESTIMONIALS = [
+  { quote: "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.", author: "Professional Tattoo Artist", image: "" },
+];
+
 const DEFAULTS: Record<string, string> = {
   free_budder_headline: "Your Tattoo Is Fresh. It Shouldn't Smell Like Chemicals.",
   free_budder_subheading: "Premium organic tattoo aftercare that absorbs fast and smells clean, smooth, and addictive.",
@@ -29,9 +33,6 @@ const DEFAULTS: Record<string, string> = {
   free_budder_badge_text: "Limited Time Offer",
   free_budder_product_image: DEFAULT_IMAGE,
   free_budder_shipping_price: "10.20",
-  free_budder_testimonial_quote: "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.",
-  free_budder_testimonial_author: "Professional Tattoo Artist",
-  free_budder_testimonial_image: "",
 };
 
 const CORE_BENEFITS = [
@@ -48,6 +49,7 @@ const FreeBudder = () => {
   const [content, setContent] = useState(DEFAULTS);
   const [faqs, setFaqs] = useState(DEFAULT_FAQS);
   const [bullets, setBullets] = useState(DEFAULT_BULLETS);
+  const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -65,6 +67,9 @@ const FreeBudder = () => {
           }
           if (row.key === 'free_budder_bullet_points') {
             try { setBullets(JSON.parse(row.value).map((b: any) => b.text || b)); } catch {}
+          }
+          if (row.key === 'free_budder_testimonials') {
+            try { setTestimonials(JSON.parse(row.value)); } catch {}
           }
         });
         setContent(merged);
@@ -190,20 +195,24 @@ const FreeBudder = () => {
           ))}
         </div>
         <p className="text-xs text-white/50 mb-4">Rated 4.9/5 by tattoo artists & collectors</p>
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
-          <p className="text-sm text-white/70 italic leading-relaxed">
-            "{content.free_budder_testimonial_quote}"
-          </p>
-          <div className="flex items-center justify-center gap-3 mt-4">
-            {content.free_budder_testimonial_image && (
-              <img
-                src={content.free_budder_testimonial_image}
-                alt={content.free_budder_testimonial_author}
-                className="w-8 h-8 rounded-full object-cover border border-white/10"
-              />
-            )}
-            <p className="text-xs text-white/30">— {content.free_budder_testimonial_author}</p>
-          </div>
+        <div className="space-y-3">
+          {testimonials.map((t, i) => (
+            <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
+              <p className="text-sm text-white/70 italic leading-relaxed">
+                "{t.quote}"
+              </p>
+              <div className="flex items-center justify-center gap-3 mt-4">
+                {t.image && (
+                  <img
+                    src={t.image}
+                    alt={t.author}
+                    className="w-8 h-8 rounded-full object-cover border border-white/10"
+                  />
+                )}
+                <p className="text-xs text-white/30">— {t.author}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
