@@ -166,7 +166,7 @@ const FreeBudder = () => {
               <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
             ))}
           </div>
-          <p className="text-sm text-blue-200/70">Rated 4.9/5 by tattoo artists & collectors</p>
+          <p className="text-sm text-blue-100">Rated 4.9/5 by tattoo artists & collectors</p>
           <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-4">
             <p className="text-sm text-blue-100/80 italic">
               "{content.free_budder_testimonial_quote}"
