@@ -49,6 +49,7 @@ const FreeBudder = () => {
   const [content, setContent] = useState(DEFAULTS);
   const [faqs, setFaqs] = useState(DEFAULT_FAQS);
   const [bullets, setBullets] = useState(DEFAULT_BULLETS);
+  const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
