@@ -1,59 +1,45 @@
 
 
-## Luxury Redesign: Free Budder Landing Page
+## Update Free Budder Landing Page Copy
 
-A complete visual overhaul of the `/free-budder` page, shifting from the current "neon cyber" aesthetic to a premium luxury dark-mode design optimized for Meta ad conversions.
+Replace the current body copy in `src/pages/FreeBudder.tsx` with the new advertorial content while preserving all existing functionality (cart logic, CTA buttons, sticky mobile CTA, FAQ accordion, dark theme, data fetching from Supabase).
 
-### What Changes
+### Changes to `src/pages/FreeBudder.tsx`
 
-**Visual Direction**
-- Deep navy-to-black gradient background (no more animated orbs/particles)
-- Clean, minimal layout with strong typography hierarchy
-- Subtle warm gold accents instead of neon blue glow effects
-- Studio-lit product image presentation with soft shadow (no pulsing "FREE" badge)
-- Elegant serif/sans-serif font pairing for a high-end skincare feel
+**Defaults updated:**
+- Headline (H1): "The Tattoo Aftercare Nobody Talks About... The Way It Smells"
+- Subheadline: "Most people expect a tattoo to hurt. What they don't expect? Opening their aftercare jar and getting hit with a sharp, overly perfumed, artificial scent."
+- Final CTA headline: "Your tattoo deserves better than synthetic fragrance and artificial color."
 
-**New Section Layout (top to bottom)**
-1. **Logo** -- small, centered, minimal
-2. **Hero** -- New headline: "Your Tattoo Is Fresh. It Shouldn't Smell Like Chemicals." with subheadline focused on scent/absorption, offer line below, and primary CTA
-3. **Core Benefits** -- 3-column icon grid: "Smells Clean & Luxurious", "Absorbs Fast", "Organic Ingredients" (with descriptions)
-4. **Why Artists Love It** -- stacked benefit blocks (existing editable bullets from admin)
-5. **Social Proof** -- star rating + testimonial block (existing editable from admin)
-6. **FAQ** -- accordion (existing editable from admin), with updated default questions including "Is there a subscription?"
-7. **Final CTA** -- "Try Premium Tattoo Aftercare -- Free" with CTA button
-8. **Sticky Mobile CTA** -- fixed bottom bar on mobile with the claim button
+**Section-by-section body copy replacement:**
 
-**All existing admin-editable content is preserved** -- headline, subheading, badge, CTA text, shipping price, product image, bullets, testimonial, and FAQs all continue to load from the `site_content` table. The defaults are updated to match the new copy.
+1. **Opening Story** -- Rewritten around the smell/color frustration (artificial scent, bright white creams, synthetic-looking products)
+2. **Problem Agitation ("The Hidden Problem...")** -- Artificial fragrance blends, synthetic perfume compounds, added dyes, heavy fillers. "Strong doesn't mean better. Bright white doesn't mean clean."
+3. **Discovery / Turning Point ("We Took a Different Approach")** -- Botanicals over lab-built scent. Natural tone from real butters/oils. Soft, creamy tan color positioning.
+4. **Product Breakdown ("What It Actually Feels Like")** -- Simplified to: melts into skin, absorbs quickly, no greasy shine, no heavy residue, no synthetic fragrance cloud
+5. **Ingredient Transparency ("Why Ingredient Integrity Matters")** -- Specific ingredients listed: shea butter, mango butter, avocado butter, jojoba oil, hempseed oil, blended essential oils. No artificial dyes/perfume/fillers.
+6. **Testimonials ("What People Notice First")** -- Updated defaults to the 4 new quotes focused on smell:
+   - "Finally something that doesn't smell fake."
+   - "It's subtle but addictive."
+   - "My tattoo feels moisturized without that heavy perfumey scent."
+   - "It actually smells natural."
+7. **Offer Section ("And Right Now...")** -- Simplified: free jars, just cover shipping. No gimmicks, no subscriptions, no inflated pricing.
+8. **FAQ** -- Updated to 5 new questions: artificial fragrance, why not bright white, scent strength, fresh tattoo use, shipping time.
+9. **Final CTA** -- "Your tattoo deserves better than synthetic fragrance and artificial color. Try it free. Just cover shipping."
 
-### What Stays the Same
-- Cart logic (clearCart, addToCart with promoType "free-budder", navigate to /checkout)
-- Data fetching from `site_content` table
-- FreeBudderEditor admin component (no changes needed)
-- Footer links
-
----
+**What stays the same:**
+- All functional code (cart, navigation, Supabase fetch, sticky mobile CTA)
+- Visual design system (dark theme, amber accents, rounded cards, typography scale)
+- CTA button component and placement pattern (5 CTAs throughout)
+- FAQ accordion behavior
+- Data fetching from `site_content` table (admin overrides still work)
+- Page structure and layout
 
 ### Technical Details
 
-**File: `src/pages/FreeBudder.tsx`** (full rewrite)
-- Remove `AnimatedBackground` import and usage
-- Remove `futuristic-bg`, `neon-image`, `neon-button`, `cyber-text`, `font-rajdhani` class usage
-- Replace with inline Tailwind classes for the luxury dark theme:
-  - Background: `bg-gradient-to-b from-[#0a0e1a] via-[#0d1321] to-[#0a0e1a]`
-  - Typography: clean white/gray hierarchy, no text-shadow glow
-  - CTA buttons: solid warm gradient (amber/gold tone) with hover effects, no pulsing animation
-  - Product image: centered with subtle drop shadow, soft radial glow behind, elegant "FREE" pill badge (not pulsing)
-- Add new "Core Benefits" 3-column section between hero and "Why Artists Love It"
-- Add sticky mobile CTA bar (`fixed bottom-0` on small screens, hidden on desktop)
-- Update default content strings to match the new copy spec
-
-**File: `src/index.css`** -- No changes needed (existing styles remain for other pages that use them)
-
-**New default content values:**
-- `free_budder_headline`: "Your Tattoo Is Fresh. It Shouldn't Smell Like Chemicals."
-- `free_budder_subheading`: "Premium organic tattoo aftercare that absorbs fast and smells clean, smooth, and addictive."
-- `free_budder_cta_text`: "Claim My Free Budder"
-- Core benefits are hardcoded (not admin-editable) since they're brand-level positioning
-
-**No database changes or new dependencies required.**
+- Single file edit: `src/pages/FreeBudder.tsx`
+- Default constants (`DEFAULT_FAQS`, `DEFAULT_TESTIMONIALS`, `DEFAULTS`) updated with new copy
+- `DEFAULT_BULLETS` removed since the new "What It Actually Feels Like" section uses inline items instead of the dynamic bullets array
+- Product breakdown section simplified from checklist cards to clean text lines matching the new minimal copy style
+- No new dependencies needed
 
