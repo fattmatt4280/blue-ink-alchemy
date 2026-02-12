@@ -22,6 +22,10 @@ const DEFAULT_BULLETS = [
   "Soothes irritation and reduces peeling",
 ];
 
+const DEFAULT_TESTIMONIALS = [
+  { quote: "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.", author: "Professional Tattoo Artist", image: "" },
+];
+
 const DEFAULTS: Record<string, string> = {
   free_budder_headline: "Your Tattoo Is Fresh. It Shouldn't Smell Like Chemicals.",
   free_budder_subheading: "Premium organic tattoo aftercare that absorbs fast and smells clean, smooth, and addictive.",
@@ -29,9 +33,6 @@ const DEFAULTS: Record<string, string> = {
   free_budder_badge_text: "Limited Time Offer",
   free_budder_product_image: DEFAULT_IMAGE,
   free_budder_shipping_price: "10.20",
-  free_budder_testimonial_quote: "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.",
-  free_budder_testimonial_author: "Professional Tattoo Artist",
-  free_budder_testimonial_image: "",
 };
 
 const CORE_BENEFITS = [
