@@ -68,6 +68,9 @@ const FreeBudder = () => {
           if (row.key === 'free_budder_bullet_points') {
             try { setBullets(JSON.parse(row.value).map((b: any) => b.text || b)); } catch {}
           }
+          if (row.key === 'free_budder_testimonials') {
+            try { setTestimonials(JSON.parse(row.value)); } catch {}
+          }
         });
         setContent(merged);
       }
