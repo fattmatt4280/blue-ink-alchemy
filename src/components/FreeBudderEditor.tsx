@@ -32,9 +32,9 @@ const DEFAULTS: Record<string, string> = {
   free_budder_badge_text: 'Limited Time Offer',
   free_budder_product_image: 'https://vozstxchkgpxzetwdzow.supabase.co/storage/v1/object/public/product-images/products/1751239126214-cpzvrwo41ga.jpeg',
   free_budder_shipping_price: '10.20',
-  free_budder_testimonial_quote: 'Best aftercare I\'ve ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.',
-  free_budder_testimonial_author: 'Professional Tattoo Artist',
-  free_budder_testimonial_image: '',
+  free_budder_testimonials: JSON.stringify([
+    { quote: 'Best aftercare I\'ve ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.', author: 'Professional Tattoo Artist', image: '' },
+  ]),
   free_budder_bullet_points: JSON.stringify([
     { text: 'Speeds up healing time with organic botanicals' },
     { text: 'No petroleum, no parabens — just clean ingredients' },
