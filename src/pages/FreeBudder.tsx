@@ -169,9 +169,9 @@ const FreeBudder = () => {
           <p className="text-sm text-blue-200/70">Rated 4.9/5 by tattoo artists & collectors</p>
           <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-4">
             <p className="text-sm text-blue-100/80 italic">
-              "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients."
+              "{content.free_budder_testimonial_quote}"
             </p>
-            <p className="text-xs text-blue-300/50 mt-2">— Professional Tattoo Artist</p>
+            <p className="text-xs text-blue-300/50 mt-2">— {content.free_budder_testimonial_author}</p>
           </div>
         </section>
 
