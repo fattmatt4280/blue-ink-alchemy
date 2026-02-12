@@ -195,20 +195,24 @@ const FreeBudder = () => {
           ))}
         </div>
         <p className="text-xs text-white/50 mb-4">Rated 4.9/5 by tattoo artists & collectors</p>
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
-          <p className="text-sm text-white/70 italic leading-relaxed">
-            "{content.free_budder_testimonial_quote}"
-          </p>
-          <div className="flex items-center justify-center gap-3 mt-4">
-            {content.free_budder_testimonial_image && (
-              <img
-                src={content.free_budder_testimonial_image}
-                alt={content.free_budder_testimonial_author}
-                className="w-8 h-8 rounded-full object-cover border border-white/10"
-              />
-            )}
-            <p className="text-xs text-white/30">— {content.free_budder_testimonial_author}</p>
-          </div>
+        <div className="space-y-3">
+          {testimonials.map((t, i) => (
+            <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
+              <p className="text-sm text-white/70 italic leading-relaxed">
+                "{t.quote}"
+              </p>
+              <div className="flex items-center justify-center gap-3 mt-4">
+                {t.image && (
+                  <img
+                    src={t.image}
+                    alt={t.author}
+                    className="w-8 h-8 rounded-full object-cover border border-white/10"
+                  />
+                )}
+                <p className="text-xs text-white/30">— {t.author}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
