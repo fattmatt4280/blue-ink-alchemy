@@ -84,7 +84,7 @@ const Blog = () => {
       post.author.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = !selectedCategory || 
-      post.categories.includes(selectedCategory);
+      (post.categories || []).includes(selectedCategory);
     
     return matchesSearch && matchesCategory;
   });
@@ -213,7 +213,7 @@ const Blog = () => {
                         </div>
                         <CardHeader className="pb-2">
                           <div className="flex flex-wrap gap-2 mb-2">
-                            {post.categories.slice(0, 2).map(category => (
+                            {(post.categories || []).slice(0, 2).map(category => (
                               <Badge
                                 key={category}
                                 variant="secondary"
