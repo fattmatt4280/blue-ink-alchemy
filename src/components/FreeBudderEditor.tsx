@@ -171,11 +171,13 @@ export const FreeBudderEditor = () => {
             <Input value={fields.free_budder_shipping_price} onChange={(e) => updateField('free_budder_shipping_price', e.target.value)} />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label>Product Image URL</Label>
-            <Input value={fields.free_budder_product_image} onChange={(e) => updateField('free_budder_product_image', e.target.value)} />
-            {fields.free_budder_product_image && (
-              <img src={fields.free_budder_product_image} alt="Preview" className="w-24 h-24 object-cover rounded-lg mt-1" />
-            )}
+            <ImageUpload
+              title="Product Image"
+              description="Upload the product image for the Free Budder landing page"
+              bucket="product-images"
+              currentImage={fields.free_budder_product_image}
+              onImageUploaded={(url) => updateField('free_budder_product_image', url)}
+            />
           </div>
         </div>
 
