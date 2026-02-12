@@ -96,15 +96,15 @@ const FreeBudder = () => {
         {/* Hero */}
         <section className="container mx-auto px-4 pt-4 pb-8 text-center max-w-2xl">
           <span className="inline-block bg-green-500/20 text-green-400 text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 border border-green-500/30">
-            Limited Time Offer
+            {content.free_budder_badge_text}
           </span>
 
           <h1 className="font-rajdhani text-4xl sm:text-5xl md:text-6xl font-bold cyber-text mb-3 leading-tight">
-            Get Your <span className="text-blue-400">FREE</span> Baby Blue Dream Budder
+            {content.free_budder_headline}
           </h1>
 
           <p className="text-lg sm:text-xl text-blue-200/80 mb-6">
-            Premium tattoo aftercare — just pay <span className="font-bold text-white">$10.20 shipping</span>
+            {content.free_budder_subheading}
           </p>
 
           {/* Product Image */}
