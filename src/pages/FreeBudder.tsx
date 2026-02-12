@@ -67,9 +67,17 @@ const FreeBudder = () => {
   }, []);
   const handleClaim = () => {
     clearCart();
-    addToCart({ ...BABY_BLUE_PRODUCT, promoType: "free-budder" } as any);
+    addToCart({
+      id: "2fc22365-b590-47a6-87a0-0fd8914e6e9d",
+      name: "Baby Blue Dream Budder (10g)",
+      price: 0,
+      image_url: content.free_budder_product_image,
+      promoType: "free-budder",
+    } as any);
     navigate("/checkout");
   };
+
+  if (!loaded) return null;
 
   return (
     <div className="min-h-screen futuristic-bg relative overflow-hidden">
