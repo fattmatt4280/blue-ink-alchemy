@@ -140,7 +140,7 @@ const FreeBudder = () => {
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white/5 border border-white/10">
                 <Icon className="w-6 h-6 text-blue-400" />
-                <span className="text-xs text-blue-200/70 font-medium">{label}</span>
+                <span className="text-xs text-blue-100 font-medium">{label}</span>
               </div>
             ))}
           </div>
