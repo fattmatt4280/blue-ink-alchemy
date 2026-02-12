@@ -31,6 +31,7 @@ const DEFAULTS: Record<string, string> = {
   free_budder_shipping_price: "10.20",
   free_budder_testimonial_quote: "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.",
   free_budder_testimonial_author: "Professional Tattoo Artist",
+  free_budder_testimonial_image: "",
 };
 
 const CORE_BENEFITS = [
