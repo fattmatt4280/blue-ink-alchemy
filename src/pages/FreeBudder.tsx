@@ -153,7 +153,7 @@ const FreeBudder = () => {
             {bullets.map((point) => (
               <div key={point} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
                 <Star className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
-                <span className="text-sm text-blue-100/80">{point}</span>
+                <span className="text-sm text-white/90">{point}</span>
               </div>
             ))}
           </div>
