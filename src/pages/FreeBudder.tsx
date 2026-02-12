@@ -1,30 +1,70 @@
-
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { Star, Shield, Leaf, Sparkles, Clock, Package, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { supabase } from "@/integrations/supabase/client";
 
-const BABY_BLUE_PRODUCT = {
-  id: "2fc22365-b590-47a6-87a0-0fd8914e6e9d",
-  name: "Baby Blue Dream Budder (10g)",
-  price: 0,
-  image_url: "https://vozstxchkgpxzetwdzow.supabase.co/storage/v1/object/public/product-images/products/1751239126214-cpzvrwo41ga.jpeg",
-};
+const DEFAULT_IMAGE = "https://vozstxchkgpxzetwdzow.supabase.co/storage/v1/object/public/product-images/products/1751239126214-cpzvrwo41ga.jpeg";
 
-const faqs = [
+const DEFAULT_FAQS = [
   { q: "What am I getting?", a: "A full-size 10g Baby Blue Dream Budder — our premium tattoo aftercare balm made with organic ingredients. It's the same product we sell for $6.99, yours FREE." },
   { q: "Why is it free?", a: "We're confident you'll love it. Once you try Blue Dream Budder, you'll never go back to petroleum-based aftercare. This is our way of letting you experience the difference." },
   { q: "How long does shipping take?", a: "Orders ship within 1-2 business days. Standard delivery is typically 3-7 business days depending on your location." },
   { q: "Is there a catch?", a: "No catch, no subscription, no hidden fees. You just pay $10.20 flat rate shipping and handling. One per customer." },
 ];
 
+const DEFAULT_BULLETS = [
+  "Speeds up healing time with organic botanicals",
+  "No petroleum, no parabens — just clean ingredients",
+  "Keeps colors vibrant during the healing process",
+  "Soothes irritation and reduces peeling",
+];
+
+const DEFAULTS: Record<string, string> = {
+  free_budder_headline: "Get Your FREE Baby Blue Dream Budder",
+  free_budder_subheading: "Premium tattoo aftercare — just pay $10.20 shipping",
+  free_budder_cta_text: "Claim Your Free Budder",
+  free_budder_badge_text: "Limited Time Offer",
+  free_budder_product_image: DEFAULT_IMAGE,
+  free_budder_shipping_price: "10.20",
+  free_budder_testimonial_quote: "Best aftercare I've ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.",
+  free_budder_testimonial_author: "Professional Tattoo Artist",
+};
+
 const FreeBudder = () => {
   const { clearCart, addToCart } = useCart();
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [content, setContent] = useState(DEFAULTS);
+  const [faqs, setFaqs] = useState(DEFAULT_FAQS);
+  const [bullets, setBullets] = useState(DEFAULT_BULLETS);
+  const [loaded, setLoaded] = useState(false);
 
+  useEffect(() => {
+    const fetchContent = async () => {
+      const { data } = await supabase
+        .from('site_content')
+        .select('key, value')
+        .like('key', 'free_budder_%');
+      if (data) {
+        const merged = { ...DEFAULTS };
+        data.forEach((row) => {
+          if (row.key in merged) merged[row.key] = row.value;
+          if (row.key === 'free_budder_faqs') {
+            try { setFaqs(JSON.parse(row.value)); } catch {}
+          }
+          if (row.key === 'free_budder_bullet_points') {
+            try { setBullets(JSON.parse(row.value).map((b: any) => b.text || b)); } catch {}
+          }
+        });
+        setContent(merged);
+      }
+      setLoaded(true);
+    };
+    fetchContent();
+  }, []);
   const handleClaim = () => {
     clearCart();
     addToCart({ ...BABY_BLUE_PRODUCT, promoType: "free-budder" } as any);
