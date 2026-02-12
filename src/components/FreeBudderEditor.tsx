@@ -28,6 +28,7 @@ const DEFAULTS: Record<string, string> = {
   free_budder_shipping_price: '10.20',
   free_budder_testimonial_quote: 'Best aftercare I\'ve ever used. My tattoos heal faster and the colors stay brighter. I recommend it to all my clients.',
   free_budder_testimonial_author: 'Professional Tattoo Artist',
+  free_budder_testimonial_image: '',
   free_budder_bullet_points: JSON.stringify([
     { text: 'Speeds up healing time with organic botanicals' },
     { text: 'No petroleum, no parabens — just clean ingredients' },
@@ -205,6 +206,13 @@ export const FreeBudderEditor = () => {
             <Label>Author</Label>
             <Input value={fields.free_budder_testimonial_author} onChange={(e) => updateField('free_budder_testimonial_author', e.target.value)} />
           </div>
+          <ImageUpload
+            title="Author Profile Image"
+            description="Upload a profile photo for the testimonial author"
+            bucket="site-images"
+            currentImage={fields.free_budder_testimonial_image}
+            onImageUploaded={(url) => updateField('free_budder_testimonial_image', url)}
+          />
         </div>
 
         {/* FAQs */}
