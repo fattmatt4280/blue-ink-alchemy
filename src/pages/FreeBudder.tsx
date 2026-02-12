@@ -150,12 +150,7 @@ const FreeBudder = () => {
         <section className="container mx-auto px-4 pb-12 max-w-xl text-center">
           <h2 className="font-rajdhani text-2xl font-bold cyber-text mb-4">Why Artists Love It</h2>
           <div className="space-y-3 text-left">
-            {[
-              "Speeds up healing time with organic botanicals",
-              "No petroleum, no parabens — just clean ingredients",
-              "Keeps colors vibrant during the healing process",
-              "Soothes irritation and reduces peeling",
-            ].map((point) => (
+            {bullets.map((point) => (
               <div key={point} className="flex items-start gap-3 bg-white/5 rounded-lg p-3 border border-white/10">
                 <Star className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
                 <span className="text-sm text-blue-100/80">{point}</span>
