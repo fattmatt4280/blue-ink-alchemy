@@ -168,7 +168,7 @@ const FreeBudder = () => {
           </div>
           <p className="text-sm text-blue-100">Rated 4.9/5 by tattoo artists & collectors</p>
           <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-4">
-            <p className="text-sm text-blue-100/80 italic">
+            <p className="text-sm text-white/90 italic">
               "{content.free_budder_testimonial_quote}"
             </p>
             <p className="text-xs text-blue-300/50 mt-2">— {content.free_budder_testimonial_author}</p>
