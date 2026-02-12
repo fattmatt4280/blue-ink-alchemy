@@ -206,6 +206,13 @@ export const FreeBudderEditor = () => {
             <Label>Author</Label>
             <Input value={fields.free_budder_testimonial_author} onChange={(e) => updateField('free_budder_testimonial_author', e.target.value)} />
           </div>
+          <ImageUpload
+            title="Author Profile Image"
+            description="Upload a profile photo for the testimonial author"
+            bucket="site-images"
+            currentImage={fields.free_budder_testimonial_image}
+            onImageUploaded={(url) => updateField('free_budder_testimonial_image', url)}
+          />
         </div>
 
         {/* FAQs */}

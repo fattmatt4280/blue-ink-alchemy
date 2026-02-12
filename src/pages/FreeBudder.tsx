@@ -194,7 +194,16 @@ const FreeBudder = () => {
           <p className="text-sm text-white/70 italic leading-relaxed">
             "{content.free_budder_testimonial_quote}"
           </p>
-          <p className="text-xs text-white/30 mt-3">— {content.free_budder_testimonial_author}</p>
+          <div className="flex items-center justify-center gap-3 mt-4">
+            {content.free_budder_testimonial_image && (
+              <img
+                src={content.free_budder_testimonial_image}
+                alt={content.free_budder_testimonial_author}
+                className="w-8 h-8 rounded-full object-cover border border-white/10"
+              />
+            )}
+            <p className="text-xs text-white/30">— {content.free_budder_testimonial_author}</p>
+          </div>
         </div>
       </section>
 
