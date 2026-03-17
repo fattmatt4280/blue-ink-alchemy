@@ -24,12 +24,12 @@ const PrivacyPolicy = () => {
           <p className="text-sm text-gray-600 mb-8">Effective Date: October 1, 2025</p>
 
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-8">
-              <h2 className="text-lg font-semibold text-purple-900 mb-2">🤖 DreamOps Agent — Automated TikTok Bot Disclosure</h2>
+              <h2 className="text-lg font-semibold text-purple-900 mb-2">🤖 DreamOps Command Center — Automated TikTok Bot Disclosure</h2>
               <p className="text-sm text-purple-800">
-                Dream Tattoo Company LLC operates an automated TikTok bot known as <strong>"DreamOps Agent"</strong>. 
+                Dream Tattoo Company LLC operates an automated TikTok bot known as <strong>"DreamOps Command Center"</strong>. 
                 This bot may collect and process limited interaction data (e.g., usernames, comments, engagement metrics) 
-                from public TikTok interactions for marketing and analytics purposes. Any data collected through DreamOps Agent 
-                is handled in accordance with this Privacy Policy. By engaging with our TikTok content or DreamOps Agent, 
+                from public TikTok interactions for marketing and analytics purposes. Any data collected through DreamOps Command Center 
+                is handled in accordance with this Privacy Policy. By engaging with our TikTok content or DreamOps Command Center, 
                 you acknowledge this automated data collection.
               </p>
             </div>
