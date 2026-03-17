@@ -64,6 +64,7 @@ const App = () => (
               <Route path="/referrals" element={<Referrals />} />
               <Route path="/budder-buddy" element={<BudderBuddy />} />
               <Route path="/free-budder" element={<FreeBudder />} />
+              <Route path="/tiktok-connect" element={<TikTokConnect />} />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               
