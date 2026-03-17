@@ -5,13 +5,13 @@ const AnnouncementBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem('announcement-banner-vday-dismissed');
+    const dismissed = localStorage.getItem('announcement-banner-easter-dismissed');
     if (dismissed) setIsVisible(false);
   }, []);
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('announcement-banner-vday-dismissed', 'true');
+    localStorage.setItem('announcement-banner-easter-dismissed', 'true');
   };
 
   if (!isVisible) return null;
