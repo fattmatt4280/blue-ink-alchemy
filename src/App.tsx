@@ -30,6 +30,7 @@ import Referrals from "./pages/Referrals";
 import Unsubscribe from "./pages/Unsubscribe";
 import BudderBuddy from "./pages/BudderBuddy";
 import FreeBudder from "./pages/FreeBudder";
+import TikTokConnect from "./pages/TikTokConnect";
 import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/referrals" element={<Referrals />} />
               <Route path="/budder-buddy" element={<BudderBuddy />} />
               <Route path="/free-budder" element={<FreeBudder />} />
+              <Route path="/tiktok-connect" element={<TikTokConnect />} />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               

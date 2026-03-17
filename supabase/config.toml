@@ -121,3 +121,11 @@ verify_jwt = true
 [[functions]]
 name = "track-referral"
 verify_jwt = false
+
+[[functions]]
+name = "tiktok-token-exchange"
+verify_jwt = false
+
+[[functions]]
+name = "tiktok-publish"
+verify_jwt = false
