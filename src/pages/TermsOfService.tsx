@@ -24,11 +24,11 @@ const TermsOfService = () => {
           <p className="text-sm text-gray-600 mb-8">Effective Date: 10-1-2025</p>
 
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-8">
-              <h2 className="text-lg font-semibold text-purple-900 mb-2">🤖 DreamOps Agent — Automated TikTok Bot Disclosure</h2>
+              <h2 className="text-lg font-semibold text-purple-900 mb-2">🤖 DreamOps Command Center — Automated TikTok Bot Disclosure</h2>
               <p className="text-sm text-purple-800">
-                Dream Tattoo Company LLC operates an automated TikTok bot known as <strong>"DreamOps Agent"</strong>. 
+                Dream Tattoo Company LLC operates an automated TikTok bot known as <strong>"DreamOps Command Center"</strong>. 
                 This bot may interact with users on the TikTok platform through automated comments, messages, and content distribution 
-                on behalf of Blue Dream Budder™. By engaging with our TikTok content or DreamOps Agent, you acknowledge that 
+                on behalf of Blue Dream Budder™. By engaging with our TikTok content or DreamOps Command Center, you acknowledge that 
                 some interactions may be automated and agree to these Terms of Service and our Privacy Policy.
               </p>
             </div>
