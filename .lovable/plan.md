@@ -1,41 +1,45 @@
 
 
-## Problem
+## Update Free Budder Landing Page Copy
 
-The current `/tiktok-connect` page only shows a "Connect TikTok" button that tries to do a real OAuth redirect (which fails without approved credentials). TikTok's app review requires a demo showing the full end-to-end flow. We need a **demo/mockup mode** that simulates the entire integration visually.
+Replace the current body copy in `src/pages/FreeBudder.tsx` with the new advertorial content while preserving all existing functionality (cart logic, CTA buttons, sticky mobile CTA, FAQ accordion, dark theme, data fetching from Supabase).
 
-## Plan
+### Changes to `src/pages/FreeBudder.tsx`
 
-**Rebuild `src/pages/TikTokConnect.tsx`** as a polished, multi-step demo page that walks through the entire flow with simulated data. The page will have a **demo mode** (default, always active) that shows each step with mock data and realistic UI, plus the real integration code ready to go once credentials are approved.
+**Defaults updated:**
+- Headline (H1): "The Tattoo Aftercare Nobody Talks About... The Way It Smells"
+- Subheadline: "Most people expect a tattoo to hurt. What they don't expect? Opening their aftercare jar and getting hit with a sharp, overly perfumed, artificial scent."
+- Final CTA headline: "Your tattoo deserves better than synthetic fragrance and artificial color."
 
-### Demo Flow (Step-by-Step)
+**Section-by-section body copy replacement:**
 
-1. **Landing / Connect Screen** — App branding, description of what the integration does, "Connect TikTok" button with TikTok logo styling
-2. **Simulated OAuth** — Clicking "Connect TikTok" shows a brief loading state, then transitions to a mock "connected" state with a fake user profile (avatar placeholder, display name "DreamTattoo")
-3. **Connected Dashboard** — Shows:
-   - Connected user card (avatar, username, green "Connected" badge)
-   - Video upload area (drag-and-drop styled zone, accepts mp4/mov, shows file name/size when selected)
-   - Caption/description textarea
-   - Privacy level selector (Public, Friends Only, Self Only)
-   - "Publish to TikTok" button
-4. **Publishing Simulation** — Clicking publish shows a progress animation, then a success card with a mock publish ID and "View on TikTok" link
-5. **Technical Info Section** — At the bottom, a collapsible section showing:
-   - Scopes used: `user.info.profile`, `video.upload`, `video.publish`
-   - OAuth redirect URI
-   - API endpoints called
-   - Edge functions architecture diagram (text)
+1. **Opening Story** -- Rewritten around the smell/color frustration (artificial scent, bright white creams, synthetic-looking products)
+2. **Problem Agitation ("The Hidden Problem...")** -- Artificial fragrance blends, synthetic perfume compounds, added dyes, heavy fillers. "Strong doesn't mean better. Bright white doesn't mean clean."
+3. **Discovery / Turning Point ("We Took a Different Approach")** -- Botanicals over lab-built scent. Natural tone from real butters/oils. Soft, creamy tan color positioning.
+4. **Product Breakdown ("What It Actually Feels Like")** -- Simplified to: melts into skin, absorbs quickly, no greasy shine, no heavy residue, no synthetic fragrance cloud
+5. **Ingredient Transparency ("Why Ingredient Integrity Matters")** -- Specific ingredients listed: shea butter, mango butter, avocado butter, jojoba oil, hempseed oil, blended essential oils. No artificial dyes/perfume/fillers.
+6. **Testimonials ("What People Notice First")** -- Updated defaults to the 4 new quotes focused on smell:
+   - "Finally something that doesn't smell fake."
+   - "It's subtle but addictive."
+   - "My tattoo feels moisturized without that heavy perfumey scent."
+   - "It actually smells natural."
+7. **Offer Section ("And Right Now...")** -- Simplified: free jars, just cover shipping. No gimmicks, no subscriptions, no inflated pricing.
+8. **FAQ** -- Updated to 5 new questions: artificial fragrance, why not bright white, scent strength, fresh tattoo use, shipping time.
+9. **Final CTA** -- "Your tattoo deserves better than synthetic fragrance and artificial color. Try it free. Just cover shipping."
 
-### Styling
-
-- Clean, modern card-based layout with TikTok's brand colors (black, #ee1d52 red, #69C9D0 teal)
-- Use existing Tailwind classes and shadcn/ui components (Card, Button, Badge, Progress)
-- Responsive — works on the 390px viewport the reviewer might use
+**What stays the same:**
+- All functional code (cart, navigation, Supabase fetch, sticky mobile CTA)
+- Visual design system (dark theme, amber accents, rounded cards, typography scale)
+- CTA button component and placement pattern (5 CTAs throughout)
+- FAQ accordion behavior
+- Data fetching from `site_content` table (admin overrides still work)
+- Page structure and layout
 
 ### Technical Details
 
-- **Single file change**: `src/pages/TikTokConnect.tsx`
-- Add a `demoMode` state (defaulting to `true`) with a small toggle at the top so the real flow can be activated later
-- In demo mode, all API calls are replaced with `setTimeout` simulations
-- The real OAuth/edge function code stays intact, just gated behind `!demoMode`
-- No database or edge function changes needed
+- Single file edit: `src/pages/FreeBudder.tsx`
+- Default constants (`DEFAULT_FAQS`, `DEFAULT_TESTIMONIALS`, `DEFAULTS`) updated with new copy
+- `DEFAULT_BULLETS` removed since the new "What It Actually Feels Like" section uses inline items instead of the dynamic bullets array
+- Product breakdown section simplified from checklist cards to clean text lines matching the new minimal copy style
+- No new dependencies needed
 
