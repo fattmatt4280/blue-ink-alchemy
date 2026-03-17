@@ -30,6 +30,7 @@ import Referrals from "./pages/Referrals";
 import Unsubscribe from "./pages/Unsubscribe";
 import BudderBuddy from "./pages/BudderBuddy";
 import FreeBudder from "./pages/FreeBudder";
+import TikTokConnect from "./pages/TikTokConnect";
 import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
