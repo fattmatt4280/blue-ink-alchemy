@@ -167,7 +167,7 @@ const TikTokConnect = () => {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <Music className="w-7 h-7 text-[#ee1d52]" />
-            <h1 className="text-xl font-bold tracking-tight">TikTok Integration</h1>
+            <h1 className="text-xl font-bold tracking-tight">Dream Ops Command Center</h1>
           </div>
           <div className="flex items-center gap-2">
             {demoMode && <Badge className="bg-[#69C9D0]/20 text-[#69C9D0] border-[#69C9D0]/30 text-[10px]">DEMO</Badge>}
