@@ -31,6 +31,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import BudderBuddy from "./pages/BudderBuddy";
 import FreeBudder from "./pages/FreeBudder";
 import TikTokConnect from "./pages/TikTokConnect";
+import TikTokCallback from "./pages/TikTokCallback";
 import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
