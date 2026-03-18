@@ -4,7 +4,7 @@ const AnimatedBackground = () => {
   const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
-    let scrollTimeout: NodeJS.Timeout;
+    let scrollTimeout: ReturnType<typeof setTimeout>;
 
     const handleScroll = () => {
       setIsScrolling(true);
