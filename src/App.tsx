@@ -66,6 +66,7 @@ const App = () => (
               <Route path="/budder-buddy" element={<BudderBuddy />} />
               <Route path="/free-budder" element={<FreeBudder />} />
               <Route path="/tiktok-connect" element={<TikTokConnect />} />
+              <Route path="/app/tiktok/callback" element={<TikTokCallback />} />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               
