@@ -31,6 +31,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import BudderBuddy from "./pages/BudderBuddy";
 import FreeBudder from "./pages/FreeBudder";
 import TikTokConnect from "./pages/TikTokConnect";
+import TikTokCallback from "./pages/TikTokCallback";
 import { DynamicPageHandler } from "./components/DynamicPageHandler";
 
 const App = () => (
@@ -65,6 +66,7 @@ const App = () => (
               <Route path="/budder-buddy" element={<BudderBuddy />} />
               <Route path="/free-budder" element={<FreeBudder />} />
               <Route path="/tiktok-connect" element={<TikTokConnect />} />
+              <Route path="/app/tiktok/callback" element={<TikTokCallback />} />
               
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               

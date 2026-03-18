@@ -11,7 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Upload, CheckCircle, Play, ChevronDown, Music, Video, Shield, Zap, Globe, Users, Lock } from "lucide-react";
 
 const TIKTOK_CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY || "";
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "https://bluedreambudder.com/tiktok-connect";
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "https://bluedreambudder.com/app/tiktok/callback";
 const SCOPES = "user.info.profile,video.upload,video.publish";
 
 type Step = "connect" | "connecting" | "connected" | "publishing" | "published";
@@ -32,13 +32,16 @@ const TikTokConnect = () => {
   const [realUser, setRealUser] = useState<{ username: string; avatar: string } | null>(null);
   const [status, setStatus] = useState("");
 
-  // Handle real OAuth callback
+  // Check for token from callback page
   useEffect(() => {
     if (demoMode) return;
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    if (code && !accessToken) {
-      exchangeCode(code);
+    const storedToken = sessionStorage.getItem("tiktok_access_token");
+    if (storedToken) {
+      setAccessToken(storedToken);
+      sessionStorage.removeItem("tiktok_access_token");
+      sessionStorage.removeItem("tiktok_open_id");
+      fetchUserInfo(storedToken);
+      setStep("connected");
     }
   }, [demoMode]);
 
