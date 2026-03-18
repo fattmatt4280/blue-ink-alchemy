@@ -32,13 +32,16 @@ const TikTokConnect = () => {
   const [realUser, setRealUser] = useState<{ username: string; avatar: string } | null>(null);
   const [status, setStatus] = useState("");
 
-  // Handle real OAuth callback
+  // Check for token from callback page
   useEffect(() => {
     if (demoMode) return;
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    if (code && !accessToken) {
-      exchangeCode(code);
+    const storedToken = sessionStorage.getItem("tiktok_access_token");
+    if (storedToken) {
+      setAccessToken(storedToken);
+      sessionStorage.removeItem("tiktok_access_token");
+      sessionStorage.removeItem("tiktok_open_id");
+      fetchUserInfo(storedToken);
+      setStep("connected");
     }
   }, [demoMode]);
 
