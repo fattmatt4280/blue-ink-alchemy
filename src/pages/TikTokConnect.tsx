@@ -11,7 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Upload, CheckCircle, Play, ChevronDown, Music, Video, Shield, Zap, Globe, Users, Lock } from "lucide-react";
 
 const TIKTOK_CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY || "";
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "https://bluedreambudder.com/tiktok-connect";
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || "https://bluedreambudder.com/app/tiktok/callback";
 const SCOPES = "user.info.profile,video.upload,video.publish";
 
 type Step = "connect" | "connecting" | "connected" | "publishing" | "published";
