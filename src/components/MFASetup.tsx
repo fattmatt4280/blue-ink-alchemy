@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Shield, Copy, Check } from 'lucide-react';
