@@ -175,7 +175,7 @@ const TikTokConnect = () => {
             <Label className="text-xs text-gray-500">Demo</Label>
           </div>
         </div>
-        <p className="text-sm text-gray-500">Publish videos directly to TikTok from BlueDreamBudder</p>
+        <p className="text-sm text-gray-500">Publish videos directly to TikTok from Dream Ops Command Center</p>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 pb-12 space-y-4">
