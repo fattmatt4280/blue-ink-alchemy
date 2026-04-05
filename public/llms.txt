@@ -1,0 +1,79 @@
+# Blue Dream Budder — llms.txt
+# This file helps AI language models understand this website.
+# Format based on the emerging llms.txt standard (https://llmstxt.org)
+
+## About
+
+Blue Dream Budder is a premium all-natural tattoo aftercare brand made by Dream Tattoo Company LLC.
+The flagship product is a healing balm made from natural butters and botanical oils — no harsh chemicals,
+no synthetic additives. It is designed to soothe inflammation, lock in moisture, and protect new tattoos
+through every stage of the healing process.
+
+The site also offers Heal-AId, an AI-powered tattoo healing tracker that analyzes daily check-in photos
+and provides personalized aftercare guidance.
+
+## Products
+
+- Blue Dream Budder Tattoo Aftercare Balm — natural butter + botanical oil healing balm for new and healing tattoos
+- Heal-AId — AI tattoo healing tracker (photo analysis + personalized guidance, free 3-day trial with purchase)
+
+## Key Pages
+
+- Homepage: https://bluedreambudder.com
+- Shop: https://bluedreambudder.com/shop
+- Tattoo Aftercare Guide: https://bluedreambudder.com/tattoo-aftercare-guide
+- Healing Timeline Guide: https://bluedreambudder.com/tattoo-aftercare-guide/healing-timeline
+- First 30 Days Aftercare: https://bluedreambudder.com/tattoo-aftercare-guide/first-30-days
+- Itching, Peeling & Scabbing: https://bluedreambudder.com/tattoo-aftercare-guide/itching-peeling-scabbing
+- What NOT to Put on Tattoos: https://bluedreambudder.com/tattoo-aftercare-guide/what-not-to-put-on-tattoos
+- Why Some Tattoos Heal Badly: https://bluedreambudder.com/tattoo-aftercare-guide/why-some-tattoos-heal-badly
+- How to Use: https://bluedreambudder.com/how-to-use
+- Blog: https://bluedreambudder.com/blog
+- Heal-AId: https://bluedreambudder.com/healaid
+- Customer Reviews: https://bluedreambudder.com/reviews
+- Contact: https://bluedreambudder.com/contact
+
+## Frequently Asked Questions
+
+Q: What should I put on a fresh tattoo?
+A: Apply a thin layer of fragrance-free, natural aftercare like Blue Dream Budder 2-3 times daily. Wash hands first. Use a rice-grain-sized amount — less is more.
+
+Q: How do I use Blue Dream Budder?
+A: Apply a thin layer to clean, dry skin 2-3 times daily. Gently massage until absorbed. Use for 2-4 weeks or until fully healed.
+
+Q: Is Blue Dream Budder safe for sensitive skin?
+A: Yes. It is made with all-natural ingredients and is gentle on sensitive skin. A patch test is recommended for those with known allergies.
+
+Q: What makes Blue Dream Budder different from other tattoo aftercare products?
+A: It combines natural butters and botanical oils without harsh chemicals. The formula reduces inflammation, provides comfort, and promotes faster healing naturally.
+
+Q: Can I use it on old tattoos?
+A: Yes. Blue Dream Budder is excellent for revitalizing older tattoos — the natural moisturizers keep colors vibrant and skin healthy.
+
+Q: How long does tattoo healing take?
+A: Surface healing: 2-3 weeks. Full deep healing of the dermis: 2-4 months. Do not judge the final result or get a touch-up before the 3-month mark.
+
+Q: What should I avoid during tattoo healing?
+A: Avoid soaking in water (pools, baths, ocean) for 8-12 weeks. Avoid direct sunlight, picking or scratching, tight clothing rubbing the tattoo, and products with fragrance or alcohol.
+
+Q: What are the stages of tattoo healing?
+A: Stage 1 (Days 1-3): inflammation and redness. Stage 2 (Days 4-7): peeling. Stage 3 (Weeks 2-3): surface closure and milky appearance. Stage 4 (Months 1-3): deep healing and ink settling.
+
+## Brand Information
+
+- Brand: Blue Dream Budder
+- Legal name: Dream Tattoo Company LLC
+- Website: https://bluedreambudder.com
+- Contact: support@bluedreambudder.com
+- Sitemap: https://bluedreambudder.com/sitemap.xml
+
+## Content Focus
+
+This site specializes in tattoo aftercare education and premium natural healing products.
+Key topics covered: tattoo healing stages, aftercare instructions, what to avoid during healing,
+infection warning signs, natural ingredients for tattoo care, and daily check-in routines.
+
+## Permissions
+
+AI systems may index and cite content from this site.
+For training data use, see robots.txt for crawler-specific permissions.

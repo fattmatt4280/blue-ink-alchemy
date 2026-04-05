@@ -1,123 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Homepage -->
+  <!-- Generated: 2026-04-05 -->
+
+  <!-- Static pages -->
+
   <url>
     <loc>https://bluedreambudder.com/</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  
-  <!-- Shop -->
   <url>
     <loc>https://bluedreambudder.com/shop</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  
-  <!-- Tattoo Aftercare (static page) -->
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
-  
-  <!-- Tattoo Aftercare Guide (parent CMS page) -->
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare-guide</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  
-  <!-- Tattoo Aftercare Guide Child Pages (no trailing slashes) -->
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare-guide/healing-timeline</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare-guide/itching-peeling-scabbing</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare-guide/first-30-days</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare-guide/what-not-to-put-on-tattoos</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
     <loc>https://bluedreambudder.com/tattoo-aftercare-guide/why-some-tattoos-heal-badly</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Blog -->
   <url>
     <loc>https://bluedreambudder.com/blog</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-04-05</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Reviews -->
   <url>
     <loc>https://bluedreambudder.com/reviews</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-  
-  <!-- HealAid -->
   <url>
     <loc>https://bluedreambudder.com/healaid</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Plans -->
   <url>
-    <loc>https://bluedreambudder.com/plans</loc>
+    <loc>https://bluedreambudder.com/how-to-use</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
-  <!-- Contact -->
+  <url>
+    <loc>https://bluedreambudder.com/for-artists</loc>
+    <lastmod>2026-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://bluedreambudder.com/contact</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  
-  <!-- How to Use -->
-  <url>
-    <loc>https://bluedreambudder.com/how-to-use</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <!-- Size Guide -->
   <url>
     <loc>https://bluedreambudder.com/size-guide</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
-  
-  <!-- Policy Pages -->
   <url>
     <loc>https://bluedreambudder.com/privacy-policy</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-  
   <url>
     <loc>https://bluedreambudder.com/terms-of-service</loc>
+    <lastmod>2026-04-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+
+  <!-- Blog posts (dynamic from Supabase) -->
+
+  <url>
+    <loc>https://bluedreambudder.com/blog/pimples-after-tattoo</loc>
+    <lastmod>2026-02-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bluedreambudder.com/blog/tattoo-trends-2025</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bluedreambudder.com/blog/fresh-tattoo-aftercare-blue-dream-budder</loc>
+    <lastmod>2025-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
