@@ -138,6 +138,21 @@ const Blog = () => {
         <meta name="twitter:title" content="Blog - Blue Dream Budder | Tattoo Aftercare Tips & Guides" />
         <meta name="twitter:description" content="Discover expert tattoo aftercare tips, healing guides, and product recommendations from Blue Dream Budder. Your ultimate resource for tattoo care." />
         <meta name="twitter:image" content="https://bluedreambudder.com/og-blog.jpg" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "Blue Dream Budder Blog",
+            "description": "Expert tattoo aftercare tips, healing guides, and product recommendations.",
+            "url": "https://bluedreambudder.com/blog",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Blue Dream Budder",
+              "url": "https://bluedreambudder.com",
+              "logo": "https://bluedreambudder.com/images/invoice-logo-bw.jpeg"
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen futuristic-bg">

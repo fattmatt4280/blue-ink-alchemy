@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Helmet } from "react-helmet-async";
 import ContentPage from "@/components/ContentPage";
 import Testimonials from "@/components/Testimonials";
 import ReviewForm from "@/components/ReviewForm";
@@ -11,6 +12,37 @@ const Reviews = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
 
   return (
+    <>
+    <Helmet>
+      <title>Customer Reviews | Blue Dream Budder Tattoo Aftercare</title>
+      <meta name="description" content="Real customer reviews for Blue Dream Budder tattoo aftercare. See how artists and collectors rate our natural healing balm." />
+      <link rel="canonical" href="https://bluedreambudder.com/reviews" />
+      <meta property="og:title" content="Customer Reviews | Blue Dream Budder" />
+      <meta property="og:description" content="Real customer reviews for Blue Dream Budder tattoo aftercare." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://bluedreambudder.com/reviews" />
+      <meta property="og:image" content="https://bluedreambudder.com/images/invoice-logo-bw.jpeg" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Customer Reviews | Blue Dream Budder" />
+      <meta name="twitter:description" content="Real customer reviews for Blue Dream Budder tattoo aftercare." />
+      <meta name="twitter:image" content="https://bluedreambudder.com/images/invoice-logo-bw.jpeg" />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "Blue Dream Budder Tattoo Aftercare Balm",
+          "brand": { "@type": "Brand", "name": "Blue Dream Budder" },
+          "url": "https://bluedreambudder.com/shop",
+          "description": "Premium all-natural tattoo aftercare balm made with natural butters and botanical oils.",
+          "review": {
+            "@type": "Review",
+            "reviewBody": "Best tattoo aftercare I've ever used. Healed faster and colors stayed vibrant.",
+            "author": { "@type": "Person", "name": "Verified Customer" },
+            "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+          }
+        })}
+      </script>
+    </Helmet>
     <ContentPage title="Customer Reviews">
       <div className="space-y-8">
         <div className="flex justify-between items-start">
@@ -49,6 +81,7 @@ const Reviews = () => {
         </div>
       </div>
     </ContentPage>
+    </>
   );
 };
 

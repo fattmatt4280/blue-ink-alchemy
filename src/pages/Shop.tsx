@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
 import AppHeader from "@/components/AppHeader";
@@ -6,6 +7,47 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 const Shop = () => {
   return (
     <div className="min-h-screen futuristic-bg">
+      <Helmet>
+        <title>Shop Tattoo Aftercare | Blue Dream Budder</title>
+        <meta name="description" content="Shop Blue Dream Budder's premium all-natural tattoo aftercare products. Natural butters, botanical oils, and zero harsh chemicals. Free shipping on orders over $50." />
+        <link rel="canonical" href="https://bluedreambudder.com/shop" />
+        <meta property="og:title" content="Shop Tattoo Aftercare | Blue Dream Budder" />
+        <meta property="og:description" content="Premium all-natural tattoo aftercare. Natural butters, botanical oils, zero harsh chemicals. Free shipping on orders over $50." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://bluedreambudder.com/shop" />
+        <meta property="og:image" content="https://bluedreambudder.com/images/invoice-logo-bw.jpeg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Shop Tattoo Aftercare | Blue Dream Budder" />
+        <meta name="twitter:description" content="Premium all-natural tattoo aftercare. Free shipping on orders over $50." />
+        <meta name="twitter:image" content="https://bluedreambudder.com/images/invoice-logo-bw.jpeg" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Blue Dream Budder Tattoo Aftercare Products",
+            "description": "Premium all-natural tattoo aftercare products including healing balms and moisturizers.",
+            "url": "https://bluedreambudder.com/shop",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@type": "Product",
+                  "name": "Blue Dream Budder Tattoo Aftercare Balm",
+                  "description": "Premium natural tattoo aftercare balm made with natural butters and botanical oils for optimal healing.",
+                  "brand": { "@type": "Brand", "name": "Blue Dream Budder" },
+                  "url": "https://bluedreambudder.com/shop",
+                  "offers": {
+                    "@type": "AggregateOffer",
+                    "priceCurrency": "USD",
+                    "availability": "https://schema.org/InStock"
+                  }
+                }
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
       <AnimatedBackground />
       <AppHeader />
       <div className="max-w-6xl mx-auto px-4 pt-24 pb-12 relative z-10">

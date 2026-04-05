@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -82,8 +83,43 @@ const ProductDetail = () => {
     return null;
   }
 
+  const productUrl = `https://bluedreambudder.com/product/${product.id}`;
+  const productImage = isHealAidProduct ? 'https://bluedreambudder.com/images/healaid-shield-logo.jpeg' : (product.image_url || 'https://bluedreambudder.com/images/invoice-logo-bw.jpeg');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black relative overflow-hidden">
+      <Helmet>
+        <title>{product.name} | Blue Dream Budder</title>
+        <meta name="description" content={product.description || `${product.name} — premium tattoo aftercare from Blue Dream Budder.`} />
+        <link rel="canonical" href={productUrl} />
+        <meta property="og:title" content={`${product.name} | Blue Dream Budder`} />
+        <meta property="og:description" content={product.description || `${product.name} — premium tattoo aftercare from Blue Dream Budder.`} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={productUrl} />
+        <meta property="og:image" content={productImage} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${product.name} | Blue Dream Budder`} />
+        <meta name="twitter:description" content={product.description || `${product.name} — premium tattoo aftercare.`} />
+        <meta name="twitter:image" content={productImage} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name,
+            "description": product.description || `${product.name} — premium tattoo aftercare from Blue Dream Budder.`,
+            "image": productImage,
+            "url": productUrl,
+            "brand": { "@type": "Brand", "name": "Blue Dream Budder" },
+            "offers": {
+              "@type": "Offer",
+              "priceCurrency": "USD",
+              "price": product.price.toFixed(2),
+              "availability": "https://schema.org/InStock",
+              "url": productUrl
+            }
+          })}
+        </script>
+      </Helmet>
       <AnimatedBackground />
       
       <Button 

@@ -50,15 +50,63 @@ const FAQ = () => {
                 "name": "What should I put on a fresh tattoo?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Use a thin layer of fragrance-free, vegan aftercare like Blue Dream Budder to keep the tattoo moisturized and protected."
+                  "text": "Apply a thin layer of fragrance-free, natural aftercare like Blue Dream Budder 2-3 times daily to keep the tattoo moisturized and protected. Wash hands before application and use a rice-grain-sized amount to avoid over-application."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Is CBD safe for tattoo aftercare?",
+                "name": "How do I use Blue Dream Budder on a new tattoo?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes. CBD has soothing and anti-inflammatory properties, making it safe for most tattoos when applied in a clean, topical balm."
+                  "text": "Apply a thin layer to clean, dry skin 2-3 times daily. Gently massage until absorbed. Use for 2-4 weeks or until fully healed. Always wash hands before application."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is Blue Dream Budder safe for sensitive skin?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Blue Dream Budder is made with all-natural ingredients and is gentle enough for sensitive skin. A patch test before first use is recommended for those with known allergies."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What makes Blue Dream Budder different from other tattoo aftercare products?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Blue Dream Budder combines natural healing ingredients with premium natural butters and botanical oils. This reduces inflammation, provides comfort, and promotes faster healing naturally — without harsh chemicals or synthetic additives."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I use Blue Dream Budder on old tattoos?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Absolutely. Blue Dream Budder is excellent for maintaining and revitalizing older tattoos. The natural moisturizers help keep colors vibrant and skin healthy long after the initial healing phase."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Are natural butters good for tattoo aftercare?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Natural butters like shea and mango are widely used in tattoo aftercare for their anti-inflammatory and deep-moisturizing properties. They absorb without clogging pores when applied in thin layers."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How long does shipping take?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Standard shipping takes 3-5 business days. Expedited shipping (1-2 business days) is available at checkout. Orders over $50 qualify for free standard shipping."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What is the return policy for Blue Dream Budder?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Blue Dream Budder offers a 30-day satisfaction guarantee. If you're not completely satisfied, contact us for a full refund or exchange. Product must be in original condition."
                 }
               }
             ]

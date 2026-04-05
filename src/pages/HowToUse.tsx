@@ -1,8 +1,68 @@
 
+import { Helmet } from "react-helmet-async";
 import ContentPage from "@/components/ContentPage";
 
 const HowToUse = () => {
   return (
+    <>
+    <Helmet>
+      <title>How to Use Blue Dream Budder | Tattoo Aftercare Instructions</title>
+      <meta name="description" content="Step-by-step instructions for applying Blue Dream Budder tattoo aftercare. Learn how much to use, how often to apply, and pro tips for optimal healing." />
+      <link rel="canonical" href="https://bluedreambudder.com/how-to-use" />
+      <meta property="og:title" content="How to Use Blue Dream Budder | Tattoo Aftercare Instructions" />
+      <meta property="og:description" content="Apply a thin layer 2-3 times daily for optimal tattoo healing. Full step-by-step guide inside." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://bluedreambudder.com/how-to-use" />
+      <meta property="og:image" content="https://bluedreambudder.com/images/invoice-logo-bw.jpeg" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="How to Use Blue Dream Budder | Tattoo Aftercare Instructions" />
+      <meta name="twitter:description" content="Apply a thin layer 2-3 times daily for optimal tattoo healing. Full step-by-step guide inside." />
+      <meta name="twitter:image" content="https://bluedreambudder.com/images/invoice-logo-bw.jpeg" />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HowTo",
+          "name": "How to Use Blue Dream Budder for Tattoo Aftercare",
+          "description": "Step-by-step guide for applying Blue Dream Budder to a new or healing tattoo for optimal results.",
+          "totalTime": "PT5M",
+          "supply": [
+            { "@type": "HowToSupply", "name": "Blue Dream Budder tattoo aftercare balm" },
+            { "@type": "HowToSupply", "name": "Antibacterial soap" },
+            { "@type": "HowToSupply", "name": "Clean towel or paper towel" }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "name": "Clean Your Hands",
+              "text": "Wash your hands thoroughly with antibacterial soap before applying any aftercare product. This prevents infection and contamination of the healing tattoo.",
+              "url": "https://bluedreambudder.com/how-to-use#step1"
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "name": "Apply a Thin Layer",
+              "text": "Take a small amount (about the size of a grain of rice) and gently massage it into your skin. A little goes a long way — over-application can clog pores and slow healing.",
+              "url": "https://bluedreambudder.com/how-to-use#step2"
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "name": "Apply at the Right Frequency",
+              "text": "For fresh tattoos: apply 2-3 times daily for the first week, then as needed. For general skincare: apply once daily or as needed for moisturization.",
+              "url": "https://bluedreambudder.com/how-to-use#step3"
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "name": "Store Properly",
+              "text": "Store Blue Dream Budder in a cool, dry place away from direct sunlight. The natural ingredients may solidify in cold temperatures — simply warm between your hands before use.",
+              "url": "https://bluedreambudder.com/how-to-use#step4"
+            }
+          ]
+        })}
+      </script>
+    </Helmet>
     <ContentPage title="How to Use Blue Dream Budder">
       <div className="space-y-8">
         <p className="text-lg text-gray-600">
@@ -54,6 +114,7 @@ const HowToUse = () => {
         </div>
       </div>
     </ContentPage>
+    </>
   );
 };
 
