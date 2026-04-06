@@ -5,6 +5,13 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# IndexNow key file — must come BEFORE catch-all
+[[redirects]]
+  from = "/12dbf76fd0b345e233e11ab7b16adba3.txt"
+  to = "/12dbf76fd0b345e233e11ab7b16adba3.txt"
+  status = 200
+  force = true
+
 # SPA fallback — all routes serve index.html
 [[redirects]]
   from = "/*"
