@@ -19,18 +19,12 @@ const HeroContent = ({ onShopNowClick, onDiscountClick }: HeroContentProps) => {
         <div className="text-left max-w-4xl">
           {/* Main Headline - Multi-line with cyan highlights */}
           <div className="space-y-1 mb-8">
-            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
-              <span className="text-cyan-400">Heal</span>
+            <h1 className="font-orbitron font-bold tracking-tight leading-none">
+              <span className="block text-4xl sm:text-6xl lg:text-8xl xl:text-9xl text-cyan-400">Heal</span>
+              <span className="block text-4xl sm:text-6xl lg:text-8xl xl:text-9xl text-cyan-400">Smarter.</span>
+              <span className="block text-4xl sm:text-6xl lg:text-8xl xl:text-9xl text-white">Ink Brighter</span>
+              <span className="block text-4xl sm:text-6xl lg:text-8xl xl:text-9xl text-cyan-400">Last Longer</span>
             </h1>
-            <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
-              <span className="text-cyan-400">Smarter.</span>
-            </h1>
-          <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
-            <span className="text-white">Ink Brighter</span>
-          </h1>
-          <h1 className="font-orbitron text-4xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
-            <span className="text-cyan-400">Last Longer</span>
-          </h1>
           </div>
           
           <p className="font-inter text-xl lg:text-2xl text-gray-300 max-w-xl leading-relaxed mb-10">
